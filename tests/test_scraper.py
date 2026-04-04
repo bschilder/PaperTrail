@@ -25,5 +25,5 @@ def test_clean_text():
 
 def test_ts_to_date():
     """Test timestamp to date conversion."""
-    assert SlackScraper._ts_to_date("1770330392.065239") == "2026-02-06"
+    assert SlackScraper._ts_to_date("1770330392.065239") == "2026-02-05"
     assert SlackScraper._ts_to_date("invalid") == ""
