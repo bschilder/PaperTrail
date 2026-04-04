@@ -32,6 +32,7 @@ papertrail scrape -o papers_raw.json
 ```
 
 This will:
+
 - Connect to your Slack workspace
 - Scan all channels for paper links (DOI, arXiv, bioRxiv, PubMed, etc.)
 - Track engagement (reactions, thread replies, etc.)
@@ -53,6 +54,7 @@ papertrail enrich papers_raw.json -o papers_enriched.json
 ```
 
 This will:
+
 - Look up each paper by DOI or URL
 - Fetch title, authors, abstract, journal, year, citations
 - Get institutional affiliations
@@ -73,6 +75,7 @@ papertrail embed papers_enriched.json -o papers_final.json --backend openai
 ```
 
 This will:
+
 - Embed paper abstracts using your chosen backend
 - Compute UMAP/t-SNE/PCA 2D projections
 - Cluster papers using k-means
@@ -117,6 +120,7 @@ papertrail build papers_final.json -o dashboard.html
 ```
 
 This will:
+
 - Generate a self-contained HTML file
 - Include table view with all papers
 - Add d3.js scatter plot with 2D embedding map
@@ -185,6 +189,7 @@ See [Configuration](configuration.md) for details.
 ### Error: `No papers found`
 
 Check that:
+
 - Your Slack token is valid
 - Your bot has permission to read channels
 - Papers have been shared in your workspace (check a channel manually)
@@ -193,6 +198,7 @@ Check that:
 ### Error: `Embedding failed`
 
 Check:
+
 - Your embedding backend token is set (`OPENAI_API_KEY` or `HF_TOKEN`)
 - You have internet connection
 - API rate limits aren't exceeded (try adding `--delay 1.0`)
@@ -201,6 +207,7 @@ Check:
 ### Error: `Build failed`
 
 Check:
+
 - Input file `papers_final.json` exists and is valid
 - You have write permission in the output directory
 - Disk has enough space for HTML file
@@ -208,6 +215,7 @@ Check:
 ### Papers are missing
 
 If you expect more papers, check:
+
 - Bot can read all channels (not just public ones)
 - Bot was added to private channels
 - Papers have recognizable URLs (DOI, arXiv, bioRxiv, PubMed)

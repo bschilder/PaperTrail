@@ -71,6 +71,7 @@ Click a row to open the detail panel.
 - **Pan**: Click and drag to move around
 
 **Color by** dropdown to switch coloring:
+
 - **Cluster**: k-means clusters (auto-computed)
 - **Channel**: Slack channel
 - **User**: Who shared it
@@ -79,6 +80,7 @@ Click a row to open the detail panel.
 - **Citations**: Citation count gradient
 
 **Projection** dropdown to switch 2D projections:
+
 - **UMAP** (recommended)
 - **t-SNE**
 - **PCA**
@@ -86,6 +88,7 @@ Click a row to open the detail panel.
 ### Detail Panel
 
 Click a paper to see:
+
 - Full title and authors
 - Abstract
 - Journal, year, citation count
@@ -192,6 +195,7 @@ git push
 ### Google Drive / Dropbox
 
 Simply upload the HTML file. These services will:
+
 - Serve it directly
 - Allow sharing via link
 - Work in all browsers
@@ -263,6 +267,7 @@ const searchWeights = {
 ### Browser Optimization
 
 For very large datasets (20,000+ papers):
+
 - Use Chrome/Edge (faster d3.js rendering)
 - Close other tabs
 - Increase browser memory: `--max-old-space-size=4096`
@@ -276,6 +281,7 @@ ls -lh dashboard.html
 ```
 
 Typical sizes:
+
 - 100 papers: 2-5 MB
 - 1,000 papers: 20-50 MB
 - 10,000 papers: 200-500 MB
@@ -374,6 +380,7 @@ document.addEventListener("search", (e) => {
 ### Dashboard is slow
 
 Check:
+
 - File size (compress if >200MB)
 - Number of papers (UMAP is slower for 10,000+)
 - Browser (use Chrome/Edge)
@@ -382,6 +389,7 @@ Check:
 ### Search returns no results
 
 Check:
+
 - Papers have abstracts (required for search)
 - Query words are spelled correctly
 - Try shorter queries ("deep learning" vs "distributed deep learning systems")
@@ -389,6 +397,7 @@ Check:
 ### Maps doesn't show
 
 Check:
+
 - Papers have embeddings (required)
 - Projection was computed (--projections umap)
 - Browser JavaScript is enabled
@@ -404,6 +413,7 @@ Solutions:
 ### Colors don't match expectations
 
 Check:
+
 - Coloring dropdown is set correctly
 - Papers have required metadata (channel, date, etc.)
 - Color palette is appropriate for your data

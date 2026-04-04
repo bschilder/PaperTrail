@@ -447,6 +447,7 @@ papertrail embed papers.json -o papers_final.json --delay 2.0
 ### Embeddings seem low quality
 
 Check:
+
 - You're using the right backend (OpenAI is best)
 - Papers have abstracts (required for good embeddings)
 - Text is in English (models are trained on English)

@@ -177,6 +177,7 @@ The scraper detects papers from these sources:
 ### No Papers Found
 
 Check that:
+
 - Your bot token is valid and has proper scopes
 - Bot was added to channels
 - Papers have shareable links
@@ -210,6 +211,7 @@ with open("papers_raw_unique.json", "w") as f:
 ### Missing User Information
 
 If user information isn't populated, check:
+
 - Bot has `users:read` scope
 - Workspace has those users
 - Users aren't deactivated
@@ -217,6 +219,7 @@ If user information isn't populated, check:
 ### Rate Limits
 
 Slack API has rate limits. If you hit them, PaperTrail will:
+
 - Automatically retry with exponential backoff
 - Show a warning
 - Continue with available data

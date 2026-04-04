@@ -45,6 +45,7 @@ git checkout -b feature/your-feature-name
 ```
 
 Use descriptive names:
+
 - `feature/add-bge-embeddings`
 - `fix/handle-missing-dois`
 - `docs/improve-quickstart`
@@ -147,6 +148,7 @@ git commit -m "Add feature: description of changes"
 ```
 
 Write good commit messages:
+
 - First line: short summary (50 chars max)
 - Blank line
 - Detailed explanation (if needed)
@@ -174,6 +176,7 @@ git push origin feature/your-feature-name
 ```
 
 Then open a Pull Request on GitHub. Include:
+
 - Description of changes
 - Why they're needed
 - Any breaking changes

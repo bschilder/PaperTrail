@@ -167,6 +167,7 @@ This will validate your Slack token without downloading data.
 **For production deployments:**
 
 Use a secrets management system like:
+
 - [HashiCorp Vault](https://www.vaultproject.io/)
 - [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/)
 - [GitHub Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) (for CI/CD)
@@ -214,6 +215,7 @@ echo $SLACK_BOT_TOKEN
 ### Error: `Invalid Slack token`
 
 Check that your token is correct and still valid. Tokens can be revoked if:
+
 - You reinstalled the app
 - The app was uninstalled from your workspace
 - The workspace regenerated tokens

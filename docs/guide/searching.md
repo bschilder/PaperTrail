@@ -310,6 +310,7 @@ Similarity scores range from 0 (no match) to 1 (perfect match):
 - **<0.5**: Weak relevance
 
 Thresholds vary by embedding backend:
+
 - **OpenAI**: Generally higher scores (more discriminative)
 - **HuggingFace**: Mid-range scores
 - **Local**: Lower scores (less discriminative)
@@ -364,6 +365,7 @@ The in-browser search uses the embedded FAISS index, so results are instant even
 ### Search returns no results
 
 Check:
+
 - Papers have embeddings (required)
 - Query words are spelled correctly
 - Try simpler/shorter query
@@ -372,6 +374,7 @@ Check:
 ### Search is slow
 
 Check:
+
 - FAISS index is loaded
 - Not doing computation on very large dataset (10,000+ papers)
 - Try reducing top_k (fewer results to compute)
@@ -379,6 +382,7 @@ Check:
 ### Search results seem irrelevant
 
 Try:
+
 - Different query (be more specific)
 - Different backend (OpenAI has best quality)
 - Check if papers have abstracts (needed for good search)

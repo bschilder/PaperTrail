@@ -140,6 +140,7 @@ papertrail enrich papers_raw.json -o papers_enriched.json \
 ### Papers Without Metadata
 
 If a paper isn't found, the enricher:
+
 - Logs a warning
 - Leaves fields as `null` or empty arrays
 - Continues with other papers
@@ -165,10 +166,12 @@ with open("papers_enriched_filtered.json", "w") as f:
 ### Rate Limiting
 
 Semantic Scholar and OpenAlex have rate limits:
+
 - **Semantic Scholar**: ~100 requests/second
 - **OpenAlex**: ~10 requests/second
 
 If you hit limits, PaperTrail will:
+
 - Automatically wait and retry
 - Show a warning
 - Continue with other papers
@@ -182,6 +185,7 @@ papertrail enrich papers_raw.json -o papers_enriched.json --delay 0.5
 ### Missing Authors or Institutions
 
 Some papers may have partial author information. This is normal for:
+
 - Very old papers
 - Non-traditional publications
 - Papers with privacy restrictions

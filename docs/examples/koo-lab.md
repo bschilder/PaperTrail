@@ -33,6 +33,7 @@ PaperTrail was built to solve this. Here's how the lab uses it:
 ### 1. Create Slack Bot
 
 Lab admin created a bot in Slack with these scopes:
+
 - `channels:history` — Read message history
 - `channels:read` — List channels
 - `users:read` — Get user information
@@ -203,6 +204,7 @@ Run monthly (or weekly) on a schedule:
 ### 3. Share Results
 
 Make the dashboard easily accessible:
+
 - Host on your lab website
 - Share link in Slack
 - Include in lab newsletter
@@ -211,6 +213,7 @@ Make the dashboard easily accessible:
 ### 4. Gather Feedback
 
 Ask lab members:
+
 - Is the dashboard useful?
 - Missing features?
 - Different visualizations?
@@ -248,6 +251,7 @@ Make sure bot was invited to all channels. In Slack:
 ### Missing papers
 
 Check:
+
 - Papers have shareable links
 - Bot was added before papers were shared
 - Look at scraper verbose output: `papertrail scrape -v`
@@ -255,6 +259,7 @@ Check:
 ### Dashboard is slow
 
 If you have 500+ papers:
+
 - Compress: `--compress`
 - Use PCA projection instead of UMAP
 - Split into multiple dashboards by channel
@@ -286,6 +291,7 @@ The Koo Lab has found PaperTrail valuable for:
 ## Questions?
 
 For issues or feature requests:
+
 - [GitHub Issues](https://github.com/bschilder/PaperTrail/issues)
 - [Email](mailto:bschilder@cshl.edu)
 
