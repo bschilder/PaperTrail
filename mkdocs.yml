@@ -1,0 +1,94 @@
+site_name: PaperTrail
+site_url: https://bschilder.github.io/PaperTrail
+site_description: Scrape, enrich, embed, and visualize papers shared in Slack
+site_author: Brian Schilder
+repo_url: https://github.com/bschilder/PaperTrail
+repo_name: bschilder/PaperTrail
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+  font:
+    text: Inter
+    code: JetBrains Mono
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Configuration: getting-started/configuration.md
+    - Quick Start: getting-started/quickstart.md
+  - User Guide:
+    - Scraping Papers: guide/scraping.md
+    - Enriching Metadata: guide/enriching.md
+    - Computing Embeddings: guide/embeddings.md
+    - Building the Dashboard: guide/dashboard.md
+    - Searching Papers: guide/searching.md
+  - API Reference:
+    - Scraper: api/scraper.md
+    - Enricher: api/enricher.md
+    - Embeddings: api/embeddings.md
+    - Projections: api/projections.md
+    - CLI: api/cli.md
+  - Examples:
+    - Koo Lab Demo: examples/koo-lab.md
+  - Contributing: contributing.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/bschilder/PaperTrail

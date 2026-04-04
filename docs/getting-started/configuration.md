@@ -1,0 +1,249 @@
+# Configuration
+
+Before running PaperTrail, you need to configure API tokens and environment variables.
+
+## Required Credentials
+
+### Slack Bot Token
+
+PaperTrail reads papers from your Slack workspace using the Slack Bot API.
+
+**To create a Slack bot:**
+
+1. Go to [api.slack.com/apps](https://api.slack.com/apps)
+2. Click "Create New App" → "From scratch"
+3. Give it a name (e.g., "PaperTrail") and select your workspace
+4. Go to **OAuth & Permissions**
+5. Under **Scopes**, add these bot token scopes:
+   - `channels:history`
+   - `channels:read`
+   - `users:read`
+   - `reactions:read`
+
+6. Go to **Install App** and click "Install to Workspace"
+7. Copy the **Bot User OAuth Token** (starts with `xoxb-`)
+
+```bash
+export SLACK_BOT_TOKEN="xoxb-your-token-here"
+```
+
+### Embedding Backend Token
+
+Choose one embedding backend and set its API key:
+
+=== "OpenAI (recommended)"
+    Get your API key from [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+
+    ```bash
+    export OPENAI_API_KEY="sk-..."
+    ```
+
+=== "HuggingFace"
+    Get your API token from [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+
+    ```bash
+    export HF_TOKEN="hf_..."
+    ```
+
+=== "Local (no key needed)"
+    Local embeddings don't require an API key:
+
+    ```bash
+    # No setup needed!
+    ```
+
+## Optional Configuration
+
+### Semantic Scholar / OpenAlex
+
+Metadata enrichment uses Semantic Scholar and OpenAlex APIs, which are free and don't require authentication. However, you can optionally add API keys for higher rate limits:
+
+```bash
+# Not required, but improves rate limits
+export SEMANTIC_SCHOLAR_API_KEY="your-key-here"
+export OPENALEX_API_KEY="your-key-here"
+```
+
+### Custom Enrichment APIs
+
+If you want to use custom metadata sources:
+
+```bash
+export CUSTOM_METADATA_API="https://your-api.example.com"
+```
+
+## Environment Setup
+
+### Quick Setup (Recommended)
+
+Create a `.env` file in your project directory:
+
+```bash
+cat > .env << EOF
+SLACK_BOT_TOKEN=xoxb-your-token-here
+OPENAI_API_KEY=sk-...
+EOF
+```
+
+Then load it before running PaperTrail:
+
+```bash
+set -a
+source .env
+set +a
+```
+
+Or use a tool like `python-dotenv`:
+
+```python
+from dotenv import load_dotenv
+load_dotenv()
+```
+
+### Per-Session Setup
+
+Set variables directly in your shell session:
+
+```bash
+export SLACK_BOT_TOKEN="xoxb-your-token-here"
+export OPENAI_API_KEY="sk-..."
+```
+
+### Persistent Setup
+
+Add to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.):
+
+```bash
+export SLACK_BOT_TOKEN="xoxb-your-token-here"
+export OPENAI_API_KEY="sk-..."
+```
+
+Then reload your shell:
+
+```bash
+source ~/.bashrc  # or ~/.zshrc
+```
+
+## Verify Configuration
+
+Check that your credentials are set:
+
+```bash
+# Check all required env vars
+python3 << 'EOF'
+import os
+required = ["SLACK_BOT_TOKEN", "OPENAI_API_KEY"]  # or HF_TOKEN or neither for local
+for var in required:
+    value = os.getenv(var, "NOT SET")
+    print(f"{var}: {value[:20]}..." if value != "NOT SET" else f"{var}: NOT SET")
+EOF
+```
+
+Or test with the scraper:
+
+```bash
+papertrail scrape --dry-run
+```
+
+This will validate your Slack token without downloading data.
+
+## Security Best Practices
+
+!!!warning
+    Never commit API keys to version control. Always use environment variables or `.env` files that are ignored by git.
+
+**Good practices:**
+
+- Add `.env` to `.gitignore`:
+  ```bash
+  echo ".env" >> .gitignore
+  ```
+
+- Use restricted API tokens with minimal scopes
+- Rotate tokens regularly
+- Use different tokens for development vs. production
+- Store tokens in a password manager or secrets management system
+
+**For production deployments:**
+
+Use a secrets management system like:
+- [HashiCorp Vault](https://www.vaultproject.io/)
+- [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/)
+- [GitHub Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) (for CI/CD)
+- [Docker Secrets](https://docs.docker.com/engine/swarm/secrets/) (for containers)
+
+## Embedding Backend Selection
+
+PaperTrail auto-detects your embedding backend based on available credentials:
+
+1. **OpenAI** — If `OPENAI_API_KEY` is set
+2. **HuggingFace** — If `HF_TOKEN` is set (and OpenAI is not)
+3. **Local** — Otherwise (no API keys required)
+
+### Force a Specific Backend
+
+Override auto-detection with the `--backend` flag:
+
+```bash
+# Force OpenAI
+papertrail embed papers.json --backend openai
+
+# Force HuggingFace
+papertrail embed papers.json --backend huggingface
+
+# Force local
+papertrail embed papers.json --backend local
+```
+
+## Troubleshooting
+
+### Error: `SLACK_BOT_TOKEN not found`
+
+Make sure you set the environment variable:
+
+```bash
+export SLACK_BOT_TOKEN="xoxb-..."
+```
+
+Verify it's set:
+
+```bash
+echo $SLACK_BOT_TOKEN
+```
+
+### Error: `Invalid Slack token`
+
+Check that your token is correct and still valid. Tokens can be revoked if:
+- You reinstalled the app
+- The app was uninstalled from your workspace
+- The workspace regenerated tokens
+
+Create a new token and try again.
+
+### Error: `OPENAI_API_KEY not found` (but I set it)
+
+Make sure you exported the variable (not just assigned it):
+
+```bash
+export OPENAI_API_KEY="sk-..."  # Correct
+OPENAI_API_KEY="sk-..."          # Won't work!
+```
+
+### Error: `Failed to download embeddings`
+
+Check your internet connection and API rate limits. OpenAI and HuggingFace have rate limits:
+
+- **OpenAI**: 3,500 requests/minute for most accounts
+- **HuggingFace**: Varies by account tier
+
+If you hit rate limits, add delays between requests:
+
+```bash
+papertrail embed papers.json --delay 1.0  # 1 second delay between requests
+```
+
+## Next Steps
+
+- **[Quick Start](quickstart.md)** — Run the pipeline
+- **[Scraping Papers](../guide/scraping.md)** — Learn about the scraper
+- **[Computing Embeddings](../guide/embeddings.md)** — Embedding details and options

@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data (don't commit large data files)
+*.faiss
+faiss_index/
+papers_raw.json
+papers_enriched.json
+papers_embedded.json
+papers_final.json
+
+# Keep example data
+!data/example_papers.json
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# mkdocs build output
+site/
+
+# Jupyter
+.ipynb_checkpoints/

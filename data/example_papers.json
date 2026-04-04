@@ -1,0 +1,102 @@
+{
+  "papers": [
+    {
+      "id": 1,
+      "channel": "papers-genomics",
+      "shared_by": "Alice",
+      "date": "2026-02-05",
+      "url": "https://doi.org/10.1101/example1",
+      "title": "Deep Learning for Regulatory Genomics",
+      "authors": [
+        "Smith J",
+        "Doe A"
+      ],
+      "year": 2026,
+      "journal": "Nature Methods",
+      "abstract": "We present a deep learning approach...",
+      "reactions_count": 4,
+      "replies_count": 2,
+      "projections": {
+        "umap": [
+          1.0,
+          2.0
+        ],
+        "tsne": [
+          -5.0,
+          3.0
+        ],
+        "pca": [
+          0.1,
+          -0.2
+        ]
+      },
+      "cluster_id": 0,
+      "cluster_label": "Genomics / Deep Learning"
+    },
+    {
+      "id": 2,
+      "channel": "papers-dl",
+      "shared_by": "Bob",
+      "date": "2026-01-15",
+      "url": "https://arxiv.org/abs/2601.00001",
+      "title": "Attention Is Still All You Need",
+      "authors": [
+        "Johnson B"
+      ],
+      "year": 2026,
+      "journal": "NeurIPS",
+      "abstract": "We revisit transformer architectures...",
+      "reactions_count": 7,
+      "replies_count": 3,
+      "projections": {
+        "umap": [
+          3.0,
+          -1.0
+        ],
+        "tsne": [
+          2.0,
+          -4.0
+        ],
+        "pca": [
+          -0.3,
+          0.1
+        ]
+      },
+      "cluster_id": 1,
+      "cluster_label": "Deep Learning / Transformers"
+    },
+    {
+      "id": 3,
+      "channel": "papers-protein",
+      "shared_by": "Charlie",
+      "date": "2026-03-01",
+      "url": "https://doi.org/10.1101/example3",
+      "title": "Protein Language Models for Drug Design",
+      "authors": [
+        "Lee C",
+        "Wang D"
+      ],
+      "year": 2026,
+      "journal": "Science",
+      "abstract": "Protein language models enable...",
+      "reactions_count": 2,
+      "replies_count": 0,
+      "projections": {
+        "umap": [
+          -2.0,
+          4.0
+        ],
+        "tsne": [
+          6.0,
+          1.0
+        ],
+        "pca": [
+          0.4,
+          0.3
+        ]
+      },
+      "cluster_id": 2,
+      "cluster_label": "Protein / Drug Design"
+    }
+  ]
+}
