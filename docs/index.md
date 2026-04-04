@@ -1,6 +1,6 @@
 # PaperTrail
 
-**Scrape, enrich, embed, and visualize papers shared in Slack.**
+**Every paper your team shares — found and mapped.**
 
 PaperTrail automatically discovers papers shared across your Slack workspace, enriches them with metadata from Semantic Scholar and OpenAlex, computes semantic embeddings, and serves an interactive dashboard with table view, 2D embedding map, and semantic search.
 

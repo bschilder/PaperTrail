@@ -1,6 +1,6 @@
 site_name: PaperTrail
 site_url: https://bschilder.github.io/PaperTrail
-site_description: Scrape, enrich, embed, and visualize papers shared in Slack
+site_description: Every paper your team shares — found and mapped.
 site_author: Brian Schilder
 repo_url: https://github.com/bschilder/PaperTrail
 repo_name: bschilder/PaperTrail

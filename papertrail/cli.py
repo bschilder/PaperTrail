@@ -1,6 +1,5 @@
 """
-PaperTrail CLI — command-line interface for scraping, enriching,
-embedding, and visualizing papers from Slack.
+PaperTrail CLI — Every paper your team shares, found and mapped.
 """
 
 from __future__ import annotations
@@ -21,7 +20,7 @@ logger = logging.getLogger("papertrail")
 @click.version_option(version=__version__)
 @click.option("--verbose", "-v", is_flag=True, help="Enable debug logging.")
 def main(verbose: bool) -> None:
-    """PaperTrail — Scrape, enrich, embed, and visualize papers from Slack."""
+    """PaperTrail — Every paper your team shares, found and mapped."""
     level = logging.DEBUG if verbose else logging.INFO
     logging.basicConfig(level=level, format="%(levelname)s: %(message)s")
 
