@@ -1,0 +1,217 @@
+/* ==========================================================================
+   PaperTrail Documentation — Custom Theme
+   Aesthetic: Clean, technical, dark-first (inspired by PyTorch / RTD / GenVarLoader)
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   Color palette — Custom brand colors
+   --------------------------------------------------------------------------- */
+
+/* Light mode */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color:        #2b2b2b;
+  --md-primary-fg-color--light: #4a4a4a;
+  --md-primary-fg-color--dark:  #1a1a1a;
+  --md-accent-fg-color:         #2196f3;
+  --md-accent-fg-color--transparent: rgba(33, 150, 243, 0.1);
+
+  /* Softer background (not pure white) */
+  --md-default-bg-color:        #fafafa;
+  --md-default-bg-color--light: #ffffff;
+
+  /* Code blocks */
+  --md-code-bg-color:           #f5f5f5;
+  --md-code-fg-color:           #37474f;
+
+  /* Sidebar */
+  --md-sidebar-bg-color:        #ffffff;
+}
+
+/* Dark mode (default — slate) */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color:        #e0e0e0;
+  --md-primary-fg-color--light: #f0f0f0;
+  --md-primary-fg-color--dark:  #b0b0b0;
+  --md-accent-fg-color:         #64b5f6;
+  --md-accent-fg-color--transparent: rgba(100, 181, 246, 0.1);
+
+  /* Deep dark background (PyTorch-like) */
+  --md-default-bg-color:        #1a1a2e;
+  --md-default-bg-color--light: #16213e;
+
+  /* Code blocks — slightly lighter than background */
+  --md-code-bg-color:           #0f3460;
+  --md-code-fg-color:           #e2e8f0;
+
+  /* Sidebar */
+  --md-sidebar-bg-color:        #16213e;
+
+  /* Header */
+  --md-primary-bg-color:        #0f3460;
+
+  /* Typeset links */
+  --md-typeset-a-color:         #64b5f6;
+}
+
+
+/* ---------------------------------------------------------------------------
+   Typography refinements
+   --------------------------------------------------------------------------- */
+
+.md-typeset {
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+
+.md-typeset h1 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.md-typeset h2 {
+  font-weight: 600;
+  margin-top: 2em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.md-typeset h3 {
+  font-weight: 600;
+}
+
+
+/* ---------------------------------------------------------------------------
+   Code blocks — clean, readable
+   --------------------------------------------------------------------------- */
+
+.md-typeset code {
+  font-size: 0.82em;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+.md-typeset pre {
+  border-radius: 8px;
+  line-height: 1.6;
+}
+
+.md-typeset pre > code {
+  font-size: 0.8em;
+}
+
+/* Syntax highlight line numbers */
+.md-typeset .highlight .linenums {
+  padding-left: 0;
+}
+
+
+/* ---------------------------------------------------------------------------
+   Tables — cleaner borders
+   --------------------------------------------------------------------------- */
+
+.md-typeset table:not([class]) {
+  font-size: 0.78rem;
+  border-collapse: collapse;
+}
+
+.md-typeset table:not([class]) th {
+  font-weight: 600;
+  text-transform: none;
+  background-color: var(--md-code-bg-color);
+}
+
+.md-typeset table:not([class]) td,
+.md-typeset table:not([class]) th {
+  padding: 0.6em 1em;
+  border: 1px solid var(--md-default-fg-color--lightest);
+}
+
+
+/* ---------------------------------------------------------------------------
+   Navigation — sidebar
+   --------------------------------------------------------------------------- */
+
+/* Tighter sidebar items */
+.md-nav__item {
+  padding: 0;
+}
+
+.md-nav__link {
+  font-size: 0.78rem;
+}
+
+/* Active link highlight */
+.md-nav__link--active {
+  font-weight: 600;
+}
+
+
+/* ---------------------------------------------------------------------------
+   Header — cleaner top bar
+   --------------------------------------------------------------------------- */
+
+.md-header {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+[data-md-color-scheme="slate"] .md-header {
+  background-color: var(--md-primary-bg-color);
+}
+
+
+/* ---------------------------------------------------------------------------
+   Admonitions
+   --------------------------------------------------------------------------- */
+
+.md-typeset .admonition,
+.md-typeset details {
+  border-radius: 6px;
+  font-size: 0.82rem;
+}
+
+
+/* ---------------------------------------------------------------------------
+   API reference — mkdocstrings
+   --------------------------------------------------------------------------- */
+
+/* Function/class signatures */
+.doc-heading code {
+  font-size: 0.9em;
+}
+
+/* Parameter tables in API docs */
+.doc-contents .field-list dt {
+  font-weight: 600;
+}
+
+/* Separator between members */
+.doc-object:not(:last-child) {
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  padding-bottom: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+/* Source badge styling */
+.doc-label--property {
+  font-size: 0.7em;
+}
+
+
+/* ---------------------------------------------------------------------------
+   Footer — subtle
+   --------------------------------------------------------------------------- */
+
+.md-footer {
+  margin-top: 3em;
+}
+
+
+/* ---------------------------------------------------------------------------
+   Responsive tweaks
+   --------------------------------------------------------------------------- */
+
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--primary {
+    width: 13rem;
+  }
+}

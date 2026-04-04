@@ -7,32 +7,49 @@ repo_name: bschilder/PaperTrail
 
 theme:
   name: material
+  custom_dir: docs/overrides
   palette:
+    # Dark mode first (matches PyTorch/RTD aesthetic)
+    - media: "(prefers-color-scheme)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: blue
-      accent: amber
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: blue
-      accent: amber
+      primary: custom
+      accent: custom
       toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
+        icon: material/brightness-2
+        name: Switch to system preference
   features:
     - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
     - navigation.expand
     - navigation.top
+    - navigation.indexes
+    - navigation.path
     - search.suggest
     - search.highlight
+    - search.share
     - content.code.copy
+    - content.code.annotate
     - content.tabs.link
+    - toc.follow
+    - header.autohide
   icon:
     repo: fontawesome/brands/github
+    logo: material/book-open-page-variant
   font:
     text: Inter
     code: JetBrains Mono
@@ -40,11 +57,25 @@ theme:
 plugins:
   - search
   - mkdocstrings:
+      default_handler: python
       handlers:
         python:
           options:
-            show_source: true
+            show_source: false
             show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            heading_level: 2
+            members_order: source
+            docstring_style: numpy
+            docstring_section_style: spacy
+            merge_init_into_class: true
+            show_signature_annotations: true
+            separate_signature: true
+            signature_crossrefs: true
+            show_if_no_docstring: false
+            annotations_path: brief
 
 markdown_extensions:
   - admonition
@@ -58,13 +89,18 @@ markdown_extensions:
       alternate_style: true
   - pymdownx.highlight:
       anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
+  - pymdownx.arithmatex:
+      generic: true
   - attr_list
   - md_in_html
   - tables
   - toc:
       permalink: true
+      toc_depth: 3
 
 nav:
   - Home: index.md
@@ -79,10 +115,12 @@ nav:
     - Building the Dashboard: guide/dashboard.md
     - Searching Papers: guide/searching.md
   - API Reference:
+    - Data: api/data.md
     - Scraper: api/scraper.md
     - Enricher: api/enricher.md
     - Embeddings: api/embeddings.md
     - Projections: api/projections.md
+    - Preview: api/preview.md
     - CLI: api/cli.md
   - Examples:
     - Koo Lab Demo: examples/koo-lab.md
@@ -92,3 +130,8 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/bschilder/PaperTrail
+  version:
+    provider: mike
+
+extra_css:
+  - stylesheets/extra.css

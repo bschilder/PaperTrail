@@ -183,5 +183,31 @@ def search(query: str, faiss_dir: str, top_k: int, backend: str | None) -> None:
         click.echo(f"   {r.get('url', '')}")
 
 
+@main.command()
+@click.option("--tag", default=None, help="Release tag (default: latest).")
+@click.option("--data-dir", default=None, help="Download directory.")
+@click.option("--force", is_flag=True, help="Re-download existing files.")
+def download(tag: str | None, data_dir: str | None, force: bool) -> None:
+    """Download paper data from a GitHub Release."""
+    from papertrail.data import download_release
+
+    dest = download_release(tag=tag, data_dir=data_dir, force=force)
+    click.echo(f"Data downloaded → {dest}")
+
+
+@main.command()
+def releases() -> None:
+    """List available data releases on GitHub."""
+    from papertrail.data import list_releases
+
+    rels = list_releases()
+    if not rels:
+        click.echo("No data releases found.")
+        return
+    for r in rels:
+        n_assets = len(r["assets"])
+        click.echo(f"  {r['tag']}  ({r['date']})  {n_assets} assets  {r['description']}")
+
+
 if __name__ == "__main__":
     main()
