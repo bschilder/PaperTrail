@@ -86,7 +86,7 @@ def enrich(input_file: str, output: str) -> None:
 @click.option("--output", "-o", default="papers_embedded.json", help="Output JSON path.")
 @click.option(
     "--backend",
-    type=click.Choice(["openai", "huggingface", "local"]),
+    type=click.Choice(["openai", "huggingface", "local", "tfidf"]),
     default=None,
     help="Embedding backend (auto-detected if omitted).",
 )

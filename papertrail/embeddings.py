@@ -5,6 +5,7 @@ Supported backends (in order of recommendation):
   1. OpenAI  (text-embedding-3-small) — fast, high quality, remote
   2. HuggingFace Inference API        — free tier, remote
   3. fastembed (local ONNX)            — offline fallback
+  4. tfidf   (scikit-learn TF-IDF + SVD) — lightweight, no API keys needed
 
 Embeddings are stored in a FAISS index for fast similarity search.
 """
@@ -25,12 +26,13 @@ logger = logging.getLogger(__name__)
 # Backend registry
 # ---------------------------------------------------------------------------
 
-Backend = Literal["openai", "huggingface", "local"]
+Backend = Literal["openai", "huggingface", "local", "tfidf"]
 
 DEFAULT_MODELS: dict[Backend, str] = {
     "openai": "text-embedding-3-small",
     "huggingface": "BAAI/bge-small-en-v1.5",
     "local": "BAAI/bge-small-en-v1.5",
+    "tfidf": "tfidf-svd-128",
 }
 
 DIMENSIONS: dict[str, int] = {
@@ -40,11 +42,16 @@ DIMENSIONS: dict[str, int] = {
     "BAAI/bge-small-en-v1.5": 384,
     "BAAI/bge-base-en-v1.5": 768,
     "BAAI/bge-large-en-v1.5": 1024,
+    "tfidf-svd-128": 128,
+    "tfidf-svd-256": 256,
 }
 
 
 def _detect_backend() -> Backend:
-    """Auto-detect the best available backend."""
+    """Auto-detect the best available backend.
+
+    Priority: OpenAI > HuggingFace > fastembed > TF-IDF (always available).
+    """
     if os.getenv("OPENAI_API_KEY"):
         return "openai"
     if os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACEHUB_API_TOKEN"):
@@ -54,10 +61,9 @@ def _detect_backend() -> Backend:
         return "local"
     except ImportError:
         pass
-    raise RuntimeError(
-        "No embedding backend available. Set OPENAI_API_KEY, HF_TOKEN, "
-        "or install fastembed (`pip install fastembed`)."
-    )
+    # TF-IDF is always available via scikit-learn
+    logger.info("No API keys or fastembed found; falling back to TF-IDF + SVD")
+    return "tfidf"
 
 
 # ---------------------------------------------------------------------------
@@ -105,10 +111,44 @@ def _embed_local(texts: list[str], model: str) -> np.ndarray:
     return np.array(list(embedding_model.embed(texts)), dtype=np.float32)
 
 
+def _embed_tfidf(texts: list[str], model: str) -> np.ndarray:
+    """Embed via TF-IDF + Truncated SVD (lightweight, no API keys).
+
+    This is a fallback for environments without API keys or GPU.
+    The model string encodes the SVD dimension, e.g. 'tfidf-svd-128'.
+    """
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.decomposition import TruncatedSVD
+
+    # Parse dimension from model name
+    n_components = 128
+    if model and "svd-" in model:
+        try:
+            n_components = int(model.split("svd-")[1])
+        except (ValueError, IndexError):
+            pass
+
+    logger.info("TF-IDF vectorizing %d texts → SVD(%d)", len(texts), n_components)
+    vectorizer = TfidfVectorizer(max_features=5000, stop_words="english")
+    tfidf_matrix = vectorizer.fit_transform(texts)
+
+    # Reduce dimensionality
+    n_components = min(n_components, tfidf_matrix.shape[1] - 1, tfidf_matrix.shape[0] - 1)
+    if n_components < 2:
+        # Too few documents/features, just return dense TF-IDF
+        return tfidf_matrix.toarray().astype(np.float32)
+
+    svd = TruncatedSVD(n_components=n_components, random_state=42)
+    reduced = svd.fit_transform(tfidf_matrix)
+    logger.info("SVD explained variance: %.2f%%", svd.explained_variance_ratio_.sum() * 100)
+    return reduced.astype(np.float32)
+
+
 _EMBED_FNS = {
     "openai": _embed_openai,
     "huggingface": _embed_huggingface,
     "local": _embed_local,
+    "tfidf": _embed_tfidf,
 }
 
 
