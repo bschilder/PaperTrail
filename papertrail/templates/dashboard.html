@@ -2519,9 +2519,9 @@
                                             </div>
                                             <div class="th-resizer"></div>
                                         </th>
-                                        <th data-field="first_shared" title="Date first shared in Slack" style="width:80px;">
+                                        <th data-field="first_shared" title="Date first shared in Slack" style="width:70px;">
                                             <div class="th-content">
-                                                <span>Date <span class="sort-indicator"></span></span>
+                                                <span>Shared <span class="sort-indicator"></span></span>
                                                 <input type="text" class="column-filter" placeholder="Filter..." data-field="first_shared">
                                             </div>
                                             <div class="th-resizer"></div>
@@ -4256,6 +4256,19 @@
             slCanvas.onmouseleave = () => {
                 sparklineDragging = false;
                 if (!sparklineBrush) {
+                    document.getElementById('sparklineInfo').textContent = `${allPapers.length} papers · ${firstYear} — ${lastYear}`;
+                }
+            };
+
+            // Double-click to clear time filter (#38)
+            slCanvas.ondblclick = () => {
+                if (sparklineBrush || timeFilterFrom || timeFilterTo) {
+                    sparklineBrush = null;
+                    timeFilterFrom = null;
+                    timeFilterTo = null;
+                    document.getElementById('sparklineClear').style.display = 'none';
+                    filterPapers();
+                    drawSparkline();
                     document.getElementById('sparklineInfo').textContent = `${allPapers.length} papers · ${firstYear} — ${lastYear}`;
                 }
             };
