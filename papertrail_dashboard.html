@@ -1065,9 +1065,21 @@
             min-width: 28px;
             text-align: center;
         }
-        .lb-rank.gold { color: #ffca28; }
-        .lb-rank.silver { color: #b0bec5; }
-        .lb-rank.bronze { color: #ff8a65; }
+        .lb-rank.gold { color: #ffd700; animation: goldShine 2s ease infinite; }
+        .lb-rank.silver { color: #c0c0c0; animation: silverShine 3s ease infinite; }
+        .lb-rank.bronze { color: #cd7f32; animation: bronzeShine 4s ease infinite; }
+        @keyframes goldShine {
+            0%, 100% { text-shadow: 0 0 4px rgba(255,215,0,0.3); }
+            50% { text-shadow: 0 0 12px rgba(255,215,0,0.6); }
+        }
+        @keyframes silverShine {
+            0%, 100% { text-shadow: 0 0 3px rgba(192,192,192,0.2); }
+            50% { text-shadow: 0 0 8px rgba(192,192,192,0.4); }
+        }
+        @keyframes bronzeShine {
+            0%, 100% { text-shadow: 0 0 2px rgba(205,127,50,0.15); }
+            50% { text-shadow: 0 0 6px rgba(205,127,50,0.3); }
+        }
         .lb-card-body { flex: 1; min-width: 0; }
         .lb-card-name {
             font-size: 13px;
@@ -4565,7 +4577,7 @@
 
             let html = `<span class="insight-chip" onclick="showAllClusters()" title="View all clusters">&#x1F30D; <span class="insight-highlight">${sortedClusters.length} clusters</span></span>`;
             html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="document.getElementById('tableToggle').click()" title="View all papers">${allPapers.length} papers</span>`;
-            if (topCluster) html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="showTopicActions('${esc(topCluster[0]).replace(/'/g, "\\'")}', event)" title="Explore this topic">&#x1F9E0; <strong>${esc(topCluster[0])}</strong> (${topCluster[1]})</span>`;
+            if (topCluster) html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="showTopicActions('${esc(topCluster[0]).replace(/'/g, "\\'")}', event)" title="Explore this topic">&#x1F4A1; <strong>${esc(topCluster[0])}</strong> (${topCluster[1]})</span>`;
             if (topPerson) html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="showContributorProfile('${esc(topPerson[0]).replace(/'/g, "\\'")}')" title="View profile">&#x1F451; <strong>${esc(topPerson[0])}</strong> (${topPerson[1]})</span>`;
             if (topCited && topCited.cited_by_count > 50) html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="window.open('${esc(topCited.url || '')}','_blank')" title="Open paper">&#x1F525; <strong>${esc((topCited.title || '').substring(0, 35))}...</strong> (${topCited.cited_by_count})</span>`;
 
@@ -5991,13 +6003,18 @@ TOOLS AVAILABLE:
 3. **compare_channels** — Compare channels by focus areas, contributors, citations
 4. **summarize_cluster** — Deep-dive into a topic cluster: top papers, key authors, trends
 5. **contributor_analysis** — Analyze a team member's sharing patterns and interests
+6. **web_search** — Search the web for information beyond the dataset (papers, authors, topics, methods)
 
 GUIDELINES:
-- Choose the BEST tool for the question. Don't default to search_papers for everything.
+- Choose the BEST tool(s) for the question. You can call multiple tools.
+- For "who is [person]" → use contributor_analysis FIRST for dataset info, then web_search to find their lab page, Google Scholar, etc. Combine into a rich profile answer.
 - For "what topics..." or "what's trending..." → use analyze_trends
 - For "compare..." or "how does X differ from Y..." → use compare_channels
 - For "what is [cluster] about..." → use summarize_cluster
 - For "what does [person] share..." → use contributor_analysis
+- For questions about methods, techniques, or topics NOT in the dataset → use web_search
+- You can combine dataset tools with web_search for comprehensive answers
+- ALWAYS provide conversational answers. Don't just list data — synthesize and explain.
 - For finding specific papers → use search_papers
 - You can call multiple tools if needed.
 
@@ -6122,6 +6139,13 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 },
                 required: ["person"]
             }
+        };
+
+        // Web search is a server-side Anthropic tool — declared separately
+        const WEB_SEARCH_TOOL = {
+            type: "web_search_20250305",
+            name: "web_search",
+            max_uses: 3,
         };
 
         const ALL_TOOLS = [SEARCH_TOOL, ANALYZE_TRENDS_TOOL, COMPARE_CHANNELS_TOOL, SUMMARIZE_CLUSTER_TOOL, CONTRIBUTOR_ANALYSIS_TOOL];
@@ -6351,127 +6375,152 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             };
         }
 
+        // Status callback for thinking UI
+        let agentStatusCallback = null;
+
         async function callClaudeAgent(query) {
             const messages = [{ role: 'user', content: query }];
+            let allPapersFound = [];
+            let allToolCalls = [];
+            const maxRounds = 4;
 
-            // First call: let Claude decide what tool to use
-            const resp1 = await fetch('https://api.anthropic.com/v1/messages', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': claudeApiKey,
-                    'anthropic-version': '2023-06-01',
-                    'anthropic-dangerous-direct-browser-access': 'true'
-                },
-                body: JSON.stringify({
-                    model: claudeModel,
-                    max_tokens: 1024,
-                    system: buildSystemPrompt(),
-                    tools: ALL_TOOLS,
-                    messages
-                })
-            });
+            for (let round = 0; round < maxRounds; round++) {
+                if (agentStatusCallback) {
+                    agentStatusCallback(round === 0 ? 'Thinking...' : `Working (step ${round + 1})...`);
+                }
 
-            if (!resp1.ok) {
-                const err = await resp1.text();
-                throw new Error(`API error ${resp1.status}: ${err}`);
+                const resp = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': claudeApiKey,
+                        'anthropic-version': '2023-06-01',
+                        'anthropic-dangerous-direct-browser-access': 'true',
+                        'anthropic-beta': 'web-search-2025-03-05'
+                    },
+                    body: JSON.stringify({
+                        model: claudeModel,
+                        max_tokens: 2048,
+                        system: buildSystemPrompt(),
+                        tools: [...ALL_TOOLS, WEB_SEARCH_TOOL],
+                        messages
+                    })
+                });
+
+                if (!resp.ok) {
+                    const err = await resp.text();
+                    throw new Error(`API error ${resp.status}: ${err}`);
+                }
+
+                const data = await resp.json();
+
+                // Collect text and tool_use blocks
+                const textBlocks = [];
+                const toolUseBlocks = [];
+                const webSearchResults = [];
+
+                for (const block of data.content) {
+                    if (block.type === 'text') textBlocks.push(block.text);
+                    if (block.type === 'tool_use') toolUseBlocks.push(block);
+                    if (block.type === 'web_search_tool_result') {
+                        webSearchResults.push(block);
+                    }
+                }
+
+                // If no tool calls, we have the final answer
+                if (toolUseBlocks.length === 0 && data.stop_reason !== 'tool_use') {
+                    // Collect any web search source URLs
+                    const sources = [];
+                    webSearchResults.forEach(ws => {
+                        (ws.content || []).forEach(item => {
+                            if (item.type === 'web_search_result') {
+                                sources.push({ title: item.title, url: item.url });
+                            }
+                        });
+                    });
+
+                    let answerText = textBlocks.join('\n');
+                    if (sources.length > 0) {
+                        answerText += '\n\n**Sources:**\n' + sources.map(s =>
+                            `- [${s.title}](${s.url})`
+                        ).join('\n');
+                    }
+
+                    return {
+                        text: answerText,
+                        results: [],
+                        _full_papers: allPapersFound,
+                        toolCalls: allToolCalls
+                    };
+                }
+
+                // Execute local tool calls
+                messages.push({ role: 'assistant', content: data.content });
+                const toolResults = [];
+
+                for (const toolBlock of toolUseBlocks) {
+                    if (agentStatusCallback) {
+                        const toolLabel = {
+                            search_papers: 'Searching papers...',
+                            analyze_trends: 'Analyzing trends...',
+                            compare_channels: 'Comparing channels...',
+                            summarize_cluster: 'Summarizing cluster...',
+                            contributor_analysis: 'Analyzing contributor...',
+                        }[toolBlock.name] || `Running ${toolBlock.name}...`;
+                        agentStatusCallback(toolLabel);
+                    }
+
+                    allToolCalls.push({ name: toolBlock.name, input: toolBlock.input });
+
+                    const result = executeTool(toolBlock.name, toolBlock.input);
+                    if (result._full_papers) {
+                        allPapersFound.push(...result._full_papers);
+                        delete result._full_papers;
+                    }
+
+                    toolResults.push({
+                        type: 'tool_result',
+                        tool_use_id: toolBlock.id,
+                        content: JSON.stringify(result)
+                    });
+                }
+
+                if (toolResults.length > 0) {
+                    messages.push({ role: 'user', content: toolResults });
+                }
             }
 
-            const data1 = await resp1.json();
-
-            // Check if Claude wants to use a tool
-            let toolUseBlock = null;
-            let textBlocks = [];
-            for (const block of data1.content) {
-                if (block.type === 'tool_use') toolUseBlock = block;
-                if (block.type === 'text') textBlocks.push(block.text);
-            }
-
-            if (!toolUseBlock) {
-                // Claude answered directly without using the tool
-                return {
-                    text: textBlocks.join('\n'),
-                    results: [],
-                    _full_papers: []
-                };
-            }
-
-            // Execute the tool
-            const toolResult = executeTool(toolUseBlock.name, toolUseBlock.input);
-            const fullPapers = toolResult._full_papers;
-            delete toolResult._full_papers;
-
-            // Second call: feed results back to Claude for a natural language answer
-            messages.push({ role: 'assistant', content: data1.content });
-            messages.push({
-                role: 'user',
-                content: [{
-                    type: 'tool_result',
-                    tool_use_id: toolUseBlock.id,
-                    content: JSON.stringify(toolResult)
-                }]
-            });
-
-            const resp2 = await fetch('https://api.anthropic.com/v1/messages', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': claudeApiKey,
-                    'anthropic-version': '2023-06-01',
-                    'anthropic-dangerous-direct-browser-access': 'true'
-                },
-                body: JSON.stringify({
-                    model: claudeModel,
-                    max_tokens: 512,
-                    system: buildSystemPrompt(),
-                    tools: ALL_TOOLS,
-                    messages
-                })
-            });
-
-            if (!resp2.ok) {
-                const err = await resp2.text();
-                throw new Error(`API error ${resp2.status}: ${err}`);
-            }
-
-            const data2 = await resp2.json();
-            const answerText = data2.content
-                .filter(b => b.type === 'text')
-                .map(b => b.text)
-                .join('\n');
-
-            return {
-                text: answerText,
-                results: toolResult.papers,
-                _full_papers: fullPapers,
-                filters: toolUseBlock.input
-            };
+            // Fallback if we hit max rounds
+            return { text: 'Agent reached maximum reasoning steps.', results: [], _full_papers: allPapersFound, toolCalls: allToolCalls };
         }
 
         async function runChatSearch(query) {
             if (!query) return;
 
-            // Smart shortcuts: "who is @name" -> open profile directly
-            const whoIsMatch = query.match(/^(?:who is|about|profile)\s+@?(.+)/i);
-            if (whoIsMatch) {
-                const name = whoIsMatch[1].trim();
-                const match = findBestPersonMatch(name.toLowerCase(), new Set(allPapers.map(p => p.shared_by).filter(Boolean).map(s => s.toLowerCase())));
-                if (match) {
-                    showContributorProfile(match);
-                    return;
+            // Smart shortcuts for LOCAL mode only (LLM mode handles these via tools)
+            if (!claudeApiKey) {
+                // "who is @name" -> open profile directly
+                const whoIsMatch = query.match(/^(?:who is|about|profile)\s+@?(.+)/i);
+                if (whoIsMatch) {
+                    const name = whoIsMatch[1].trim();
+                    const match = findBestPersonMatch(name.toLowerCase(), new Set(allPapers.map(p => p.shared_by).filter(Boolean).map(s => s.toLowerCase())));
+                    if (match) {
+                        showContributorProfile(match);
+                        return;
+                    }
                 }
-            }
 
-            // Smart shortcut: "what is [topic]" -> open topic info
-            const whatIsMatch = query.match(/^(?:what is|about|tell me about)\s+(?:the\s+)?(.+?)(?:\s+cluster|\s+topic)?$/i);
-            if (whatIsMatch) {
-                const topic = whatIsMatch[1].trim().toLowerCase();
-                const clusters = {};
-                allPapers.forEach(p => { if (p.cluster_label) clusters[p.cluster_label.toLowerCase()] = p.cluster_label; });
-                const match = Object.entries(clusters).find(([k]) => k.includes(topic));
-                if (match) {
-                    showTopicInfo(match[1]);
-                    return;
+                // "what is [topic]" -> open topic info
+                const whatIsMatch = query.match(/^(?:what is|tell me about)\s+(?:the\s+)?(.+?)(?:\s+cluster|\s+topic)?$/i);
+                if (whatIsMatch) {
+                    const topic = whatIsMatch[1].trim().toLowerCase();
+                    const clusters = {};
+                    allPapers.forEach(p => { if (p.cluster_label) clusters[p.cluster_label.toLowerCase()] = p.cluster_label; });
+                    const match = Object.entries(clusters).find(([k]) => k.includes(topic));
+                    if (match) {
+                        showTopicInfo(match[1]);
+                        return;
+                    }
                 }
             }
 
@@ -6482,20 +6531,42 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
 
             if (claudeApiKey) {
                 // LLM Agent mode
+                const thinkingEl = document.createElement('div');
                 resultsPanel.innerHTML = `
                     <div class="chatbot-results-header">
                         <span>Thinking<span class="ai-mode-badge llm">${claudeModel.includes('opus') ? 'Opus' : claudeModel.includes('haiku') ? 'Haiku' : 'Sonnet'}</span></span>
                         <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
                     </div>
-                    <div class="ai-thinking">
+                    <div class="ai-thinking" id="agentThinkingStatus">
                         <div class="ai-thinking-dots"><span></span><span></span><span></span></div>
-                        Searching papers...
+                        <span id="agentStatusText">Thinking...</span>
                     </div>`;
                 resultsPanel.classList.add('visible');
 
+                // Live status updates
+                agentStatusCallback = (status) => {
+                    const el = document.getElementById('agentStatusText');
+                    if (el) el.textContent = status;
+                };
+
                 try {
                     const agentResult = await callClaudeAgent(query);
-                    renderChatResults(resultsPanel, agentResult.text, agentResult._full_papers || [], 'llm');
+                    agentStatusCallback = null;
+
+                    // Show tool calls as expandable thinking
+                    let thinkingHTML = '';
+                    if (agentResult.toolCalls && agentResult.toolCalls.length > 0) {
+                        thinkingHTML = `<details class="agent-thinking-details">
+                            <summary style="font-size:11px;color:#666;cursor:pointer;padding:6px 14px;">
+                                &#x1F9E0; ${agentResult.toolCalls.length} tool${agentResult.toolCalls.length > 1 ? 's' : ''} used
+                            </summary>
+                            <div style="padding:4px 14px 8px;font-size:11px;color:#555;">
+                                ${agentResult.toolCalls.map(tc => `<div style="margin-bottom:4px;">&#x2022; <strong>${tc.name}</strong>: ${JSON.stringify(tc.input).substring(0, 80)}${JSON.stringify(tc.input).length > 80 ? '...' : ''}</div>`).join('')}
+                            </div>
+                        </details>`;
+                    }
+
+                    renderChatResults(resultsPanel, thinkingHTML + agentResult.text, agentResult._full_papers || [], 'llm');
                 } catch (err) {
                     console.error('LLM agent error:', err);
                     // Fall back to local
@@ -7385,12 +7456,21 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 if (inInput && !(e.metaKey || e.ctrlKey)) return;
 
                 switch(e.key) {
-                    case 'Escape':
+                    case 'Escape': {
+                        // Close agent panel if open
+                        const ap = document.getElementById('agentPanel');
+                        if (ap.classList.contains('visible')) {
+                            ap.classList.remove('visible');
+                            document.getElementById('agentMascotBtn').classList.remove('active');
+                            document.getElementById('agentMascotBtn').classList.remove('settled');
+                            break;
+                        }
                         selectedPapers.clear();
                         hideDetailPanel();
                         document.getElementById('chatbotResults').classList.remove('visible');
                         renderMap();
                         break;
+                    }
                     case '1':
                         document.querySelectorAll('.proj-btn').forEach(b => b.classList.toggle('active', b.dataset.proj === 'umap'));
                         animateProjectionChange('umap');
