@@ -392,16 +392,18 @@
 
         /* Chatbot Results Dropdown */
         .chatbot-results {
-            position: absolute;
-            top: calc(100% + 6px);
-            left: 0;
-            right: 0;
-            background: #1a1a2e;
-            border: 1px solid #3a3a4e;
-            border-radius: 10px;
-            max-height: 400px;
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            max-width: 90vw;
+            background: linear-gradient(135deg, #1a1a30, #1e1e38);
+            border: 1px solid rgba(100,181,246,0.2);
+            border-radius: 12px;
+            max-height: 60vh;
             overflow-y: auto;
-            z-index: 250;
+            z-index: 500;
             display: none;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
         }
