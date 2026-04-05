@@ -122,12 +122,18 @@
         }
         .agent-mascot:hover .mascot-label { color: #e0e0e0; }
         .agent-mascot.active {
-            background: #64b5f6;
+            background: linear-gradient(135deg, #3a6bbe, #64b5f6);
             border-color: #64b5f6;
             color: #fff;
+            box-shadow: 0 4px 20px rgba(100,181,246,0.35), 0 0 0 2px rgba(100,181,246,0.15);
+            transform: translateY(0);
         }
         .agent-mascot.active .mascot-label { color: #fff; }
-        .agent-mascot.active .mascot-eye { fill: #64b5f6 !important; }
+        .agent-mascot.active .mascot-eye { fill: #2a5090 !important; }
+        .agent-mascot.active .mascot-leg-l { animation: wiggleLeft 0.4s ease infinite alternate; }
+        .agent-mascot.active .mascot-leg-r { animation: wiggleRight 0.4s ease infinite alternate; }
+        .agent-mascot.active .mascot-ant-l { animation: antWaveL 0.6s ease infinite alternate; }
+        .agent-mascot.active .mascot-ant-r { animation: antWaveR 0.6s ease infinite alternate; }
         @keyframes wiggleLeft {
             0% { transform: translate(0, 0); }
             100% { transform: translate(-1px, 1px); }
@@ -148,16 +154,54 @@
         /* Collapsible agent panel */
         .agent-panel {
             display: none;
-            background: linear-gradient(180deg, #1a1a2e, #181830);
-            border-bottom: 1px solid #2a2a3e;
-            padding: 8px 20px;
+            background: linear-gradient(135deg, #171730 0%, #1a1a35 50%, #1d1d38 100%);
+            border-bottom: 2px solid rgba(100,181,246,0.25);
+            border-top: 1px solid rgba(100,181,246,0.1);
+            padding: 10px 20px;
             flex-shrink: 0;
-            animation: slideDown 0.2s ease-out;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(100,181,246,0.06), inset 0 1px 0 rgba(100,181,246,0.08);
         }
-        .agent-panel.visible { display: block; }
-        @keyframes slideDown {
-            from { max-height: 0; opacity: 0; }
-            to { max-height: 100px; opacity: 1; }
+        .agent-panel.visible {
+            display: block;
+            animation: agentPanelOpen 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .agent-panel.visible .chatbot-bar {
+            animation: agentBarExpand 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+        }
+        @keyframes agentPanelOpen {
+            0% {
+                max-height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                opacity: 0;
+                transform: scaleY(0);
+                transform-origin: top right;
+            }
+            40% {
+                max-height: 60px;
+                transform: scaleY(1) scaleX(0.3);
+                transform-origin: top right;
+                opacity: 0.7;
+            }
+            100% {
+                max-height: 80px;
+                padding-top: 10px;
+                padding-bottom: 10px;
+                opacity: 1;
+                transform: scaleY(1) scaleX(1);
+                transform-origin: top right;
+            }
+        }
+        @keyframes agentBarExpand {
+            0% {
+                opacity: 0;
+                transform: translateX(200px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .chatbot-bar {
@@ -1291,7 +1335,7 @@
             width: 10px;
             height: 10px;
             border-radius: 2px;
-            background: #1a1a2e;
+            background: #0a0a14;
             position: relative;
             cursor: default;
         }
