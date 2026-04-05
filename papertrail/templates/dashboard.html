@@ -4529,10 +4529,21 @@
                 })
                 : computePCA3D(papers3DRef);
 
-            // Normalize to fit in a sphere
-            let maxDist = 0;
-            coords3D.forEach(c => { const d = Math.sqrt(c[0]*c[0] + c[1]*c[1] + c[2]*c[2]); if (d > maxDist) maxDist = d; });
-            const scale = 25 / (maxDist || 1);
+            // Normalize each axis independently for full 3D spread
+            let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity,minZ=Infinity,maxZ=-Infinity;
+            coords3D.forEach(c => {
+                if(c[0]<minX)minX=c[0]; if(c[0]>maxX)maxX=c[0];
+                if(c[1]<minY)minY=c[1]; if(c[1]>maxY)maxY=c[1];
+                if(c[2]<minZ)minZ=c[2]; if(c[2]>maxZ)maxZ=c[2];
+            });
+            const rangeX3=(maxX-minX)||1, rangeY3=(maxY-minY)||1, rangeZ3=(maxZ-minZ)||1;
+            // Normalize to [-20, 20] per axis
+            coords3D = coords3D.map(c => [
+                ((c[0]-minX)/rangeX3 - 0.5) * 40,
+                ((c[1]-minY)/rangeY3 - 0.5) * 40,
+                ((c[2]-minZ)/rangeZ3 - 0.5) * 40
+            ]);
+            const scale = 1; // already normalized
             coords3DRef = coords3D;
             scale3D = scale;
 
