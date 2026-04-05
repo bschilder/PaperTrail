@@ -2054,6 +2054,15 @@
                 </div>
 
                 <div class="sidebar-section">
+                    <div class="sidebar-label">Transform</div>
+                    <div class="projection-buttons" id="transformButtons">
+                        <button class="proj-btn active" data-transform="linear">Linear</button>
+                        <button class="proj-btn" data-transform="log">Log</button>
+                        <button class="proj-btn" data-transform="sqrt">Sqrt</button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
                     <div class="sidebar-label">Activity</div>
                     <canvas id="sparklineCanvas" width="230" height="48" style="width:100%;height:48px;border-radius:6px;background:#252538;cursor:crosshair;"></canvas>
                     <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -2329,6 +2338,7 @@
         // Time travel state (global so filterPapers can access)
         let ttCutoffDate = null; // null = show all
         let basePointSize = 3; // global point size multiplier
+        let scaleTransform = 'linear'; // linear, log, sqrt
         let densityMap = new Map(); // paper -> density score (0-1)
         let currentProjection = 'umap';
 
@@ -3029,8 +3039,8 @@
 
         function getPointRadius(paper) {
             if (scaleByMode === 'uniform') return basePointSize;
-            if (scaleByMode === 'citations') return Math.max(3, Math.min(10, (paper.cited_by_count || 0) / 5));
-            if (scaleByMode === 'engagement') return Math.max(3, Math.min(10, (paper.engagement || 0) * 2 + 3));
+            if (scaleByMode === 'citations') return Math.max(basePointSize * 0.7, Math.min(basePointSize * 3, basePointSize + applyTransform(paper.cited_by_count || 0, 500) * basePointSize * 2));
+            if (scaleByMode === 'engagement') return Math.max(basePointSize * 0.7, Math.min(basePointSize * 3, basePointSize + applyTransform(paper.engagement || 0, 5) * basePointSize * 2));
             if (scaleByMode === 'year') return Math.max(3, Math.min(10, ((paper.year || 2020) - 2015) / 2 + 3));
             if (scaleByMode === 'relevance' && semanticQuery) {
                 const score = semanticScores.get(paper.title) || 0;
@@ -3056,13 +3066,13 @@
 
             if (colorByMode === 'year') {
                 const year = paper.year || 2020;
-                const normalized = Math.min(1, (year - 2015) / 10);
+                const normalized = Math.min(1, applyTransform(year - 2015, 10));
                 return interpolateColor([100, 181, 246], [239, 83, 80], normalized);
             }
 
             if (colorByMode === 'citations') {
                 const citations = paper.cited_by_count || 0;
-                const normalized = Math.min(1, citations / 100);
+                const normalized = Math.min(1, applyTransform(citations, 500));
                 return interpolateColor([100, 181, 246], [255, 202, 40], normalized);
             }
 
@@ -3082,6 +3092,15 @@
             }
 
             return '#64b5f6';
+        }
+
+        function applyTransform(value, maxValue) {
+            // Normalize value to [0,1] with chosen transform
+            if (maxValue <= 0) return 0;
+            const v = Math.max(0, value);
+            if (scaleTransform === 'log') return Math.log1p(v) / Math.log1p(maxValue);
+            if (scaleTransform === 'sqrt') return Math.sqrt(v) / Math.sqrt(maxValue);
+            return v / maxValue; // linear
         }
 
         function interpolateColor(rgb1, rgb2, t) {
@@ -5644,8 +5663,8 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             }
 
             if (suggestions.length > 0) {
-                dropdown.innerHTML = suggestions.map(s =>
-                    `<div class="autocomplete-item">${s}</div>`
+                dropdown.innerHTML = suggestions.map((s, i) =>
+                    `<div class="autocomplete-item${i === 0 ? ' ac-active' : ''}">${s}</div>`
                 ).join('');
                 dropdown.classList.add('visible');
 
@@ -5779,6 +5798,15 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 scaleByMode = e.target.value;
                 renderMap();
                 debouncedSaveHash();
+            });
+
+            document.querySelectorAll('#transformButtons .proj-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#transformButtons .proj-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    scaleTransform = btn.dataset.transform;
+                    renderMap();
+                });
             });
 
             document.getElementById('pointSizeSlider').addEventListener('input', (e) => {
