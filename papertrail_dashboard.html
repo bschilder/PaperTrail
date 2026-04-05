@@ -5151,11 +5151,25 @@
         }
 
         function resetZoom() {
-            zoomLevel = 1;
-            panX = 0;
-            panY = 0;
+            const startZoom = zoomLevel;
+            const startPanX = panX;
+            const startPanY = panY;
+            const duration = 400;
+            const startTime = performance.now();
+
+            function step(now) {
+                const t = Math.min(1, (now - startTime) / duration);
+                // Cubic ease-out
+                const ease = 1 - Math.pow(1 - t, 3);
+                zoomLevel = startZoom + (1 - startZoom) * ease;
+                panX = startPanX * (1 - ease);
+                panY = startPanY * (1 - ease);
+                renderMap();
+                if (t < 1) requestAnimationFrame(step);
+            }
+
             computeBounds();
-            renderMap();
+            requestAnimationFrame(step);
         }
 
         function showTooltip(mouseX, mouseY, pageX, pageY) {
