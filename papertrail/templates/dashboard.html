@@ -312,11 +312,11 @@
             position: absolute;
             top: calc(100% + 8px);
             right: 0;
-            width: 320px;
-            background: #1a1a2e;
-            border: 1px solid #3a3a4e;
-            border-radius: 10px;
-            padding: 14px;
+            width: 380px;
+            background: linear-gradient(135deg, #1e1e36 0%, #222240 100%);
+            border: 1px solid rgba(100,181,246,0.25);
+            border-radius: 12px;
+            padding: 16px;
             z-index: 300;
             box-shadow: 0 8px 24px rgba(0,0,0,0.6);
         }
@@ -2299,23 +2299,62 @@
                     <button class="chatbot-example-btn" data-query="Who are the most active contributors and what do they focus on?">contributors</button>
                 </div>
                 <button class="chatbot-settings-btn" id="chatbotSettingsBtn" title="Configure AI (API key)">⚙</button>
-                <div class="chatbot-settings-popup" id="chatbotSettingsPopup">
-                    <div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:8px;">AI Agent Settings</div>
-                    <div style="font-size:11px;color:#888;margin-bottom:8px;">Enter your Anthropic API key to enable the AI agent. Without a key, a local keyword parser is used instead.</div>
-                    <input type="password" class="chatbot-bar-input" id="apiKeyInput" placeholder="sk-ant-..." style="font-size:12px;margin-bottom:8px;">
-                    <div style="font-size:11px;color:#888;margin-bottom:4px;">Model</div>
-                    <select id="modelSelect" class="color-by-select" style="width:100%;margin-bottom:8px;font-size:12px;">
-                        <option value="claude-sonnet-4-20250514">Sonnet 4 — fast + smart (default)</option>
-                        <option value="claude-opus-4-20250514">Opus 4 — most capable</option>
-                        <option value="claude-haiku-3-5-20241022">Haiku 3.5 — fastest + cheapest</option>
-                    </select>
-                    <div style="display:flex;gap:6px;">
-                        <button id="apiKeySave" style="flex:1;padding:6px;background:#64b5f6;border:none;color:#fff;border-radius:6px;cursor:pointer;font-size:12px;">Save</button>
-                        <button id="apiKeyClear" style="flex:1;padding:6px;background:#3a3a4e;border:1px solid #4a4a5e;color:#e0e0e0;border-radius:6px;cursor:pointer;font-size:12px;">Clear</button>
+                <div class="chatbot-settings-popup" id="chatbotSettingsPopup" style="width:380px;">
+                    <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:10px;">AI Agent Setup</div>
+
+                    <!-- Service selector -->
+                    <div style="font-size:11px;color:#888;margin-bottom:8px;">Connect an AI service to unlock powerful search, analysis, and web search capabilities.</div>
+
+                    <div style="margin-bottom:10px;">
+                        <div style="font-size:11px;color:#888;margin-bottom:4px;">Service</div>
+                        <select id="serviceSelect" class="color-by-select" style="width:100%;font-size:12px;margin-bottom:6px;">
+                            <option value="anthropic">Anthropic (Claude) — recommended</option>
+                            <option value="openai">OpenAI (GPT-4)</option>
+                        </select>
                     </div>
-                    <div id="apiKeyStatus" style="font-size:11px;color:#666;margin-top:6px;"></div>
-                    <div style="border-top:1px solid #2a2a3e;margin-top:10px;padding-top:10px;">
-                        <div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:6px;">Display</div>
+
+                    <!-- API Key input -->
+                    <div style="margin-bottom:8px;">
+                        <div style="font-size:11px;color:#888;margin-bottom:4px;">API Key</div>
+                        <input type="password" class="chatbot-bar-input" id="apiKeyInput" placeholder="sk-ant-..." style="font-size:12px;padding-right:12px;">
+                    </div>
+
+                    <!-- Model selector (changes based on service) -->
+                    <div style="margin-bottom:8px;">
+                        <div style="font-size:11px;color:#888;margin-bottom:4px;">Model</div>
+                        <select id="modelSelect" class="color-by-select" style="width:100%;font-size:12px;">
+                            <option value="claude-sonnet-4-20250514">Sonnet 4 — fast + smart (default)</option>
+                            <option value="claude-opus-4-20250514">Opus 4 — most capable</option>
+                            <option value="claude-haiku-3-5-20241022">Haiku 3.5 — fastest + cheapest</option>
+                        </select>
+                    </div>
+
+                    <div style="display:flex;gap:6px;margin-bottom:6px;">
+                        <button id="apiKeySave" style="flex:1;padding:8px;background:#64b5f6;border:none;color:#fff;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">Connect</button>
+                        <button id="apiKeyClear" style="padding:8px 12px;background:#3a3a4e;border:1px solid #4a4a5e;color:#e0e0e0;border-radius:6px;cursor:pointer;font-size:12px;">Disconnect</button>
+                    </div>
+
+                    <div id="apiKeyStatus" style="font-size:11px;color:#666;margin-bottom:8px;"></div>
+
+                    <!-- Connected services -->
+                    <div id="connectedServices" style="border-top:1px solid #2a2a3e;padding-top:8px;margin-bottom:8px;"></div>
+
+                    <!-- What you get -->
+                    <div style="border-top:1px solid #2a2a3e;padding-top:8px;margin-bottom:8px;">
+                        <div style="font-size:10px;text-transform:uppercase;color:#555;letter-spacing:0.5px;margin-bottom:4px;">With AI Connected</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;font-size:10px;color:#888;">
+                            <span>&#x2713; Natural language queries</span>
+                            <span>&#x2713; Web search</span>
+                            <span>&#x2713; Trend analysis</span>
+                            <span>&#x2713; Channel comparisons</span>
+                            <span>&#x2713; Contributor profiles</span>
+                            <span>&#x2713; Multi-turn chat</span>
+                        </div>
+                    </div>
+
+                    <!-- Display settings -->
+                    <div style="border-top:1px solid #2a2a3e;padding-top:8px;">
+                        <div style="font-size:11px;font-weight:600;color:#aaa;margin-bottom:4px;">Display</div>
                         <div style="display:flex;align-items:center;gap:8px;">
                             <span style="font-size:11px;color:#888;">Text Size</span>
                             <input type="range" id="textScaleSlider" min="80" max="130" value="100" style="flex:1;">
@@ -6544,39 +6583,102 @@
                 }
             });
 
+            // Multi-service key storage
+            let connectedServices = JSON.parse(localStorage.getItem('papertrail_services') || '{}');
+
+            function updateConnectedServicesUI() {
+                const container = document.getElementById('connectedServices');
+                const services = Object.entries(connectedServices);
+                if (services.length === 0) {
+                    container.innerHTML = '<div style="font-size:10px;color:#555;">No services connected</div>';
+                    return;
+                }
+                container.innerHTML = services.map(([svc, data]) =>
+                    `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;">
+                        <span style="color:#66bb6a;">&#x2713;</span>
+                        <span style="font-size:11px;color:#e0e0e0;flex:1;">${esc(svc)} · ${esc(data.model || 'default')}</span>
+                        <button onclick="disconnectService('${svc}')" style="background:none;border:1px solid #3a3a4e;color:#888;padding:1px 6px;border-radius:4px;cursor:pointer;font-size:9px;">Remove</button>
+                    </div>`
+                ).join('');
+            }
+
+            // Expose for inline onclick
+            window.disconnectService = function(svc) {
+                delete connectedServices[svc];
+                localStorage.setItem('papertrail_services', JSON.stringify(connectedServices));
+                if (svc === 'anthropic') { claudeApiKey = null; settingsBtn.classList.remove('has-key'); }
+                updateConnectedServicesUI();
+                document.getElementById('apiKeyStatus').textContent = svc + ' disconnected';
+                document.getElementById('apiKeyStatus').style.color = '#ffa726';
+            };
+
+            // Service selector changes model options
+            document.getElementById('serviceSelect').addEventListener('change', () => {
+                const svc = document.getElementById('serviceSelect').value;
+                const modelSelect = document.getElementById('modelSelect');
+                const apiInput = document.getElementById('apiKeyInput');
+                if (svc === 'openai') {
+                    modelSelect.innerHTML = '<option value="gpt-4o">GPT-4o (default)</option><option value="gpt-4o-mini">GPT-4o Mini (fast)</option><option value="gpt-4-turbo">GPT-4 Turbo</option>';
+                    apiInput.placeholder = 'sk-...';
+                } else {
+                    modelSelect.innerHTML = '<option value="claude-sonnet-4-20250514">Sonnet 4 — fast + smart (default)</option><option value="claude-opus-4-20250514">Opus 4 — most capable</option><option value="claude-haiku-3-5-20241022">Haiku 3.5 — fastest</option>';
+                    apiInput.placeholder = 'sk-ant-...';
+                }
+                // Pre-fill if already connected
+                if (connectedServices[svc]) {
+                    apiInput.value = connectedServices[svc].key?.slice(0, 10) + '...';
+                    modelSelect.value = connectedServices[svc].model || modelSelect.options[0].value;
+                } else {
+                    apiInput.value = '';
+                }
+            });
+
             document.getElementById('apiKeySave').addEventListener('click', () => {
                 const key = document.getElementById('apiKeyInput').value.trim();
-                claudeModel = document.getElementById('modelSelect').value;
-                if (key && key.startsWith('sk-')) {
-                    claudeApiKey = key;
-                    const modelName = document.getElementById('modelSelect').selectedOptions[0].text;
-                    document.getElementById('apiKeyStatus').textContent = 'AI agent active · ' + modelName;
+                const svc = document.getElementById('serviceSelect').value;
+                const model = document.getElementById('modelSelect').value;
+                if (key && (key.startsWith('sk-') || key.length > 20)) {
+                    connectedServices[svc] = { key, model };
+                    localStorage.setItem('papertrail_services', JSON.stringify(connectedServices));
+                    if (svc === 'anthropic') {
+                        claudeApiKey = key;
+                        claudeModel = model;
+                    }
+                    document.getElementById('apiKeyStatus').textContent = esc(svc) + ' connected ✓';
                     document.getElementById('apiKeyStatus').style.color = '#66bb6a';
                     settingsBtn.classList.add('has-key');
+                    updateConnectedServicesUI();
                     settingsPopup.classList.remove('visible');
                 } else {
-                    document.getElementById('apiKeyStatus').textContent = 'Invalid key. Should start with sk-';
+                    document.getElementById('apiKeyStatus').textContent = 'Invalid key format';
                     document.getElementById('apiKeyStatus').style.color = '#ef5350';
                 }
             });
 
-            // Allow model change without re-saving key
             document.getElementById('modelSelect').addEventListener('change', () => {
-                claudeModel = document.getElementById('modelSelect').value;
-                if (claudeApiKey) {
-                    const modelName = document.getElementById('modelSelect').selectedOptions[0].text;
-                    document.getElementById('apiKeyStatus').textContent = 'Switched to ' + modelName;
+                const svc = document.getElementById('serviceSelect').value;
+                const model = document.getElementById('modelSelect').value;
+                if (svc === 'anthropic') claudeModel = model;
+                if (connectedServices[svc]) {
+                    connectedServices[svc].model = model;
+                    localStorage.setItem('papertrail_services', JSON.stringify(connectedServices));
+                    document.getElementById('apiKeyStatus').textContent = 'Switched to ' + document.getElementById('modelSelect').selectedOptions[0].text;
                     document.getElementById('apiKeyStatus').style.color = '#66bb6a';
                 }
             });
 
             document.getElementById('apiKeyClear').addEventListener('click', () => {
-                claudeApiKey = null;
-                document.getElementById('apiKeyInput').value = '';
-                document.getElementById('apiKeyStatus').textContent = 'API key cleared. Using local search.';
-                document.getElementById('apiKeyStatus').style.color = '#ffa726';
-                settingsBtn.classList.remove('has-key');
+                const svc = document.getElementById('serviceSelect').value;
+                window.disconnectService(svc);
             });
+
+            // Restore saved connections on load
+            if (connectedServices.anthropic) {
+                claudeApiKey = connectedServices.anthropic.key;
+                claudeModel = connectedServices.anthropic.model || 'claude-sonnet-4-20250514';
+                settingsBtn.classList.add('has-key');
+            }
+            updateConnectedServicesUI();
         }
 
         // ===== LLM AGENT =====
