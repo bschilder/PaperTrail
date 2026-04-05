@@ -97,9 +97,18 @@ def _embed_huggingface(texts: list[str], model: str) -> np.ndarray:
     batch_size = 64
     for i in range(0, len(texts), batch_size):
         batch = texts[i : i + batch_size]
-        resp = requests.post(url, json={"inputs": batch}, headers=headers, timeout=120)
-        resp.raise_for_status()
-        all_embeddings.extend(resp.json())
+        for attempt in range(3):
+            resp = requests.post(url, json={"inputs": batch}, headers=headers, timeout=120)
+            if resp.status_code == 503 and "loading" in resp.text.lower():
+                logger.warning("Model is loading, retrying in 5s (attempt %d/3)", attempt + 1)
+                import time
+                time.sleep(5)
+                continue
+            resp.raise_for_status()
+            all_embeddings.extend(resp.json())
+            break
+        else:
+            resp.raise_for_status()  # raise on final failure
     return np.array(all_embeddings, dtype=np.float32)
 
 
@@ -189,6 +198,34 @@ def embed_texts(
     return embeddings
 
 
+def list_backends() -> list[dict[str, Any]]:
+    """
+    Return available embedding backends and their status.
+
+    Returns
+    -------
+    list[dict]
+        Each dict has keys: ``name``, ``available`` (bool), ``model``.
+    """
+    backends = []
+    for name, model in DEFAULT_MODELS.items():
+        available = False
+        if name == "openai":
+            available = bool(os.getenv("OPENAI_API_KEY"))
+        elif name == "huggingface":
+            available = bool(os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACEHUB_API_TOKEN"))
+        elif name == "local":
+            try:
+                import fastembed  # noqa: F401
+                available = True
+            except ImportError:
+                pass
+        elif name == "tfidf":
+            available = True  # always available
+        backends.append({"name": name, "available": available, "model": model})
+    return backends
+
+
 # ---------------------------------------------------------------------------
 # FAISS vector store
 # ---------------------------------------------------------------------------
@@ -227,6 +264,10 @@ class VectorStore:
         # Normalize for cosine similarity via inner product
         norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
         normalized = (embeddings / np.clip(norms, 1e-10, None)).astype(np.float32)
+
+        if np.any(np.isnan(normalized)):
+            logger.warning("NaN values detected in embeddings, replacing with zeros")
+            normalized = np.nan_to_num(normalized)
 
         self.index = self._faiss.IndexFlatIP(self.dimension)
         self.index.add(normalized)

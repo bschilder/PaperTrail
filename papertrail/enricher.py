@@ -273,7 +273,7 @@ class PaperEnricher:
 
             # Apply backoff (less aggressive after success)
             if i < len(papers):
-                time.sleep(backoff / 1000)  # Convert to seconds
+                time.sleep(backoff)
 
         logger.info(f"Successfully enriched {len(enriched)}/{len(papers)} papers")
         return enriched
@@ -379,7 +379,7 @@ class PaperEnricher:
                 "id": pmid,
                 "rettype": "json",
                 "tool": "PaperTrail",
-                "email": "paper.trail@example.com",
+                "email": self.email or "paper.trail@example.com",
             }
 
             response = self._request_with_backoff(PUBMED_API, params=params)
@@ -613,7 +613,10 @@ class PaperEnricher:
 
         try:
             if HAS_PYALEX:
-                data = Works()[f"https://doi.org/{doi}"]
+                try:
+                    data = Works()[f"https://doi.org/{doi}"]
+                except (IndexError, KeyError):
+                    data = None
                 if data and data.get("title"):
                     metadata = self._parse_openalex_response(data)
                     if metadata:
@@ -643,7 +646,10 @@ class PaperEnricher:
 
         try:
             if HAS_PYALEX:
-                data = Works()[f"pmid:{pmid}"]
+                try:
+                    data = Works()[f"pmid:{pmid}"]
+                except (IndexError, KeyError):
+                    data = None
                 if data and data.get("title"):
                     metadata = self._parse_openalex_response(data)
                     if metadata:
@@ -815,7 +821,8 @@ class PaperEnricher:
                 words[pos] = word
 
         # Reconstruct in order
-        return " ".join(words[i] for i in sorted(words.keys()))
+        max_pos = max(words.keys()) if words else 0
+        return " ".join(words.get(i, "") for i in range(max_pos + 1) if words.get(i, ""))
 
     def _request_with_backoff(
         self,
@@ -862,7 +869,7 @@ class PaperEnricher:
                     if attempt < max_retries - 1:
                         logger.debug(f"Rate limited, backing off {backoff}s")
                         time.sleep(backoff)
-                        backoff *= 2
+                        backoff = min(backoff * 2, 60)
                         continue
                     else:
                         return None
@@ -874,7 +881,7 @@ class PaperEnricher:
                 # Server error - retry with backoff
                 if attempt < max_retries - 1:
                     time.sleep(backoff)
-                    backoff *= 2
+                    backoff = min(backoff * 2, 60)
                     continue
 
                 return None
@@ -883,7 +890,7 @@ class PaperEnricher:
                 if attempt < max_retries - 1:
                     logger.debug(f"Timeout, retrying in {backoff}s")
                     time.sleep(backoff)
-                    backoff *= 2
+                    backoff = min(backoff * 2, 60)
                     continue
                 return None
 
@@ -891,7 +898,7 @@ class PaperEnricher:
                 logger.debug(f"Request failed: {e}")
                 if attempt < max_retries - 1:
                     time.sleep(backoff)
-                    backoff *= 2
+                    backoff = min(backoff * 2, 60)
                     continue
                 return None
 

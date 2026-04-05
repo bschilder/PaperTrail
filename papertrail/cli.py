@@ -27,28 +27,29 @@ def main(verbose: bool) -> None:
 
 @main.command()
 @click.option("--token", envvar="SLACK_BOT_TOKEN", help="Slack Bot Token.")
+@click.option("--channel", "-c", required=True, help="Slack channel ID to scrape.")
 @click.option("--output", "-o", default="papers_raw.json", help="Output JSON path.")
 @click.option("--engagement/--no-engagement", default=True, help="Fetch engagement metrics.")
-def scrape(token: str, output: str, engagement: bool) -> None:
-    """Scrape papers from Slack channels."""
-    from papertrail.scraper import SlackScraper
+def scrape(token: str, channel: str, output: str, engagement: bool) -> None:
+    """Scrape papers from a Slack channel."""
+    from papertrail.scraper import SlackPaperScraper
 
     if not token:
         raise click.ClickException("Set SLACK_BOT_TOKEN or pass --token.")
 
-    scraper = SlackScraper(token=token)
-    papers = scraper.scrape(with_engagement=engagement)
+    scraper = SlackPaperScraper(token=token)
+    papers = scraper.scrape_channel(channel, include_replies=engagement)
 
     data = [
         {
             "channel": p.channel_name,
             "shared_by": p.shared_by,
-            "date": p.date,
+            "timestamp": p.timestamp,
             "slack_link": p.permalink,
-            "url": p.url,
-            "text": p.text,
+            "url": p.paper_url,
+            "text": p.message_text,
             "reactions_count": p.reactions_count,
-            "replies_count": p.replies_count,
+            "reply_count": p.reply_count,
             "reaction_details": p.reaction_details,
         }
         for p in papers
@@ -102,6 +103,7 @@ def embed(
 ) -> None:
     """Compute embeddings, projections, clusters, and build FAISS index."""
     import numpy as np
+    from tqdm import tqdm
 
     from papertrail.embeddings import VectorStore, embed_texts
     from papertrail.projections import cluster_papers, compute_projections
@@ -109,9 +111,11 @@ def embed(
     with open(input_file) as f:
         papers = json.load(f)
 
+    click.echo(f"Processing {len(papers)} papers...")
+
     # Build text representations
     texts = []
-    for p in papers:
+    for p in tqdm(papers, desc="Building texts"):
         parts = [p.get("title", ""), p.get("abstract", ""), p.get("text", "")]
         texts.append(" ".join(part for part in parts if part))
 

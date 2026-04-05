@@ -157,9 +157,6 @@ class SlackPaperScraper:
 
     This is the main scraper class. For backward compatibility with older code,
     the original SlackScraper class is still available as an alias.
-    """
-    """
-    Comprehensive Slack paper scraper with pagination, filtering, and enrichment.
 
     Supports two modes of operation:
     1. Direct Slack API access via slack_sdk.WebClient (recommended)
@@ -217,12 +214,17 @@ class SlackPaperScraper:
         search_queries: list[str] | None = None,
         rate_limit_delay: float = 0.3,
         use_mcp: bool = False,
+        custom_domains: set[str] | None = None,
     ):
         """Initialize the Slack paper scraper."""
         self.token = token
         self.channels = channels
         self.rate_limit_delay = rate_limit_delay
         self.use_mcp = use_mcp
+
+        # Merge custom domains with built-in paper domains
+        if custom_domains:
+            PAPER_DOMAINS.update(custom_domains)
 
         # Default search queries targeting known paper domains
         self.search_queries = search_queries or self._build_default_queries()
@@ -237,6 +239,22 @@ class SlackPaperScraper:
         self._channel_cache: dict[str, str] = {}
         self._user_cache: dict[str, str] = {}
         self._conversation_cache: dict[str, dict[str, Any]] = {}
+
+        # Validate token with auth.test (optional, don't crash on failure)
+        if token and not use_mcp:
+            try:
+                resp = requests.get(
+                    f"{self.BASE_URL}/auth.test",
+                    headers=self.headers,
+                    timeout=10,
+                )
+                data = resp.json()
+                if not data.get("ok"):
+                    logger.warning("Slack token validation failed: %s", data.get("error", "unknown"))
+                else:
+                    logger.info("Authenticated as %s in team %s", data.get("user"), data.get("team"))
+            except Exception as e:
+                logger.warning("Could not validate Slack token: %s", e)
 
     @staticmethod
     def _build_default_queries() -> list[str]:
@@ -578,8 +596,8 @@ class SlackPaperScraper:
         dict
             Channel information with keys: id, name, topic, purpose, etc.
         """
-        if channel_id in self._channel_cache:
-            return self._conversation_cache.get(channel_id, {})
+        if channel_id in self._conversation_cache:
+            return self._conversation_cache[channel_id]
 
         try:
             response = self._api_call("conversations.info", channel=channel_id)
@@ -735,11 +753,6 @@ class SlackPaperScraper:
 
     @staticmethod
     def _clean_slack_text(text: str) -> str:
-        """
-        Remove Slack formatting and special characters from message text.
-
-        This is the primary implementation.
-        """
         """
         Remove Slack formatting and special characters from message text.
 

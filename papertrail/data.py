@@ -29,12 +29,18 @@ import json
 import logging
 import os
 import shutil
+import sys
 import tarfile
 from pathlib import Path
 from typing import Any, Optional
 from urllib.parse import urljoin
 
 import requests
+
+try:
+    from tqdm import tqdm
+except ImportError:
+    tqdm = None
 
 logger = logging.getLogger(__name__)
 
@@ -239,9 +245,18 @@ def download_release(
         resp = requests.get(download_url, stream=True, timeout=60)
         resp.raise_for_status()
 
-        with open(dest, "wb") as f:
-            for chunk in resp.iter_content(chunk_size=8192):
-                f.write(chunk)
+        total_size = int(resp.headers.get("content-length", 0))
+        if tqdm is not None and total_size > 0:
+            with open(dest, "wb") as f, tqdm(
+                total=total_size, unit="B", unit_scale=True, desc=name
+            ) as pbar:
+                for chunk in resp.iter_content(chunk_size=8192):
+                    f.write(chunk)
+                    pbar.update(len(chunk))
+        else:
+            with open(dest, "wb") as f:
+                for chunk in resp.iter_content(chunk_size=8192):
+                    f.write(chunk)
         downloaded.append(dest)
         logger.info("Saved %s (%d KB)", dest, dest.stat().st_size // 1024)
 
@@ -260,7 +275,10 @@ def _decompress(path: Path, dest_dir: Path) -> None:
     if name.endswith(".tar.gz") or name.endswith(".tgz"):
         logger.info("Extracting %s ...", name)
         with tarfile.open(path, "r:gz") as tar:
-            tar.extractall(dest_dir, filter="data")
+            if sys.version_info >= (3, 12):
+                tar.extractall(dest_dir, filter="data")
+            else:
+                tar.extractall(dest_dir)
 
     elif name.endswith(".json.gz"):
         out_path = dest_dir / name.replace(".gz", "")

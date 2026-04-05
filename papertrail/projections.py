@@ -53,6 +53,8 @@ def compute_projections(
     # t-SNE
     logger.info("Computing t-SNE...")
     perplexity = min(30, n - 1)
+    if perplexity < 5:
+        logger.warning("t-SNE perplexity is very low (%d). Results may be unreliable with so few samples.", perplexity)
     tsne = TSNE(
         n_components=2,
         perplexity=perplexity,
