@@ -2402,6 +2402,9 @@
                                 <option value="viridis">Viridis</option>
                                 <option value="plasma">Plasma</option>
                                 <option value="inferno">Inferno</option>
+                                <option value="magma">Magma</option>
+                                <option value="greyscale">Greyscale</option>
+                                <option value="hot">Hot</option>
                             </select>
                         </div>
                     </div>
@@ -3005,10 +3008,16 @@
                 }
             });
 
-            // Normalize journal names: remove parenthetical content
+            // Normalize journal names
+            const JOURNAL_MAP = {
+                'arxiv.org': 'arXiv', 'ArXiv.org': 'arXiv', 'Arxiv': 'arXiv',
+                'biorxiv': 'bioRxiv', 'Biorxiv': 'bioRxiv',
+                'medrxiv': 'medRxiv', 'Medrxiv': 'medRxiv',
+            };
             allPapers.forEach(p => {
                 if (p.journal) {
                     p.journal = p.journal.replace(/\s*\(.*?\)\s*/g, '').trim();
+                    if (JOURNAL_MAP[p.journal]) p.journal = JOURNAL_MAP[p.journal];
                 }
             });
 
@@ -4192,10 +4201,13 @@
 
         // Color palettes for KDE
         const KDE_PALETTES = {
+            blues: [[8,8,30],[15,20,60],[20,40,100],[25,65,140],[40,100,180],[70,140,210],[100,170,230],[140,200,240],[180,220,250]],
             viridis: [[68,1,84],[72,36,117],[65,68,135],[53,95,141],[42,120,142],[33,145,140],[34,168,132],[68,191,112],[122,209,81],[189,223,38],[253,231,37]],
             plasma: [[13,8,135],[75,3,161],[126,3,168],[168,34,150],[204,71,120],[231,109,90],[250,149,64],[253,195,40],[240,249,33]],
             inferno: [[0,0,4],[22,11,57],[66,10,104],[106,23,110],[147,38,103],[188,55,84],[221,81,58],[243,118,27],[252,165,10],[246,215,70],[252,255,164]],
-            blues: [[8,8,30],[15,20,60],[20,40,100],[25,65,140],[40,100,180],[70,140,210],[100,170,230],[140,200,240],[180,220,250]],
+            magma: [[0,0,4],[16,14,55],[56,15,100],[99,22,109],[143,37,106],[186,54,96],[221,86,78],[247,132,67],[254,188,82],[252,253,191]],
+            greyscale: [[10,10,10],[30,30,30],[50,50,50],[80,80,80],[110,110,110],[140,140,140],[170,170,170],[200,200,200],[230,230,230]],
+            hot: [[10,0,0],[80,0,0],[160,20,0],[220,60,0],[250,120,0],[255,180,30],[255,220,80],[255,245,160],[255,255,220]],
         };
 
         function computeKDE() {
@@ -5690,17 +5702,30 @@
                 } else {
                     previousPositions.clear();
                     animationRAF = null;
-                    // Recompute KDE with fade-in after projection change (#74, #75)
+                    // Recompute KDE with bandwidth animation (#74, #75, #78)
                     if (kdeEnabled) {
-                        computeKDE();
-                        // Fade in KDE over 500ms
+                        const targetBw = parseFloat(document.getElementById('kdeBandwidth').value);
+                        const startBw = targetBw * 5; // start blurry
                         let kdeFadeStart = performance.now();
+                        const kdeDuration = 800;
+
                         function kdeFadeStep(now) {
-                            const t = Math.min(1, (now - kdeFadeStart) / 500);
-                            kdeOpacityOverride = t;
+                            const t = Math.min(1, (now - kdeFadeStart) / kdeDuration);
+                            const easeT = 1 - Math.pow(1 - t, 2); // ease-out
+                            // Animate bandwidth from high to target
+                            const animBw = startBw + (targetBw - startBw) * easeT;
+                            document.getElementById('kdeBandwidth').value = animBw.toFixed(1);
+                            kdeOpacityOverride = Math.min(1, t * 1.5); // fade in faster than bw shrinks
+                            computeKDE();
                             renderMap();
-                            if (t < 1) requestAnimationFrame(kdeFadeStep);
-                            else kdeOpacityOverride = null;
+                            if (t < 1) {
+                                requestAnimationFrame(kdeFadeStep);
+                            } else {
+                                kdeOpacityOverride = null;
+                                document.getElementById('kdeBandwidth').value = targetBw;
+                                computeKDE();
+                                renderMap();
+                            }
                         }
                         requestAnimationFrame(kdeFadeStep);
                     }
