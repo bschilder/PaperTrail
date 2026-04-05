@@ -2642,7 +2642,8 @@
                 <div style="font-size:11px;color:#888;margin-bottom:8px;">Click below to open your provider's API key page. Create a key and copy it.</div>
                 <div style="display:flex;gap:6px;">
                     <a href="https://console.anthropic.com/settings/keys" target="_blank" style="flex:1;padding:8px;background:linear-gradient(135deg,#d97706,#b45309);border:none;color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;text-align:center;text-decoration:none;display:block;">Get Claude API Key &#x2197;</a>
-                    <a href="https://platform.openai.com/api-keys" target="_blank" style="padding:8px 12px;background:#3a3a4e;border:1px solid #4a4a5e;color:#e0e0e0;border-radius:8px;cursor:pointer;font-size:12px;text-decoration:none;display:block;">OpenAI &#x2197;</a>
+                    <a href="https://platform.openai.com/api-keys" target="_blank" style="padding:8px 10px;background:#3a3a4e;border:1px solid #4a4a5e;color:#e0e0e0;border-radius:8px;cursor:pointer;font-size:11px;text-decoration:none;display:block;">OpenAI &#x2197;</a>
+                    <a href="https://huggingface.co/settings/tokens" target="_blank" style="padding:8px 10px;background:#3a3a4e;border:1px solid #4a4a5e;color:#e0e0e0;border-radius:8px;cursor:pointer;font-size:11px;text-decoration:none;display:block;">HF (free) &#x2197;</a>
                 </div>
             </div>
 
@@ -2654,6 +2655,7 @@
                     <select id="serviceSelect" class="color-by-select" style="width:100%;font-size:12px;">
                         <option value="anthropic">Anthropic (Claude) — recommended</option>
                         <option value="openai">OpenAI (GPT-4)</option>
+                        <option value="huggingface">HuggingFace (Qwen) — free tier</option>
                     </select>
                 </div>
                 <div style="margin-bottom:8px;">
@@ -6690,8 +6692,11 @@
                 const modelSelect = document.getElementById('modelSelect');
                 const apiInput = document.getElementById('apiKeyInput');
                 if (svc === 'openai') {
-                    modelSelect.innerHTML = '<option value="gpt-4o">GPT-4o (default)</option><option value="gpt-4o-mini">GPT-4o Mini (fast)</option><option value="gpt-4-turbo">GPT-4 Turbo</option>';
+                    modelSelect.innerHTML = '<option value="gpt-4o">GPT-4o (default)</option><option value="gpt-4o-mini">GPT-4o Mini (fast)</option>';
                     apiInput.placeholder = 'sk-...';
+                } else if (svc === 'huggingface') {
+                    modelSelect.innerHTML = '<option value="Qwen/Qwen2.5-72B-Instruct">Qwen 2.5 72B (recommended)</option><option value="meta-llama/Llama-3.3-70B-Instruct">Llama 3.3 70B</option><option value="Qwen/Qwen3-8B">Qwen 3 8B (fast)</option>';
+                    apiInput.placeholder = 'hf_...';
                 } else {
                     modelSelect.innerHTML = '<option value="claude-sonnet-4-20250514">Sonnet 4 — fast + smart (default)</option><option value="claude-opus-4-20250514">Opus 4 — most capable</option><option value="claude-haiku-3-5-20241022">Haiku 3.5 — fastest</option>';
                     apiInput.placeholder = 'sk-ant-...';
@@ -6710,12 +6715,15 @@
                 const key = document.getElementById('apiKeyInput').value.trim();
                 const svc = document.getElementById('serviceSelect').value;
                 const model = document.getElementById('modelSelect').value;
-                if (key && !key.includes('...') && (key.startsWith('sk-') || key.length > 20)) {
+                if (key && !key.includes('...') && (key.startsWith('sk-') || key.startsWith('hf_') || key.length > 20)) {
                     connectedServices[svc] = { key, model };
                     localStorage.setItem('papertrail_services', JSON.stringify(connectedServices));
                     if (svc === 'anthropic') {
                         claudeApiKey = key;
                         claudeModel = model;
+                    } else if (svc === 'huggingface') {
+                        hfToken = key;
+                        hfModel = model;
                     }
                     document.getElementById('apiKeyStatus').innerHTML = '<span style="color:#66bb6a;font-weight:600;">&#x2713; ' + esc(svc) + ' connected!</span> You can now use AI-powered search.';
                     document.getElementById('apiKeyStatus').style.color = '#66bb6a';
@@ -6751,6 +6759,11 @@
                 claudeApiKey = connectedServices.anthropic.key;
                 claudeModel = connectedServices.anthropic.model || 'claude-sonnet-4-20250514';
                 settingsBtn.classList.add('has-key');
+            }
+            if (connectedServices.huggingface) {
+                hfToken = connectedServices.huggingface.key;
+                hfModel = connectedServices.huggingface.model || 'Qwen/Qwen2.5-72B-Instruct';
+                if (!claudeApiKey) settingsBtn.classList.add('has-key');
             }
             updateConnectedServicesUI();
         }
@@ -6793,13 +6806,10 @@
             const summary = buildDatasetSummary();
             return `You are an AI assistant embedded in PaperTrail, a dashboard for exploring academic papers shared in a team's Slack channels.
 
-DATASET SUMMARY:
-- ${summary.total_papers} papers total
-- Channels: ${summary.channels.join(', ')}
-- People who shared: ${summary.people.join(', ')}
-- Cluster labels: ${summary.cluster_labels.join(', ')}
-- Date range: ${summary.date_range.from} to ${summary.date_range.to}
-- Fields per paper: ${summary.fields_per_paper.join(', ')}
+DATASET: ${summary.total_papers} papers, ${summary.channels.length} channels, ${summary.people.length} contributors, ${summary.cluster_labels.length} clusters.
+Date range: ${summary.date_range.from} to ${summary.date_range.to}.
+Channels: ${summary.channels.join(', ')}.
+Top contributors: ${summary.people.slice(0, 10).join(', ')}.
 
 You have powerful tools to analyze this dataset:
 
@@ -7257,7 +7267,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     },
                     body: JSON.stringify({
                         model: claudeModel,
-                        max_tokens: 2048,
+                        max_tokens: 1024,
                         system: buildSystemPrompt(),
                         tools: [...ALL_TOOLS, WEB_SEARCH_TOOL],
                         messages
