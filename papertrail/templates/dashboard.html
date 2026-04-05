@@ -2464,7 +2464,7 @@
                             <table class="data-table" id="dataTable">
                                 <thead>
                                     <tr>
-                                        <th style="width:30px;text-align:center;">#</th>
+                                        <th style="width:42px;text-align:center;">#</th>
                                         <th style="width:30px;text-align:center;"><input type="checkbox" id="tableSelectAll" title="Select all"></th>
                                         <th data-field="title" title="Paper title &#10;Click header to sort &#10;Drag edge to resize column" style="width:30%;">
                                             <div class="th-content">
@@ -4640,7 +4640,7 @@
             papers3DRef = filteredPapers.filter(p => p.projections && p.projections[currentProjection]);
             const proj3DKey = currentProjection + '3d'; // e.g. "umap3d"
             const has3D = papers3DRef.length > 0 && papers3DRef[0].projections?.[proj3DKey];
-            const coords3D = has3D
+            let coords3D = has3D
                 ? papers3DRef.map(p => {
                     const c = p.projections[proj3DKey];
                     return c ? [c[0], c[1], c[2]] : [0, 0, 0];
@@ -5022,9 +5022,8 @@
             // KDE background (needs screen positions)
             if (kdeEnabled) { computeKDE(); drawKDEBackground(); }
 
-            // Draw subtle density contours for terrain effect
-            if (!kdeEnabled) {
-                // Light contour rings around dense areas
+            // Density contours removed — use KDE toggle for real density visualization
+            if (false) {
                 const contourPoints = filteredPapers.filter(p => p._sx > 0 && p._sx < canvas.width);
                 if (contourPoints.length > 20) {
                     ctx.globalAlpha = 0.04;
@@ -5032,7 +5031,6 @@
                     ctx.lineWidth = 1;
                     contourPoints.forEach(p => {
                         if (p._sx < 0 || p._sx > canvas.width) return;
-                        // Draw faint circle at each point position
                         ctx.beginPath();
                         ctx.arc(p._sx, p._sy, 15, 0, Math.PI * 2);
                         ctx.stroke();
