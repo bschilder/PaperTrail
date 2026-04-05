@@ -2545,13 +2545,13 @@
             </div>
             <div style="font-size:13px;color:#888;margin-bottom:14px;text-align:left;">
                 <div style="font-weight:600;color:#888;margin-bottom:6px;">What you can do:</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;">
-                    <span>&#x1F5FA; 4 views: Map, 3D, Table, Leaderboard</span>
-                    <span>&#x1F50D; AI-powered paper search</span>
-                    <span>&#x1F4CA; Filter by channel, topic, time</span>
-                    <span>&#x1F464; Contributor profiles & stats</span>
-                    <span>&#x1F3AF; Lasso & rectangle selection</span>
-                    <span>&#x23F1; Time-travel animation</span>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                    <div style="background:#1a1a2e;border:1px solid #2a2a3e;border-radius:8px;padding:8px 10px;font-size:12px;color:#a0a0b0;">&#x1F5FA; 4 views: Map, 3D, Table, Leaderboard</div>
+                    <div style="background:#1a1a2e;border:1px solid #2a2a3e;border-radius:8px;padding:8px 10px;font-size:12px;color:#a0a0b0;">&#x1F50D; AI-powered paper search</div>
+                    <div style="background:#1a1a2e;border:1px solid #2a2a3e;border-radius:8px;padding:8px 10px;font-size:12px;color:#a0a0b0;">&#x1F4CA; Filter by channel, topic, time</div>
+                    <div style="background:#1a1a2e;border:1px solid #2a2a3e;border-radius:8px;padding:8px 10px;font-size:12px;color:#a0a0b0;">&#x1F464; Contributor profiles & stats</div>
+                    <div style="background:#1a1a2e;border:1px solid #2a2a3e;border-radius:8px;padding:8px 10px;font-size:12px;color:#a0a0b0;">&#x1F3AF; Lasso & rectangle selection</div>
+                    <div style="background:#1a1a2e;border:1px solid #2a2a3e;border-radius:8px;padding:8px 10px;font-size:12px;color:#a0a0b0;">&#x23F1; Time-travel animation</div>
                 </div>
             </div>
             <div class="onboarding-hints">
@@ -3786,13 +3786,20 @@
             if (colorByMode === 'year') {
                 const year = paper.year || 2020;
                 const normalized = Math.min(1, applyTransform(year - 2015, 10));
-                return interpolateColor([100, 181, 246], [239, 83, 80], normalized);
+                // Viridis-inspired multi-stop
+                if (normalized < 0.25) return interpolateColor([68,1,84], [59,82,139], normalized/0.25);
+                if (normalized < 0.5) return interpolateColor([59,82,139], [33,145,140], (normalized-0.25)/0.25);
+                if (normalized < 0.75) return interpolateColor([33,145,140], [94,201,98], (normalized-0.5)/0.25);
+                return interpolateColor([94,201,98], [253,231,37], (normalized-0.75)/0.25);
             }
 
             if (colorByMode === 'citations') {
                 const citations = paper.cited_by_count || 0;
                 const normalized = Math.min(1, applyTransform(citations, 500));
-                return interpolateColor([100, 181, 246], [255, 202, 40], normalized);
+                // Plasma-inspired multi-stop
+                if (normalized < 0.33) return interpolateColor([13,8,135], [126,3,168], normalized/0.33);
+                if (normalized < 0.66) return interpolateColor([126,3,168], [231,109,90], (normalized-0.33)/0.33);
+                return interpolateColor([231,109,90], [240,249,33], (normalized-0.66)/0.34);
             }
 
             if (colorByMode === 'engagement') {
