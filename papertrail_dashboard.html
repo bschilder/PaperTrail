@@ -3154,7 +3154,8 @@
 
             // Normalize journal names
             const JOURNAL_MAP = {
-                'arxiv.org': 'arXiv', 'ArXiv.org': 'arXiv', 'Arxiv': 'arXiv',
+                'arxiv.org': 'arXiv', 'ArXiv.org': 'arXiv', 'Arxiv': 'arXiv', 'arXiv (Cornell University)': 'arXiv',
+                'PubMed': '', 'Pubmed': '',
                 'biorxiv': 'bioRxiv', 'Biorxiv': 'bioRxiv',
                 'medrxiv': 'medRxiv', 'Medrxiv': 'medRxiv',
             };
@@ -8264,7 +8265,10 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 document.getElementById('tableView').classList.toggle('visible', view === 'table');
                 document.getElementById('leaderboardView').classList.toggle('visible', view === 'leaderboard');
                 document.getElementById('threeDView').classList.toggle('visible', view === 'threeD');
-                if (view === 'map') renderMap();
+                if (view === 'map') {
+                    // Force canvas resize in case dimensions were lost during modal/view switch
+                    setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
+                }
                 if (view === 'table') { renderTable(); setupTableEvents(); }
                 if (view === 'leaderboard') renderLeaderboard();
                 if (view === 'threeD') init3DView();
