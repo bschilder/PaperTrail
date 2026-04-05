@@ -2528,17 +2528,30 @@
             </div>
             <div class="onboarding-title" id="onboardingTitle">Welcome to PaperTrail</div>
             <div class="onboarding-text" id="onboardingText">
-                This map shows <strong id="onboardingCount">0</strong> papers shared by your team across Slack.
-                Each dot is a paper. <strong>Similar papers cluster together</strong> — nearby dots discuss related topics.
+                Explore <strong id="onboardingCount">0</strong> papers shared by your team across Slack.
+                Each dot is a paper — <strong>similar papers cluster together</strong> by topic.
+            </div>
+            <div style="font-size:11px;color:#666;margin-bottom:12px;text-align:left;">
+                <div style="font-weight:600;color:#888;margin-bottom:6px;">What you can do:</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;">
+                    <span>&#x1F5FA; 4 views: Map, 3D, Table, Leaderboard</span>
+                    <span>&#x1F50D; AI-powered paper search</span>
+                    <span>&#x1F4CA; Filter by channel, topic, time</span>
+                    <span>&#x1F464; Contributor profiles & stats</span>
+                    <span>&#x1F3AF; Lasso & rectangle selection</span>
+                    <span>&#x23F1; Time-travel animation</span>
+                </div>
             </div>
             <div class="onboarding-hints">
-                <div class="onboarding-hint"><kbd>Hover</kbd> Preview any paper</div>
-                <div class="onboarding-hint"><kbd>Click</kbd> Select & view details</div>
-                <div class="onboarding-hint"><kbd>/</kbd> Search with AI</div>
-                <div class="onboarding-hint"><kbd>?</kbd> All keyboard shortcuts</div>
+                <div class="onboarding-hint"><kbd>Hover</kbd> Preview papers</div>
+                <div class="onboarding-hint"><kbd>&#8592;&#8594;</kbd> Switch views</div>
+                <div class="onboarding-hint"><kbd>/</kbd> AI Agent search</div>
+                <div class="onboarding-hint"><kbd>V L R</kbd> Pan / Lasso / Rect</div>
+                <div class="onboarding-hint"><kbd>1 2 3</kbd> UMAP / tSNE / PCA</div>
+                <div class="onboarding-hint"><kbd>?</kbd> All shortcuts</div>
             </div>
             <button class="onboarding-btn" onclick="document.getElementById('onboardingOverlay').classList.remove('visible')">
-                Explore Papers
+                Explore Papers <span style="opacity:0.7;font-size:12px;margin-left:6px;">(or press Enter)</span>
             </button>
             <label class="onboarding-dismiss">
                 <input type="checkbox" id="onboardingDismiss"> Don't show again
@@ -2569,7 +2582,6 @@
                 <div class="shortcut-row"><kbd>Scroll</kbd><span>Zoom in/out</span></div>
                 <div style="font-size:10px;color:#64b5f6;text-transform:uppercase;letter-spacing:1px;padding:8px 0 4px;">General</div>
                 <div class="shortcut-row"><kbd>/</kbd><span>Open AI Agent search</span></div>
-                <div class="shortcut-row"><kbd>Cmd+A</kbd><span>Toggle AI Agent panel</span></div>
                 <div class="shortcut-row"><kbd>Esc</kbd><span>Clear selection / close panels</span></div>
                 <div class="shortcut-row"><kbd>?</kbd><span>Show this help</span></div>
             </div>
@@ -7343,7 +7355,9 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
                 // Don't trigger shortcuts when typing in inputs
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+                // Allow CMD/Ctrl shortcuts through even when in inputs
+                const inInput = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT';
+                if (inInput && !(e.metaKey || e.ctrlKey)) return;
 
                 switch(e.key) {
                     case 'Escape':
@@ -7363,13 +7377,6 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     case '3':
                         document.querySelectorAll('.proj-btn').forEach(b => b.classList.toggle('active', b.dataset.proj === 'pca'));
                         animateProjectionChange('pca');
-                        break;
-                    case 'a':
-                    case 'A':
-                        if (e.metaKey || e.ctrlKey) {
-                            e.preventDefault();
-                            document.getElementById('agentMascotBtn').click();
-                        }
                         break;
                     case '/':
                         e.preventDefault();
