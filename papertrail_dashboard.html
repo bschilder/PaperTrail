@@ -2343,7 +2343,7 @@
                 </div>
 
                 <div class="sidebar-section">
-                    <div class="sidebar-label">Point Size</div>
+                    <div class="sidebar-label">Scale Factor</div>
                     <div class="select-controls">
                         <input type="range" id="pointSizeSlider" min="1" max="8" value="3" step="0.5" style="flex:1;">
                         <span class="threshold-display" id="pointSizeDisplay">3</span>
@@ -2354,15 +2354,15 @@
                     <div class="sidebar-label" style="display:flex;justify-content:space-between;align-items:center;">
                         <span>KDE Background</span>
                         <label class="toggle-switch">
-                            <input type="checkbox" id="kdeToggle">
+                            <input type="checkbox" id="kdeToggle" checked>
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <div class="collapsible-options" id="kdeOptions" style="display:none;">
+                    <div class="collapsible-options" id="kdeOptions">
                         <div class="select-controls" style="margin-bottom:4px;">
                             <span style="font-size:10px;color:#666;min-width:55px;">Bandwidth</span>
-                            <input type="range" id="kdeBandwidth" min="1" max="10" value="4" step="0.5" style="flex:1;">
-                            <span class="threshold-display" id="kdeBwDisplay" style="min-width:20px;">4</span>
+                            <input type="range" id="kdeBandwidth" min="0.2" max="10" value="1" step="0.1" style="flex:1;">
+                            <span class="threshold-display" id="kdeBwDisplay" style="min-width:20px;">1</span>
                         </div>
                         <div class="select-controls" style="margin-bottom:4px;">
                             <span style="font-size:10px;color:#666;min-width:55px;">Opacity</span>
@@ -2372,10 +2372,10 @@
                         <div class="select-controls">
                             <span style="font-size:10px;color:#666;min-width:55px;">Palette</span>
                             <select class="color-by-select" id="kdePalette" style="flex:1;">
+                                <option value="blues">Blues</option>
                                 <option value="viridis">Viridis</option>
                                 <option value="plasma">Plasma</option>
                                 <option value="inferno">Inferno</option>
-                                <option value="blues">Blues</option>
                             </select>
                         </div>
                     </div>
@@ -2793,7 +2793,7 @@
         let basePointSize = 3; // global point size multiplier
         let scaleTransform = 'linear'; // linear, log, sqrt
         let densityMap = new Map(); // paper -> density score (0-1)
-        let kdeEnabled = false;
+        let kdeEnabled = true; // KDE on by default
         let kdeCanvas = null; // offscreen canvas for KDE
         let renderedLabels = []; // {x, y, w, h, label} for click detection
         let hiddenClusters = new Set(); // cluster labels hidden via legend toggle
@@ -3145,6 +3145,8 @@
 
             const sidebarStats = document.getElementById('sidebarStats');
             if (sidebarStats) sidebarStats.textContent = filteredPapers.length + ' / ' + allPapers.length;
+            const insightCount = document.getElementById('insightPaperCount');
+            if (insightCount) insightCount.textContent = filteredPapers.length;
         }
 
         // ===== TABLE VIEW =====
@@ -4941,7 +4943,7 @@
             const topCited = [...allPapers].sort((a, b) => (b.cited_by_count || 0) - (a.cited_by_count || 0))[0];
 
             let html = `<span class="insight-chip" onclick="showAllClusters()" title="View all clusters">&#x1F30D; <span class="insight-highlight">${sortedClusters.length} clusters</span></span>`;
-            html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="document.getElementById('tableToggle').click()" title="View all papers">${allPapers.length} papers</span>`;
+            html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="document.getElementById('tableToggle').click()" title="View all papers"><span id="insightPaperCount">${allPapers.length}</span> papers</span>`;
             if (topCluster) html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="showTopicActions('${esc(topCluster[0]).replace(/'/g, "\\'")}', event)" title="Explore this topic">&#x1F4A1; <strong>${esc(topCluster[0])}</strong> (${topCluster[1]})</span>`;
             if (topPerson) html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="showContributorProfile('${esc(topPerson[0]).replace(/'/g, "\\'")}')" title="View profile">&#x1F451; <strong>${esc(topPerson[0])}</strong> (${topPerson[1]})</span>`;
             if (topCited && topCited.cited_by_count > 50) html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="window.open('${esc(topCited.url || '')}','_blank')" title="Open paper">&#x1F525; <strong>${esc((topCited.title || '').substring(0, 35))}...</strong> (${topCited.cited_by_count})</span>`;
@@ -7650,6 +7652,8 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             // ===== EVENT LISTENERS =====
             function switchView(view) {
                 currentView = view;
+                // Clear tooltip when switching views (#54)
+                document.getElementById('tooltip').classList.remove('visible');
                 ['map', 'table', 'leaderboard', 'threeD'].forEach(v => {
                     const toggle = document.getElementById(v === 'threeD' ? 'threeDToggle' : v + 'Toggle');
                     if (toggle) toggle.classList.toggle('active', view === v);
@@ -7669,9 +7673,9 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             document.getElementById('leaderboardToggle').addEventListener('click', () => switchView('leaderboard'));
             document.getElementById('threeDToggle').addEventListener('click', () => switchView('threeD'));
 
-            document.querySelectorAll('.proj-btn').forEach(btn => {
+            document.querySelectorAll('#projectionButtons .proj-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    document.querySelectorAll('.proj-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('#projectionButtons .proj-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     animateProjectionChange(btn.dataset.proj);
                     debouncedSaveHash();
