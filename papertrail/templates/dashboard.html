@@ -554,6 +554,14 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
+            border-radius: 6px;
+            padding: 4px;
+            transition: outline 0.15s ease;
+            outline: 2px solid transparent;
+        }
+        .sidebar-section.focused {
+            outline: 2px solid #42a5f5;
+            outline-offset: 2px;
         }
 
         .sidebar-label {
@@ -1468,6 +1476,26 @@
             transition: all 0.15s;
         }
         .profile-close:hover { color: #fff; background: #3a3a4e; }
+        .modal-back-btn {
+            position: absolute;
+            top: 12px;
+            left: 14px;
+            background: #252538;
+            border: 1px solid #3a3a4e;
+            color: #888;
+            font-size: 16px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .modal-back-btn:hover { color: #fff; background: #3a3a4e; }
+        .modal-back-btn.visible { display: flex; }
         .profile-header {
             padding: 24px 24px 16px;
             border-bottom: 1px solid #2a2a3e;
@@ -2595,6 +2623,102 @@
         let renderedLabels = []; // {x, y, w, h, label} for click detection
         let hiddenClusters = new Set(); // cluster labels hidden via legend toggle
         let currentProjection = 'umap';
+
+        // Sidebar section focus state for CMD+Up/Down navigation
+        let focusedSidebarIdx = -1;
+        const sidebarSectionIds = [
+            'projectionButtons',  // Projection
+            'colorBySelect',      // Color By
+            'pointSizeSlider',    // Point Size
+            'kdeToggle',          // KDE Background
+            'scaleBySelect',      // Scale By
+            'transformButtons'    // Transform
+        ];
+
+        function getSidebarSections() {
+            return sidebarSectionIds.map(id => {
+                const el = document.getElementById(id);
+                return el ? el.closest('.sidebar-section') : null;
+            }).filter(Boolean);
+        }
+
+        function focusSidebarSection(idx) {
+            const sections = getSidebarSections();
+            // Remove previous focus
+            document.querySelectorAll('.sidebar-section.focused').forEach(s => s.classList.remove('focused'));
+            if (idx < 0 || idx >= sections.length) {
+                focusedSidebarIdx = -1;
+                return;
+            }
+            focusedSidebarIdx = idx;
+            sections[idx].classList.add('focused');
+            sections[idx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+
+        function handleSidebarArrow(direction) {
+            const sections = getSidebarSections();
+            const section = sections[focusedSidebarIdx];
+            if (!section) return;
+
+            // Projection buttons
+            const projBtns = section.querySelectorAll('.proj-btn');
+            if (projBtns.length > 0) {
+                const activeBtn = section.querySelector('.proj-btn.active');
+                const btns = Array.from(projBtns);
+                const curIdx = btns.indexOf(activeBtn);
+                const newIdx = direction === 'down'
+                    ? Math.min(curIdx + 1, btns.length - 1)
+                    : Math.max(curIdx - 1, 0);
+                btns[newIdx].click();
+                return;
+            }
+
+            // Select dropdown
+            const select = section.querySelector('select');
+            if (select) {
+                const curIdx = select.selectedIndex;
+                const newIdx = direction === 'down'
+                    ? Math.min(curIdx + 1, select.options.length - 1)
+                    : Math.max(curIdx - 1, 0);
+                select.selectedIndex = newIdx;
+                select.dispatchEvent(new Event('change'));
+                return;
+            }
+
+            // Range slider
+            const slider = section.querySelector('input[type="range"]');
+            if (slider) {
+                const step = parseFloat(slider.step) || 1;
+                const val = parseFloat(slider.value);
+                const newVal = direction === 'down'
+                    ? Math.min(val + step, parseFloat(slider.max))
+                    : Math.max(val - step, parseFloat(slider.min));
+                slider.value = newVal;
+                slider.dispatchEvent(new Event('input'));
+                return;
+            }
+
+            // Toggle checkbox (KDE)
+            const toggle = section.querySelector('input[type="checkbox"]');
+            if (toggle) {
+                toggle.checked = !toggle.checked;
+                toggle.dispatchEvent(new Event('change'));
+                return;
+            }
+        }
+
+        function handleSidebarEnter() {
+            // Enter activates the currently highlighted option (already handled by arrow cycling)
+            // For toggles, treat Enter as toggle
+            const sections = getSidebarSections();
+            const section = sections[focusedSidebarIdx];
+            if (!section) return;
+            const toggle = section.querySelector('input[type="checkbox"]');
+            if (toggle) {
+                toggle.checked = !toggle.checked;
+                toggle.dispatchEvent(new Event('change'));
+            }
+        }
 
         // Canvas state
         let canvas, ctx;
@@ -7201,6 +7325,43 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     case '?':
                         document.getElementById('shortcutsOverlay').classList.toggle('visible');
                         break;
+                    case 'ArrowUp':
+                    case 'ArrowDown': {
+                        if (e.metaKey || e.ctrlKey) {
+                            // CMD+Arrow Up/Down: cycle through sidebar sections
+                            e.preventDefault();
+                            const sections = getSidebarSections();
+                            if (sections.length === 0) break;
+                            if (focusedSidebarIdx === -1) {
+                                focusSidebarSection(e.key === 'ArrowDown' ? 0 : sections.length - 1);
+                            } else {
+                                const newIdx = e.key === 'ArrowDown'
+                                    ? (focusedSidebarIdx + 1) % sections.length
+                                    : (focusedSidebarIdx - 1 + sections.length) % sections.length;
+                                focusSidebarSection(newIdx);
+                            }
+                        } else if (focusedSidebarIdx >= 0) {
+                            // Arrow Up/Down within focused section: cycle options
+                            e.preventDefault();
+                            handleSidebarArrow(e.key === 'ArrowDown' ? 'down' : 'up');
+                        }
+                        break;
+                    }
+                    case 'Enter': {
+                        if (focusedSidebarIdx >= 0) {
+                            e.preventDefault();
+                            handleSidebarEnter();
+                        }
+                        break;
+                    }
+                    case 'Escape': {
+                        if (focusedSidebarIdx >= 0) {
+                            e.preventDefault();
+                            focusSidebarSection(-1);
+                            break;
+                        }
+                        break;
+                    }
                     case 'ArrowLeft':
                     case 'ArrowRight': {
                         if (e.metaKey || e.ctrlKey) {
