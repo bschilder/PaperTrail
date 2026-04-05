@@ -2433,34 +2433,8 @@
             });
             ctx.globalAlpha = 1;
 
-            // Draw cluster labels at centroids (always visible)
-            {
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                for (const cid of Object.keys(clusterCentroids)) {
-                    const c = clusterCentroids[cid];
-                    if (c.count < 3) continue;
-                    const cx = c.x / c.count;
-                    const cy = c.y / c.count;
-                    if (cx < 0 || cx > canvas.width || cy < 0 || cy > canvas.height) continue;
-
-                    // Background pill — subtler when not in cluster mode
-                    const isClusterMode = colorByMode === 'cluster';
-                    const label = c.label.length > 25 ? c.label.substring(0, 22) + '...' : c.label;
-                    ctx.font = (isClusterMode ? 'bold ' : '') + '11px -apple-system, sans-serif';
-                    const tw = ctx.measureText(label).width;
-                    ctx.fillStyle = isClusterMode ? 'rgba(15, 15, 23, 0.75)' : 'rgba(15, 15, 23, 0.5)';
-                    const px = 6, py = 3;
-                    ctx.beginPath();
-                    ctx.roundRect(cx - tw/2 - px, cy - 7 - py, tw + px*2, 14 + py*2, 4);
-                    ctx.fill();
-
-                    ctx.fillStyle = isClusterMode ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.45)';
-                    ctx.fillText(label, cx, cy);
-                }
-                ctx.textAlign = 'start';
-                ctx.textBaseline = 'alphabetic';
-            }
+            // Draw hierarchical cluster labels (DataMapPlot-inspired)
+            drawHierarchicalLabels(clusterCentroids);
 
             // Draw color legend
             drawLegend();
@@ -2601,6 +2575,90 @@
                 Math.min(mw - pad * 2, vpRight - vpLeft),
                 Math.min(mh - pad * 2, vpBottom - vpTop)
             );
+        }
+
+        function drawHierarchicalLabels(clusterCentroids) {
+            const entries = Object.entries(clusterCentroids)
+                .filter(([_, c]) => c.count >= 3)
+                .map(([cid, c]) => ({
+                    cid,
+                    cx: c.x / c.count,
+                    cy: c.y / c.count,
+                    count: c.count,
+                    label: c.label,
+                }))
+                .filter(c => c.cx > -50 && c.cx < canvas.width + 50 && c.cy > -50 && c.cy < canvas.height + 50);
+
+            if (entries.length === 0) return;
+
+            // Sort by count descending — largest clusters first
+            entries.sort((a, b) => b.count - a.count);
+
+            const maxCount = entries[0].count;
+            const isClusterMode = colorByMode === 'cluster';
+
+            // Size tiers: large (top 3), medium (next 5), small (rest)
+            // At zoom > 2, show all; at zoom 1, hide small labels
+            const minCountForDisplay = zoomLevel > 2 ? 3 : zoomLevel > 1.3 ? 8 : 12;
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Track placed label bounding boxes for overlap avoidance
+            const placed = [];
+
+            entries.forEach((c, rank) => {
+                if (c.count < minCountForDisplay && rank > 3) return;
+
+                // Hierarchical sizing: font size 10-20px based on relative cluster size
+                const sizeRatio = c.count / maxCount;
+                const fontSize = Math.round(10 + sizeRatio * 12);
+                const isMajor = rank < 3;
+                const isMedium = rank < 8;
+
+                // Opacity: larger clusters more prominent
+                const baseAlpha = isClusterMode ? 0.9 : 0.5;
+                const alpha = isMajor ? baseAlpha : (isMedium ? baseAlpha * 0.7 : baseAlpha * 0.45);
+
+                const fontWeight = isMajor ? '700' : (isMedium ? '600' : '400');
+                ctx.font = `${fontWeight} ${fontSize}px -apple-system, BlinkMacSystemFont, sans-serif`;
+
+                const label = c.label.length > 30 ? c.label.substring(0, 27) + '...' : c.label;
+                const tw = ctx.measureText(label).width;
+                const th = fontSize * 1.2;
+
+                // Simple overlap check
+                const bbox = { x: c.cx - tw/2 - 4, y: c.cy - th/2 - 2, w: tw + 8, h: th + 4 };
+                const overlaps = placed.some(p =>
+                    bbox.x < p.x + p.w && bbox.x + bbox.w > p.x &&
+                    bbox.y < p.y + p.h && bbox.y + bbox.h > p.y
+                );
+                if (overlaps && !isMajor) return; // Skip non-major overlapping labels
+
+                placed.push(bbox);
+
+                // Background: subtle frosted pill for readability
+                if (isMajor || isClusterMode) {
+                    ctx.fillStyle = `rgba(15, 15, 23, ${isMajor ? 0.6 : 0.4})`;
+                    const px = 8, py = 4;
+                    ctx.beginPath();
+                    ctx.roundRect(c.cx - tw/2 - px, c.cy - th/2 - py, tw + px*2, th + py*2, fontSize/3);
+                    ctx.fill();
+                }
+
+                // Text with slight text-shadow effect via double render
+                ctx.globalAlpha = alpha * 0.3;
+                ctx.fillStyle = '#000';
+                ctx.fillText(label, c.cx + 1, c.cy + 1);
+
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = isMajor ? 'rgba(255,255,255,0.95)' : `rgba(255,255,255,${isClusterMode ? 0.8 : 0.55})`;
+                ctx.fillText(label, c.cx, c.cy);
+            });
+
+            ctx.globalAlpha = 1;
+            ctx.textAlign = 'start';
+            ctx.textBaseline = 'alphabetic';
         }
 
         function animateProjectionChange(newProjection) {
