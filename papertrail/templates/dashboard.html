@@ -2340,6 +2340,7 @@
         let basePointSize = 3; // global point size multiplier
         let scaleTransform = 'linear'; // linear, log, sqrt
         let densityMap = new Map(); // paper -> density score (0-1)
+        let renderedLabels = []; // {x, y, w, h, label} for click detection
         let currentProjection = 'umap';
 
         // Canvas state
@@ -2447,9 +2448,17 @@
         }
 
         // ===== UI INITIALIZATION =====
+        let channelDragging = false;
+        let channelDragAction = null; // 'select' or 'deselect'
+
         function initChannelFilters(channels) {
             const container = document.getElementById('channelFilters');
             container.innerHTML = '';
+
+            // Drag to select/deselect multiple channels
+            container.addEventListener('mousedown', () => { channelDragging = true; channelDragAction = null; });
+            document.addEventListener('mouseup', () => { channelDragging = false; channelDragAction = null; });
+
             channels.sort().forEach(channel => {
                 const row = document.createElement('div');
                 row.className = 'channel-row';
@@ -2461,15 +2470,37 @@
                 const count = allPapers.filter(p => (p.channels || []).includes(channel)).length;
                 btn.innerHTML = `<span class="channel-name">${channelDisplayName(channel)}</span><span class="channel-count">${count}</span>`;
                 btn.style.setProperty('--channel-color', CHANNEL_COLORS[channel] || '#64b5f6');
-                btn.addEventListener('click', () => {
-                    if (selectedChannels.has(channel)) {
-                        selectedChannels.delete(channel);
+                function toggleChannel(ch, btn) {
+                    if (selectedChannels.has(ch)) {
+                        selectedChannels.delete(ch);
                         btn.classList.remove('active');
                     } else {
-                        selectedChannels.add(channel);
+                        selectedChannels.add(ch);
                         btn.classList.add('active');
                     }
+                }
+
+                btn.addEventListener('click', () => {
+                    toggleChannel(channel, btn);
                     filterPapers();
+                });
+
+                btn.addEventListener('mouseenter', () => {
+                    if (channelDragging) {
+                        // First drag determines action (select or deselect)
+                        if (channelDragAction === null) {
+                            channelDragAction = selectedChannels.has(channel) ? 'deselect' : 'select';
+                        }
+                        if (channelDragAction === 'select' && !selectedChannels.has(channel)) {
+                            selectedChannels.add(channel);
+                            btn.classList.add('active');
+                            filterPapers();
+                        } else if (channelDragAction === 'deselect' && selectedChannels.has(channel)) {
+                            selectedChannels.delete(channel);
+                            btn.classList.remove('active');
+                            filterPapers();
+                        }
+                    }
                 });
 
                 const link = document.createElement('a');
@@ -3707,6 +3738,7 @@
         }
 
         function drawHierarchicalLabels(clusterCentroids) {
+            renderedLabels = []; // reset for this frame
             const entries = Object.entries(clusterCentroids)
                 .filter(([_, c]) => c.count >= 3)
                 .map(([cid, c]) => ({
@@ -3765,6 +3797,7 @@
                 if (overlaps && !isMajor) return; // Skip non-major overlapping labels
 
                 placed.push(bbox);
+                renderedLabels.push({ ...bbox, label: c.label });
 
                 // Background: subtle frosted pill for readability
                 if (isMajor || isClusterMode) {
@@ -4002,6 +4035,12 @@
                 lassoCtx.setLineDash([]);
             }
 
+            // Set cursor for label hover
+            const overLabel = renderedLabels.some(lb =>
+                mouseX >= lb.x && mouseX <= lb.x + lb.w && mouseY >= lb.y && mouseY <= lb.y + lb.h
+            );
+            canvas.style.cursor = overLabel ? 'pointer' : (hoveredPaperIdx >= 0 ? 'pointer' : 'default');
+
             // Show tooltip
             showTooltip(mouseX, mouseY, e.clientX, e.clientY);
         }
@@ -4023,6 +4062,16 @@
                 const dy = e.clientY - mouseDownPos.y;
                 if (Math.abs(dx) < 3 && Math.abs(dy) < 3) {
                     const [mx, my] = canvasCoords(e);
+
+                    // Check if clicking a cluster label
+                    const clickedLabel = renderedLabels.find(lb =>
+                        mx >= lb.x && mx <= lb.x + lb.w && my >= lb.y && my <= lb.y + lb.h
+                    );
+                    if (clickedLabel) {
+                        showTopicActions(clickedLabel.label, e);
+                        return;
+                    }
+
                     let hitIdx = -1, minDist = 12;
                     filteredPapers.forEach((paper, idx) => {
                         if (paper._sx === undefined) return;
