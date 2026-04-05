@@ -352,12 +352,8 @@
         }
 
         .export-buttons {
-            display: none;
-            gap: 8px;
-        }
-
-        .export-buttons.visible {
             display: flex;
+            gap: 8px;
         }
 
         .export-buttons button {
@@ -516,6 +512,33 @@
         .channel-slack-link img {
             width: 14px;
             height: 14px;
+        }
+
+        .projection-buttons {
+            display: flex;
+            gap: 4px;
+            background: #1f1f30;
+            padding: 3px;
+            border-radius: 8px;
+            border: 1px solid #2a2a3e;
+        }
+        .proj-btn {
+            flex: 1;
+            padding: 5px 0;
+            border: none;
+            background: transparent;
+            color: #888;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .proj-btn:hover:not(.active) { color: #ccc; background: rgba(255,255,255,0.04); }
+        .proj-btn.active {
+            background: #64b5f6;
+            color: #fff;
+            font-weight: 600;
         }
 
         .color-by-select, .scale-by-select {
@@ -893,6 +916,33 @@
             width: 7px;
             height: 7px;
             border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Insights bar */
+        .insights-bar {
+            background: linear-gradient(90deg, rgba(100,181,246,0.08) 0%, rgba(187,134,252,0.06) 100%);
+            border-bottom: 1px solid rgba(100,181,246,0.15);
+            padding: 6px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .insights-text {
+            font-size: 12px;
+            color: #a0a0b0;
+            line-height: 1.4;
+        }
+        .insights-text strong { color: #e0e0e0; }
+        .insights-text .insight-highlight { color: #64b5f6; font-weight: 600; }
+        .insights-close {
+            background: none;
+            border: none;
+            color: #555;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 4px;
             flex-shrink: 0;
         }
 
@@ -1301,6 +1351,12 @@
             </div>
         </div>
 
+        <!-- Insights Bar -->
+        <div class="insights-bar" id="insightsBar" style="display:none;">
+            <div class="insights-text" id="insightsText"></div>
+            <button class="insights-close" onclick="this.parentElement.style.display='none'">&times;</button>
+        </div>
+
         <!-- Main Container -->
         <div class="main-container">
             <!-- Sidebar -->
@@ -1312,11 +1368,11 @@
 
                 <div class="sidebar-section">
                     <div class="sidebar-label">Projection</div>
-                    <select class="color-by-select" id="projectionSelect">
-                        <option value="umap">UMAP</option>
-                        <option value="tsne">t-SNE</option>
-                        <option value="pca">PCA</option>
-                    </select>
+                    <div class="projection-buttons" id="projectionButtons">
+                        <button class="proj-btn active" data-proj="umap">UMAP</button>
+                        <button class="proj-btn" data-proj="tsne">t-SNE</button>
+                        <button class="proj-btn" data-proj="pca">PCA</button>
+                    </div>
                 </div>
 
                 <div class="sidebar-section">
@@ -1589,13 +1645,24 @@
         let shiftPanStart = null;
 
         // ===== HELPERS =====
-        function channelDisplayName(ch) {
-            return '#' + ch;
+        // XSS sanitizer for user-controlled data in innerHTML
+        function esc(s) {
+            if (!s) return '';
+            const d = document.createElement('div');
+            d.textContent = String(s);
+            return d.innerHTML;
         }
+
+        function channelDisplayName(ch) {
+            return '#' + esc(ch);
+        }
+
+        // Slack workspace URL — will be overridden by data payload if present
+        let slackWorkspaceUrl = 'https://koolab.slack.com';
 
         function slackChannelUrl(ch) {
             const cid = CHANNEL_IDS[ch];
-            return cid ? `https://koolab.slack.com/archives/${cid}` : '#';
+            return cid ? `${slackWorkspaceUrl}/archives/${cid}` : '#';
         }
 
         function personDisplay(name) {
@@ -1761,7 +1828,7 @@
                 }
 
                 row.innerHTML = `
-                    <td title="${(paper.title || '').replace(/"/g, '&quot;')}"><a href="${paper.url || '#'}" target="_blank" class="paper-title">${paper.title || 'Untitled'}</a></td>
+                    <td title="${esc(paper.title)}"><a href="${esc(paper.url) || '#'}" target="_blank" class="paper-title">${esc(paper.title) || 'Untitled'}</a></td>
                     <td>${paper.year || ''}</td>
                     <td title="${(paper.journal || '').replace(/"/g, '&quot;')}">${paper.journal || ''}</td>
                     <td title="${authors.replace(/"/g, '&quot;')}">${authors}</td>
@@ -1911,9 +1978,9 @@
         }
 
         function computeBounds() {
-            // Use 2nd-98th percentile to be outlier-resistant
+            // Use 2nd-98th percentile of ALL papers (not filtered) for stable viewport
             const xs = [], ys = [];
-            filteredPapers.forEach(paper => {
+            allPapers.forEach(paper => {
                 const proj = paper.projections && paper.projections[currentProjection];
                 if (!proj) return;
                 xs.push(proj[0]);
@@ -2121,6 +2188,48 @@
             timeFilterTo = new Date(ty, tm, 0); // last day of month
             document.getElementById('sparklineClear').style.display = 'block';
             filterPapers();
+        }
+
+        function generateLandscapeSummary() {
+            if (allPapers.length === 0) return;
+            const bar = document.getElementById('insightsBar');
+            const text = document.getElementById('insightsText');
+
+            // Find largest cluster
+            const clusters = {};
+            allPapers.forEach(p => {
+                if (p.cluster_label) clusters[p.cluster_label] = (clusters[p.cluster_label] || 0) + 1;
+            });
+            const sortedClusters = Object.entries(clusters).sort((a, b) => b[1] - a[1]);
+            const topCluster = sortedClusters[0];
+
+            // Find most active contributor
+            const people = {};
+            allPapers.forEach(p => { if (p.shared_by) people[p.shared_by] = (people[p.shared_by] || 0) + 1; });
+            const topPerson = Object.entries(people).sort((a, b) => b[1] - a[1])[0];
+
+            // Find fastest growing cluster (last 6 months)
+            const now = new Date();
+            const sixMonthsAgo = new Date(now);
+            sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+            const recentClusters = {};
+            allPapers.forEach(p => {
+                if (p.cluster_label && p.first_shared && new Date(p.first_shared) > sixMonthsAgo) {
+                    recentClusters[p.cluster_label] = (recentClusters[p.cluster_label] || 0) + 1;
+                }
+            });
+            const fastestGrowing = Object.entries(recentClusters).sort((a, b) => b[1] - a[1])[0];
+
+            // Most cited paper
+            const topCited = [...allPapers].sort((a, b) => (b.cited_by_count || 0) - (a.cited_by_count || 0))[0];
+
+            let html = `<span class="insight-highlight">${sortedClusters.length} topic clusters</span> across ${allPapers.length} papers`;
+            if (topCluster) html += ` · Largest: <strong>${esc(topCluster[0])}</strong> (${topCluster[1]})`;
+            if (topPerson) html += ` · Most active: <strong>${esc(topPerson[0])}</strong> (${topPerson[1]} papers)`;
+            if (topCited && topCited.cited_by_count > 50) html += ` · Most cited: <strong>${esc((topCited.title || '').substring(0, 40))}...</strong> (${topCited.cited_by_count})`;
+
+            text.innerHTML = html;
+            bar.style.display = 'flex';
         }
 
         function dataToScreen(dx, dy) {
@@ -2812,11 +2921,11 @@
                 // Abstract preview
                 const abstract = hoveredPaper.abstract || '';
                 const abstractHtml = abstract
-                    ? `<div class="tooltip-abstract">${abstract.substring(0, 250)}</div>`
+                    ? `<div class="tooltip-abstract">${esc(abstract.substring(0, 250))}</div>`
                     : '';
 
                 tooltip.innerHTML = `
-                    <div class="tooltip-title">${hoveredPaper.title || 'Untitled'}</div>
+                    <div class="tooltip-title">${esc(hoveredPaper.title) || 'Untitled'}</div>
                     <div class="tooltip-meta">
                         ${channelDots}
                         <span class="tooltip-meta-item">${hoveredPaper.year || '?'}</span>
@@ -2892,7 +3001,7 @@
                             <input type="checkbox" class="paper-checkbox" data-idx="${allIdx}" checked>
                         </div>
                         <div class="card-body">
-                            <div class="card-title">${paper.title || 'Untitled'}</div>
+                            <div class="card-title">${esc(paper.title) || 'Untitled'}</div>
                             <div class="card-meta">
                                 ${paper.year || ''} &middot; ${(paper.cited_by_count || 0)} cites
                             </div>
@@ -4307,6 +4416,9 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             initTableResize();
             setSelectionMode('pan');
 
+            // Generate landscape summary
+            generateLandscapeSummary();
+
             // Show onboarding if not dismissed
             if (!localStorage.getItem('papertrail_onboarding_dismissed') && allPapers.length > 0) {
                 document.getElementById('onboardingCount').textContent = allPapers.length;
@@ -4340,8 +4452,12 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 setupTableEvents();
             });
 
-            document.getElementById('projectionSelect').addEventListener('change', (e) => {
-                animateProjectionChange(e.target.value);
+            document.querySelectorAll('.proj-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.proj-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    animateProjectionChange(btn.dataset.proj);
+                });
             });
 
             document.getElementById('colorBySelect').addEventListener('change', (e) => {
@@ -4421,15 +4537,15 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         renderMap();
                         break;
                     case '1':
-                        document.getElementById('projectionSelect').value = 'umap';
+                        document.querySelectorAll('.proj-btn').forEach(b => b.classList.toggle('active', b.dataset.proj === 'umap'));
                         animateProjectionChange('umap');
                         break;
                     case '2':
-                        document.getElementById('projectionSelect').value = 'tsne';
+                        document.querySelectorAll('.proj-btn').forEach(b => b.classList.toggle('active', b.dataset.proj === 'tsne'));
                         animateProjectionChange('tsne');
                         break;
                     case '3':
-                        document.getElementById('projectionSelect').value = 'pca';
+                        document.querySelectorAll('.proj-btn').forEach(b => b.classList.toggle('active', b.dataset.proj === 'pca'));
                         animateProjectionChange('pca');
                         break;
                     case '/':
