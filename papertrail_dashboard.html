@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PaperTrail Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -1055,6 +1056,27 @@
             min-width: 40px;
         }
 
+        /* 3D View */
+        .three-d-view {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden;
+            background: #050510;
+        }
+        .three-d-view.visible { display: block; }
+        .three-d-controls {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15,15,23,0.8);
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid #2a2a3e;
+            z-index: 10;
+        }
+
         /* Time travel control */
         .time-travel {
             position: absolute;
@@ -1927,6 +1949,7 @@
                     <button id="mapToggle" class="active">Map</button>
                     <button id="tableToggle">Table</button>
                     <button id="leaderboardToggle">Leaderboard</button>
+                    <button id="threeDToggle">3D</button>
                 </div>
             </div>
 
@@ -2205,6 +2228,13 @@
                     <!-- Leaderboard View -->
                     <div class="leaderboard-view" id="leaderboardView">
                         <div class="lb-container" id="leaderboardContent"></div>
+                    </div>
+                    <!-- 3D View -->
+                    <div class="three-d-view" id="threeDView">
+                        <div id="threeDContainer" style="width:100%;height:100%;"></div>
+                        <div class="three-d-controls">
+                            <span style="font-size:11px;color:#888;">Drag to orbit · Scroll to zoom · Click point for details</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3472,6 +3502,137 @@
             timeFilterTo = new Date(ty, tm, 0); // last day of month
             document.getElementById('sparklineClear').style.display = 'block';
             filterPapers();
+        }
+
+        // ===== 3D VIEW (Three.js) =====
+        let scene3D, camera3D, renderer3D, controls3D;
+        let threeDInitialized = false;
+        let threeDRAF = null;
+
+        function init3DView() {
+            const container = document.getElementById('threeDContainer');
+            if (!container || typeof THREE === 'undefined') return;
+
+            if (threeDInitialized) {
+                // Resize on re-entry
+                camera3D.aspect = container.clientWidth / container.clientHeight;
+                camera3D.updateProjectionMatrix();
+                renderer3D.setSize(container.clientWidth, container.clientHeight);
+                animate3D();
+                return;
+            }
+
+            // Scene
+            scene3D = new THREE.Scene();
+            scene3D.background = new THREE.Color(0x050510);
+            scene3D.fog = new THREE.FogExp2(0x050510, 0.015);
+
+            // Camera
+            camera3D = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera3D.position.set(0, 0, 50);
+
+            // Renderer
+            renderer3D = new THREE.WebGLRenderer({ antialias: true });
+            renderer3D.setSize(container.clientWidth, container.clientHeight);
+            renderer3D.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer3D.domElement);
+
+            // Simple orbit controls (manual since we can't import OrbitControls from CDN easily)
+            let isDragging3D = false, prevMouse3D = { x: 0, y: 0 };
+            let theta3D = 0, phi3D = Math.PI / 4, radius3D = 50;
+
+            function updateCamera() {
+                camera3D.position.x = radius3D * Math.sin(phi3D) * Math.cos(theta3D);
+                camera3D.position.y = radius3D * Math.cos(phi3D);
+                camera3D.position.z = radius3D * Math.sin(phi3D) * Math.sin(theta3D);
+                camera3D.lookAt(0, 0, 0);
+            }
+
+            renderer3D.domElement.addEventListener('mousedown', (e) => {
+                isDragging3D = true;
+                prevMouse3D = { x: e.clientX, y: e.clientY };
+            });
+            renderer3D.domElement.addEventListener('mousemove', (e) => {
+                if (!isDragging3D) return;
+                const dx = e.clientX - prevMouse3D.x;
+                const dy = e.clientY - prevMouse3D.y;
+                theta3D -= dx * 0.005;
+                phi3D = Math.max(0.1, Math.min(Math.PI - 0.1, phi3D - dy * 0.005));
+                prevMouse3D = { x: e.clientX, y: e.clientY };
+                updateCamera();
+            });
+            renderer3D.domElement.addEventListener('mouseup', () => { isDragging3D = false; });
+            renderer3D.domElement.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                radius3D = Math.max(10, Math.min(200, radius3D + e.deltaY * 0.05));
+                updateCamera();
+            });
+
+            // Star field background
+            const starsGeom = new THREE.BufferGeometry();
+            const starsCount = 2000;
+            const starsPos = new Float32Array(starsCount * 3);
+            for (let i = 0; i < starsCount * 3; i++) {
+                starsPos[i] = (Math.random() - 0.5) * 300;
+            }
+            starsGeom.setAttribute('position', new THREE.BufferAttribute(starsPos, 3));
+            const starsMat = new THREE.PointsMaterial({ color: 0x444466, size: 0.3 });
+            scene3D.add(new THREE.Points(starsGeom, starsMat));
+
+            // Paper points as instanced spheres
+            const papers3D = filteredPapers.filter(p => p.projections && p.projections[currentProjection]);
+
+            // Normalize coordinates to fit in a cube
+            const xs = papers3D.map(p => p.projections[currentProjection][0]);
+            const ys = papers3D.map(p => p.projections[currentProjection][1]);
+            const xMin = Math.min(...xs), xMax = Math.max(...xs);
+            const yMin = Math.min(...ys), yMax = Math.max(...ys);
+            const range = Math.max(xMax - xMin, yMax - yMin) || 1;
+
+            const sphereGeo = new THREE.SphereGeometry(0.3, 8, 6);
+            const CLUSTER_COLORS_3D = [0x64b5f6, 0xbb86fc, 0x66bb6a, 0xffa726, 0xef5350, 0x26c6da, 0xffca28, 0xab47bc, 0x8d6e63, 0x78909c, 0xec407a, 0x7e57c2];
+
+            const instancedMesh = new THREE.InstancedMesh(sphereGeo, new THREE.MeshPhongMaterial({ shininess: 80 }), papers3D.length);
+            const dummy = new THREE.Object3D();
+            const color = new THREE.Color();
+
+            papers3D.forEach((paper, i) => {
+                const proj = paper.projections[currentProjection];
+                const x = ((proj[0] - xMin) / range - 0.5) * 40;
+                const y = ((proj[1] - yMin) / range - 0.5) * 40;
+                // Use cluster_id for z-axis spread
+                const z = ((paper.cluster_id || 0) % 5 - 2) * 3 + (Math.random() - 0.5) * 2;
+
+                dummy.position.set(x, y, z);
+                dummy.updateMatrix();
+                instancedMesh.setMatrixAt(i, dummy.matrix);
+
+                const cid = paper.cluster_id || 0;
+                color.set(CLUSTER_COLORS_3D[cid % CLUSTER_COLORS_3D.length]);
+                instancedMesh.setColorAt(i, color);
+            });
+
+            instancedMesh.instanceColor.needsUpdate = true;
+            scene3D.add(instancedMesh);
+
+            // Lighting
+            scene3D.add(new THREE.AmbientLight(0x404060, 0.6));
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(10, 20, 15);
+            scene3D.add(dirLight);
+            const pointLight = new THREE.PointLight(0x64b5f6, 0.5, 100);
+            pointLight.position.set(-10, -5, 20);
+            scene3D.add(pointLight);
+
+            updateCamera();
+            threeDInitialized = true;
+            animate3D();
+        }
+
+        function animate3D() {
+            if (currentView !== 'threeD') return;
+            threeDRAF = requestAnimationFrame(animate3D);
+            renderer3D.render(scene3D, camera3D);
         }
 
         function generateLandscapeSummary() {
@@ -5894,20 +6055,24 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             // ===== EVENT LISTENERS =====
             function switchView(view) {
                 currentView = view;
-                document.getElementById('mapToggle').classList.toggle('active', view === 'map');
-                document.getElementById('tableToggle').classList.toggle('active', view === 'table');
-                document.getElementById('leaderboardToggle').classList.toggle('active', view === 'leaderboard');
+                ['map', 'table', 'leaderboard', 'threeD'].forEach(v => {
+                    const toggle = document.getElementById(v === 'threeD' ? 'threeDToggle' : v + 'Toggle');
+                    if (toggle) toggle.classList.toggle('active', view === v);
+                });
                 document.getElementById('mapView').classList.toggle('visible', view === 'map');
                 document.getElementById('tableView').classList.toggle('visible', view === 'table');
                 document.getElementById('leaderboardView').classList.toggle('visible', view === 'leaderboard');
+                document.getElementById('threeDView').classList.toggle('visible', view === 'threeD');
                 if (view === 'map') renderMap();
                 if (view === 'table') { renderTable(); setupTableEvents(); }
                 if (view === 'leaderboard') renderLeaderboard();
+                if (view === 'threeD') init3DView();
             }
 
             document.getElementById('mapToggle').addEventListener('click', () => switchView('map'));
             document.getElementById('tableToggle').addEventListener('click', () => switchView('table'));
             document.getElementById('leaderboardToggle').addEventListener('click', () => switchView('leaderboard'));
+            document.getElementById('threeDToggle').addEventListener('click', () => switchView('threeD'));
 
             document.querySelectorAll('.proj-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
