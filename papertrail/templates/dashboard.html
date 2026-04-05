@@ -2500,7 +2500,7 @@
                 </div>
 
                 <div class="sidebar-section">
-                    <div class="sidebar-label">Transform</div>
+                    <div class="sidebar-label sidebar-label-tip" style="position:relative;">Transform<span class="sidebar-tip">Applies to Citations/Year color &amp; scale modes</span></div>
                     <div class="projection-buttons" id="transformButtons">
                         <button class="proj-btn active" data-transform="linear">Linear</button>
                         <button class="proj-btn" data-transform="log">Log</button>
@@ -4205,7 +4205,7 @@
             if (scaleByMode === 'uniform') return basePointSize;
             if (scaleByMode === 'citations') return Math.max(basePointSize * 0.7, Math.min(basePointSize * 3, basePointSize + applyTransform(paper.cited_by_count || 0, 500) * basePointSize * 2));
             if (scaleByMode === 'engagement') return Math.max(basePointSize * 0.7, Math.min(basePointSize * 3, basePointSize + applyTransform(paper.engagement || 0, 5) * basePointSize * 2));
-            if (scaleByMode === 'year') return Math.max(3, Math.min(10, ((paper.year || 2020) - 2015) / 2 + 3));
+            if (scaleByMode === 'year') return Math.max(basePointSize * 0.7, Math.min(basePointSize * 3, basePointSize + applyTransform((paper.year || 2020) - 2015, 10) * basePointSize * 2));
             if (scaleByMode === 'relevance' && semanticQuery) {
                 const score = semanticScores.get(paper.title) || 0;
                 return Math.max(3, Math.min(10, score * 10));
