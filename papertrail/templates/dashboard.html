@@ -3656,6 +3656,16 @@
 
                 tbody.appendChild(row);
             });
+
+            // Table select all
+            const selectAllCb = document.getElementById('tableSelectAll');
+            if (selectAllCb) {
+                selectAllCb.addEventListener('change', () => {
+                    document.querySelectorAll('.table-row-checkbox').forEach(cb => {
+                        cb.checked = selectAllCb.checked;
+                    });
+                });
+            }
         }
 
         // ===== TABLE COLUMN RESIZING =====
@@ -5804,7 +5814,13 @@
         }
 
         function downloadFiltered(format) {
-            downloadPapers(filteredPapers, format);
+            const checked = document.querySelectorAll('.table-row-checkbox:checked');
+            if (checked.length > 0 && checked.length < filteredPapers.length) {
+                const indices = Array.from(checked).map(cb => parseInt(cb.dataset.idx));
+                downloadPapers(indices.map(i => filteredPapers[i]).filter(Boolean), format);
+            } else {
+                downloadPapers(filteredPapers, format);
+            }
         }
 
         function downloadPapers(papers, format) {
