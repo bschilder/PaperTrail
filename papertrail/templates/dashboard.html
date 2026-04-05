@@ -2339,6 +2339,8 @@
                         <option value="citations">Citations</option>
                         <option value="engagement">Engagement</option>
                         <option value="density">Density (eq_hist)</option>
+                        <option value="contributor">Contributor</option>
+                        <option value="journal">Journal</option>
                     </select>
                 </div>
 
@@ -2973,6 +2975,13 @@
                 }
             });
 
+            // Normalize journal names: remove parenthetical content
+            allPapers.forEach(p => {
+                if (p.journal) {
+                    p.journal = p.journal.replace(/\s*\(.*?\)\s*/g, '').trim();
+                }
+            });
+
             // Compute engagement score for each paper
             // engagement = shares_count + reactions_count + reply_count (from data)
             // If not available, use shares array length as proxy
@@ -3339,6 +3348,7 @@
 
         function selectTopicOnMap(label) {
             document.getElementById('topicActionPopup').classList.remove('visible');
+            document.getElementById('mapToggle').click();
             const lbl = label.toLowerCase();
             selectedPapers.clear();
             const matched = [];
@@ -3704,6 +3714,16 @@
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
+            // Default sort: newest first, engagement as tiebreaker
+            if (!sortField) {
+                filteredPapers.sort((a, b) => {
+                    const dateA = a.first_shared || '';
+                    const dateB = b.first_shared || '';
+                    if (dateA !== dateB) return dateB.localeCompare(dateA);
+                    return (b.engagement || 0) - (a.engagement || 0);
+                });
+            }
+
             filteredPapers.forEach((paper, idx) => {
                 const row = document.createElement('tr');
                 const authors = Array.isArray(paper.authors) ? paper.authors.join(', ') : (paper.authors || '');
@@ -3949,6 +3969,19 @@
                 if (d < 0.5) return interpolateColor([59, 82, 139], [33, 145, 140], (d - 0.25) / 0.25);
                 if (d < 0.75) return interpolateColor([33, 145, 140], [94, 201, 98], (d - 0.5) / 0.25);
                 return interpolateColor([94, 201, 98], [253, 231, 37], (d - 0.75) / 0.25);
+            }
+
+            if (colorByMode === 'contributor') {
+                const people = [...new Set(allPapers.map(p => p.shared_by).filter(Boolean))].sort();
+                const idx = people.indexOf(paper.shared_by);
+                const COLORS = ['#64b5f6','#bb86fc','#66bb6a','#ffa726','#ef5350','#26c6da','#ffca28','#ab47bc','#8d6e63','#78909c','#ec407a','#7e57c2'];
+                return COLORS[idx % COLORS.length] || '#64b5f6';
+            }
+            if (colorByMode === 'journal') {
+                const journals = [...new Set(allPapers.map(p => p.journal).filter(Boolean))].sort();
+                const idx = journals.indexOf(paper.journal);
+                const COLORS = ['#64b5f6','#bb86fc','#66bb6a','#ffa726','#ef5350','#26c6da','#ffca28','#ab47bc','#8d6e63','#78909c','#ec407a','#7e57c2'];
+                return idx >= 0 ? COLORS[idx % COLORS.length] : '#444';
             }
 
             return '#64b5f6';
@@ -7950,6 +7983,17 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
 
                 switch(e.key) {
                     case 'Escape': {
+                        // Close modals first if any are open (#53)
+                        const profileModalEl = document.getElementById('profileModal');
+                        const topicModalEl = document.getElementById('topicModal');
+                        if (profileModalEl.classList.contains('visible')) {
+                            closeModalAndClearHistory('profileModal');
+                            break;
+                        }
+                        if (topicModalEl.classList.contains('visible')) {
+                            closeModalAndClearHistory('topicModal');
+                            break;
+                        }
                         // Close agent panel if open
                         const ap = document.getElementById('agentPanel');
                         if (ap.classList.contains('visible')) {
