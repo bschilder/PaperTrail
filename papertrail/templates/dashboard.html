@@ -81,6 +81,65 @@
         }
 
         /* ===== CHATBOT BAR (top nav) ===== */
+        /* Agent mascot button */
+        .agent-mascot {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #252540, #2a2a45);
+            border: 1px solid #3a3a50;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            color: #64b5f6;
+        }
+        .agent-mascot:hover {
+            background: linear-gradient(135deg, #2a2a4a, #32325a);
+            border-color: #64b5f6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(100,181,246,0.2);
+        }
+        .agent-mascot:hover .mascot-svg { animation: mascotBounce 0.5s ease; }
+        .mascot-svg {
+            width: 24px;
+            height: 24px;
+            image-rendering: pixelated;
+        }
+        .mascot-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #a0a0b0;
+        }
+        .agent-mascot:hover .mascot-label { color: #e0e0e0; }
+        .agent-mascot.active {
+            background: #64b5f6;
+            border-color: #64b5f6;
+            color: #fff;
+        }
+        .agent-mascot.active .mascot-label { color: #fff; }
+        .agent-mascot.active .mascot-eye { fill: #64b5f6 !important; }
+        @keyframes mascotBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        /* Collapsible agent panel */
+        .agent-panel {
+            display: none;
+            background: linear-gradient(180deg, #1a1a2e, #181830);
+            border-bottom: 1px solid #2a2a3e;
+            padding: 8px 20px;
+            flex-shrink: 0;
+            animation: slideDown 0.2s ease-out;
+        }
+        .agent-panel.visible { display: block; }
+        @keyframes slideDown {
+            from { max-height: 0; opacity: 0; }
+            to { max-height: 100px; opacity: 1; }
+        }
+
         .chatbot-bar {
             flex: 1;
             display: flex;
@@ -1090,16 +1149,23 @@
         }
         .profile-close {
             position: absolute;
-            top: 12px;
-            right: 14px;
-            background: none;
-            border: none;
-            color: #666;
-            font-size: 20px;
+            top: 10px;
+            right: 10px;
+            background: #252538;
+            border: 1px solid #3a3a4e;
+            color: #888;
+            font-size: 18px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             cursor: pointer;
             z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
         }
-        .profile-close:hover { color: #fff; }
+        .profile-close:hover { color: #fff; background: #3a3a4e; }
         .profile-header {
             padding: 24px 24px 16px;
             border-bottom: 1px solid #2a2a3e;
@@ -1167,16 +1233,16 @@
         }
         .heatmap-day-label {
             height: 10px;
-            font-size: 8px;
-            color: #555;
+            font-size: 9px;
+            color: #888;
             display: flex;
             align-items: center;
         }
         .heatmap-month-labels {
             display: flex;
             gap: 2px;
-            font-size: 8px;
-            color: #555;
+            font-size: 9px;
+            color: #888;
             margin-top: 3px;
             margin-left: 20px;
         }
@@ -1715,29 +1781,41 @@
                 </div>
             </div>
 
-            <!-- Chatbot bar in center of header -->
-            <div class="chatbot-bar">
-                <svg class="chatbot-avatar" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Pixel art space invader -->
-                    <rect x="3" y="1" width="2" height="2" fill="#64b5f6"/>
-                    <rect x="11" y="1" width="2" height="2" fill="#64b5f6"/>
-                    <rect x="5" y="3" width="6" height="2" fill="#64b5f6"/>
-                    <rect x="3" y="5" width="10" height="2" fill="#64b5f6"/>
-                    <rect x="1" y="7" width="2" height="2" fill="#64b5f6"/>
-                    <rect x="3" y="7" width="10" height="2" fill="#64b5f6"/>
-                    <rect x="13" y="7" width="2" height="2" fill="#64b5f6"/>
-                    <rect x="1" y="9" width="2" height="2" fill="#64b5f6"/>
-                    <rect x="5" y="9" width="2" height="2" fill="#64b5f6"/>
-                    <rect x="9" y="9" width="2" height="2" fill="#64b5f6"/>
-                    <rect x="13" y="9" width="2" height="2" fill="#64b5f6"/>
-                    <rect x="3" y="11" width="2" height="2" fill="#64b5f6"/>
-                    <rect x="5" y="13" width="2" height="2" fill="#64b5f6"/>
-                    <rect x="9" y="13" width="2" height="2" fill="#64b5f6"/>
-                    <rect x="11" y="11" width="2" height="2" fill="#64b5f6"/>
-                    <!-- Eyes -->
-                    <rect x="5" y="7" width="2" height="2" fill="#0f0f17"/>
-                    <rect x="9" y="7" width="2" height="2" fill="#0f0f17"/>
+            <div style="flex:1;"></div>
+
+            <!-- Agent mascot button -->
+            <button class="agent-mascot" id="agentMascotBtn" title="Ask the AI Agent (/)">
+                <svg class="mascot-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="1" width="2" height="2" fill="currentColor"/>
+                    <rect x="11" y="1" width="2" height="2" fill="currentColor"/>
+                    <rect x="5" y="3" width="6" height="2" fill="currentColor"/>
+                    <rect x="3" y="5" width="10" height="2" fill="currentColor"/>
+                    <rect x="1" y="7" width="2" height="2" fill="currentColor"/>
+                    <rect x="3" y="7" width="10" height="2" fill="currentColor"/>
+                    <rect x="13" y="7" width="2" height="2" fill="currentColor"/>
+                    <rect x="1" y="9" width="2" height="2" fill="currentColor"/>
+                    <rect x="5" y="9" width="2" height="2" fill="currentColor"/>
+                    <rect x="9" y="9" width="2" height="2" fill="currentColor"/>
+                    <rect x="13" y="9" width="2" height="2" fill="currentColor"/>
+                    <rect x="3" y="11" width="2" height="2" fill="currentColor"/>
+                    <rect x="5" y="13" width="2" height="2" fill="currentColor"/>
+                    <rect x="9" y="13" width="2" height="2" fill="currentColor"/>
+                    <rect x="11" y="11" width="2" height="2" fill="currentColor"/>
+                    <rect x="5" y="7" width="2" height="2" fill="#0f0f17" class="mascot-eye"/>
+                    <rect x="9" y="7" width="2" height="2" fill="#0f0f17" class="mascot-eye"/>
                 </svg>
+                <span class="mascot-label">Ask AI</span>
+            </button>
+
+            <div class="export-buttons" id="exportButtons">
+                <button id="exportCsv">CSV</button>
+                <button id="exportXlsx">XLSX</button>
+            </div>
+        </div>
+
+        <!-- Collapsible Agent Panel -->
+        <div class="agent-panel" id="agentPanel">
+            <div class="chatbot-bar" style="max-width:none;">
                 <div class="chatbot-bar-input-wrap">
                     <input type="text" class="chatbot-bar-input" id="chatbotInput" placeholder="Ask about papers... try @person, #channel, or keywords">
                     <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
@@ -1749,7 +1827,6 @@
                     <button class="chatbot-example-btn" data-query="Who are the most active contributors and what do they focus on?">contributors</button>
                 </div>
                 <button class="chatbot-settings-btn" id="chatbotSettingsBtn" title="Configure AI (API key)">⚙</button>
-                <!-- Settings popup -->
                 <div class="chatbot-settings-popup" id="chatbotSettingsPopup">
                     <div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:8px;">AI Agent Settings</div>
                     <div style="font-size:11px;color:#888;margin-bottom:8px;">Enter your Anthropic API key to enable the AI agent. Without a key, a local keyword parser is used instead.</div>
@@ -1767,12 +1844,7 @@
                     <div id="apiKeyStatus" style="font-size:11px;color:#666;margin-top:6px;"></div>
                 </div>
             </div>
-
-            <div id="statsDisplay">Loading...</div>
-            <div class="export-buttons" id="exportButtons">
-                <button id="exportCsv">CSV</button>
-                <button id="exportXlsx">XLSX</button>
-            </div>
+            <div id="statsDisplay" style="display:none;">Loading...</div>
         </div>
 
         <!-- Insights Bar -->
@@ -1786,7 +1858,10 @@
             <!-- Sidebar -->
             <div class="sidebar">
                 <div class="sidebar-section">
-                    <div class="sidebar-label">Channels</div>
+                    <div class="sidebar-label" style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>Channels</span>
+                        <span id="sidebarStats" style="font-size:10px;color:#64b5f6;font-weight:400;text-transform:none;letter-spacing:0;">Loading...</span>
+                    </div>
                     <div class="channel-filters" id="channelFilters"></div>
                 </div>
 
@@ -2046,7 +2121,7 @@
             'paper_digest_moon': 'C0AEX373E5Q'
         };
 
-        const SLACK_ICON_SVG = `<svg viewBox="0 0 24 24" class="slack-icon" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zm-1.268 0a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z" fill="#888"/></svg>`;
+        const SLACK_ICON_SVG = `<svg viewBox="0 0 24 24" class="slack-icon" xmlns="http://www.w3.org/2000/svg"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313z" fill="#E01E5A"/><path d="M8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312z" fill="#36C5F0"/><path d="M18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zm-1.268 0a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312z" fill="#2EB67D"/><path d="M15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z" fill="#ECB22E"/></svg>`;
 
         // ===== GLOBAL STATE =====
         let allPapers = [];
@@ -2256,8 +2331,8 @@
                 renderMap();
             }
 
-            const statsEl = document.getElementById('statsDisplay');
-            if (statsEl) statsEl.textContent = filteredPapers.length + ' / ' + allPapers.length + ' papers';
+            const sidebarStats = document.getElementById('sidebarStats');
+            if (sidebarStats) sidebarStats.textContent = filteredPapers.length + ' / ' + allPapers.length;
         }
 
         // ===== TABLE VIEW =====
@@ -5457,6 +5532,24 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 }
             });
 
+            // Agent mascot toggle
+            document.getElementById('agentMascotBtn').addEventListener('click', () => {
+                const panel = document.getElementById('agentPanel');
+                const btn = document.getElementById('agentMascotBtn');
+                panel.classList.toggle('visible');
+                btn.classList.toggle('active');
+                if (panel.classList.contains('visible')) {
+                    setTimeout(() => document.getElementById('chatbotInput').focus(), 100);
+                }
+            });
+
+            // Profile modal: click outside to close
+            document.getElementById('profileModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('profileModal')) {
+                    document.getElementById('profileModal').classList.remove('visible');
+                }
+            });
+
             // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
                 // Don't trigger shortcuts when typing in inputs
@@ -5483,6 +5576,12 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         break;
                     case '/':
                         e.preventDefault();
+                        // Open agent panel if closed
+                        const agentPanel = document.getElementById('agentPanel');
+                        if (!agentPanel.classList.contains('visible')) {
+                            agentPanel.classList.add('visible');
+                            document.getElementById('agentMascotBtn').classList.add('active');
+                        }
                         document.getElementById('chatbotInput').focus();
                         break;
                     case 't':
