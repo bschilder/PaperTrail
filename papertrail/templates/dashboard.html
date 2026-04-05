@@ -8528,6 +8528,75 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 }
             });
 
+            // Agent demo animation
+            let agentDemoShown = localStorage.getItem('papertrail_agent_demo') === '1';
+
+            function runAgentDemo() {
+                if (agentDemoShown) return;
+                agentDemoShown = true;
+                localStorage.setItem('papertrail_agent_demo', '1');
+
+                const input = document.getElementById('chatbotInput');
+                const sendBtn = document.getElementById('agentSendBtn');
+                const demoQuery = "what's trending?";
+                let charIdx = 0;
+
+                // Phase 1: Type the query character by character
+                input.value = '';
+                const typeInterval = setInterval(() => {
+                    if (charIdx < demoQuery.length) {
+                        input.value += demoQuery[charIdx];
+                        charIdx++;
+                    } else {
+                        clearInterval(typeInterval);
+                        // Phase 2: Animate send button press
+                        setTimeout(() => {
+                            sendBtn.style.transform = 'translateY(-50%) scale(0.85)';
+                            sendBtn.style.background = '#42a5f5';
+                            setTimeout(() => {
+                                sendBtn.style.transform = '';
+                                sendBtn.style.background = '';
+
+                                // Phase 3: Run the search and stream response word by word
+                                const smartResult = handleSmartLocalQuery(demoQuery);
+                                if (smartResult) {
+                                    const resultsPanel = document.getElementById('chatbotResults');
+                                    resultsPanel.classList.add('visible');
+                                    resultsPanel.innerHTML = `
+                                        <div class="chatbot-results-header">
+                                            <span>${smartResult.title}<span class="ai-mode-badge local">smart local</span></span>
+                                            <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
+                                        </div>
+                                        <div class="ai-response" id="demoResponseArea"></div>`;
+
+                                    // Stream words
+                                    const fullHTML = smartResult.html;
+                                    const tempDiv = document.createElement('div');
+                                    tempDiv.innerHTML = fullHTML;
+                                    const fullText = tempDiv.textContent;
+                                    const words = fullText.split(/\s+/);
+                                    const responseArea = document.getElementById('demoResponseArea');
+                                    let wordIdx = 0;
+
+                                    const wordInterval = setInterval(() => {
+                                        if (wordIdx < words.length) {
+                                            responseArea.textContent += (wordIdx > 0 ? ' ' : '') + words[wordIdx];
+                                            wordIdx++;
+                                        } else {
+                                            clearInterval(wordInterval);
+                                            // Replace with full HTML after streaming
+                                            setTimeout(() => {
+                                                responseArea.innerHTML = fullHTML;
+                                            }, 300);
+                                        }
+                                    }, 40);
+                                }
+                            }, 150);
+                        }, 400);
+                    }
+                }, 60);
+            }
+
             // Agent mascot toggle
             document.getElementById('agentMascotBtn').addEventListener('click', () => {
                 const panel = document.getElementById('agentPanel');
@@ -8535,8 +8604,12 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 panel.classList.toggle('visible');
                 btn.classList.toggle('active');
                 if (panel.classList.contains('visible')) {
-                    setTimeout(() => document.getElementById('chatbotInput').focus(), 200);
-                    // Stop mascot wiggle after 2 seconds
+                    setTimeout(() => {
+                        document.getElementById('chatbotInput').focus();
+                        if (!agentDemoShown) {
+                            setTimeout(runAgentDemo, 500);
+                        }
+                    }, 200);
                     setTimeout(() => btn.classList.add('settled'), 2000);
                 } else {
                     btn.classList.remove('settled');
