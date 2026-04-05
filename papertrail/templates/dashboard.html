@@ -2808,6 +2808,11 @@
         let previousPositions = new Map(); // paper index -> {x, y}
         let hoveredPaperIdx = -1; // index into filteredPapers
 
+        // Opening load animation state
+        let initialLoadAnimated = false;
+        let loadAnimProgress = 0;
+        let loadAnimStartAngles = null; // pre-computed per-paper angles for stable spiral
+
         // O(1) paper index lookup (built once during loadData)
         let paperIndexMap = new Map(); // paper object -> index in allPapers
 
@@ -5109,12 +5114,30 @@
             }
 
             // Pre-pass: compute screen positions for KDE
-            filteredPapers.forEach(paper => {
+            filteredPapers.forEach((paper, idx) => {
                 const proj = paper.projections && paper.projections[currentProjection];
                 if (!proj) { paper._sx = -999; paper._sy = -999; return; }
                 const [sx, sy] = dataToScreen(proj[0], proj[1]);
                 paper._sx = sx;
                 paper._sy = sy;
+
+                // Opening animation: interpolate from center sphere to actual positions
+                if (loadAnimProgress < 1) {
+                    const cx = canvas.width / 2;
+                    const cy = canvas.height / 2;
+                    if (!loadAnimStartAngles) {
+                        loadAnimStartAngles = new Float32Array(filteredPapers.length);
+                        for (let i = 0; i < filteredPapers.length; i++) {
+                            loadAnimStartAngles[i] = (i / filteredPapers.length) * Math.PI * 2 * 3 + (Math.random() - 0.5) * 0.5;
+                        }
+                    }
+                    const angle = loadAnimStartAngles[idx] || 0;
+                    const startR = 30;
+                    const startX = cx + Math.cos(angle) * startR;
+                    const startY = cy + Math.sin(angle) * startR;
+                    paper._sx = startX + (sx - startX) * loadAnimProgress;
+                    paper._sy = startY + (sy - startY) * loadAnimProgress;
+                }
             });
 
             // KDE background (needs screen positions)
@@ -5157,7 +5180,20 @@
                 const proj = paper.projections && paper.projections[currentProjection];
                 if (!proj) return; // already set in pre-pass
 
-                const [sx, sy] = dataToScreen(proj[0], proj[1]);
+                let [sx, sy] = dataToScreen(proj[0], proj[1]);
+
+                // Opening animation: interpolate from center sphere to actual positions
+                if (loadAnimProgress < 1 && loadAnimStartAngles) {
+                    const cx = canvas.width / 2;
+                    const cy = canvas.height / 2;
+                    const angle = loadAnimStartAngles[idx] || 0;
+                    const startR = 30;
+                    const startX = cx + Math.cos(angle) * startR;
+                    const startY = cy + Math.sin(angle) * startR;
+                    sx = startX + (sx - startX) * loadAnimProgress;
+                    sy = startY + (sy - startY) * loadAnimProgress;
+                }
+
                 paper._sx = sx;
                 paper._sy = sy;
 
@@ -7685,6 +7721,24 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             initChatbot();
             initTableResize();
             setSelectionMode('pan');
+
+            // Opening animation: sphere to projection
+            if (allPapers.length > 0 && !initialLoadAnimated) {
+                initialLoadAnimated = true;
+                loadAnimProgress = 0;
+                const duration = 1500;
+                const startTime = performance.now();
+
+                function loadAnimStep(now) {
+                    const t = Math.min(1, (now - startTime) / duration);
+                    // Ease out cubic
+                    loadAnimProgress = 1 - Math.pow(1 - t, 3);
+                    renderMap();
+                    if (t < 1) requestAnimationFrame(loadAnimStep);
+                    else loadAnimProgress = 1;
+                }
+                requestAnimationFrame(loadAnimStep);
+            }
 
             // ===== URL HASH STATE =====
             function saveHashState() {
