@@ -2756,6 +2756,15 @@
                     }
                 });
 
+                const infoBtn = document.createElement('button');
+                infoBtn.className = 'channel-slack-link';
+                infoBtn.title = 'Channel info';
+                infoBtn.innerHTML = '<span style="font-size:12px;color:#64b5f6;">i</span>';
+                infoBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showChannelInfo(channel);
+                });
+
                 const link = document.createElement('a');
                 link.className = 'channel-slack-link';
                 link.href = slackChannelUrl(channel);
@@ -2764,6 +2773,7 @@
                 link.innerHTML = SLACK_ICON_SVG;
 
                 row.appendChild(btn);
+                row.appendChild(infoBtn);
                 row.appendChild(link);
                 container.appendChild(row);
             });
@@ -2839,6 +2849,98 @@
         }
 
         // ===== TABLE VIEW =====
+        // ===== CHANNEL INFO =====
+        function showChannelInfo(channel) {
+            const papers = allPapers.filter(p => (p.channels || []).includes(channel));
+            const modal = document.getElementById('topicModal');
+            const header = document.getElementById('topicHeader');
+            const body = document.getElementById('topicBody');
+
+            const people = {};
+            const clusters = {};
+            let totalCites = 0;
+            papers.forEach(p => {
+                if (p.shared_by) people[p.shared_by] = (people[p.shared_by] || 0) + 1;
+                if (p.cluster_label) clusters[p.cluster_label] = (clusters[p.cluster_label] || 0) + 1;
+                totalCites += p.cited_by_count || 0;
+            });
+            const topContribs = Object.entries(people).sort((a, b) => b[1] - a[1]).slice(0, 8);
+            const topClusters = Object.entries(clusters).sort((a, b) => b[1] - a[1]).slice(0, 6);
+            const topPapers = [...papers].sort((a, b) => (b.cited_by_count || 0) - (a.cited_by_count || 0)).slice(0, 8);
+
+            // Date range
+            const dates = papers.filter(p => p.first_shared).map(p => p.first_shared).sort();
+            const dateRange = dates.length > 0
+                ? `${new Date(dates[0]).toLocaleDateString()} — ${new Date(dates[dates.length-1]).toLocaleDateString()}`
+                : 'N/A';
+
+            header.innerHTML = `
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#26c6da;margin-bottom:4px;">${SLACK_ICON_SVG} Channel</div>
+                <div class="profile-name">${channelDisplayName(channel)}</div>
+                <div class="profile-subtitle" style="color:#888;">${dateRange}</div>
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">${papers.length}</div>
+                        <div class="profile-stat-label">Papers</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">${totalCites.toLocaleString()}</div>
+                        <div class="profile-stat-label">Total Cites</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">${topContribs.length > 0 ? topContribs.length : 0}</div>
+                        <div class="profile-stat-label">Contributors</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">${topClusters.length}</div>
+                        <div class="profile-stat-label">Topics</div>
+                    </div>
+                </div>
+            `;
+
+            const contribHTML = topContribs.map(([name, count]) =>
+                `<span class="card-tag person-tag" style="cursor:pointer;" onclick="document.getElementById('topicModal').classList.remove('visible');showContributorProfile('${esc(name).replace(/'/g, "\\'")}')">${esc(name)} (${count})</span>`
+            ).join(' ');
+
+            const clusterHTML = topClusters.map(([label, count]) =>
+                `<span class="card-tag cluster-tag" style="cursor:pointer;" onclick="document.getElementById('topicModal').classList.remove('visible');showTopicInfo('${esc(label).replace(/'/g, "\\'")}')">${esc(label)} (${count})</span>`
+            ).join(' ');
+
+            const paperListHTML = topPapers.map(p => {
+                const paperLink = p.url ? `<a href="${esc(p.url)}" target="_blank" onclick="event.stopPropagation()"><span style="color:#64b5f6;">&#128196;</span></a>` : '';
+                const slackLink = p.slack_url ? `<a href="${esc(p.slack_url)}" target="_blank" onclick="event.stopPropagation()">${SLACK_ICON_SVG}</a>` : '';
+                return `<div class="profile-paper-item">
+                    <span style="color:#ffca28;font-size:11px;min-width:40px;">${p.cited_by_count || 0}x</span>
+                    <span class="profile-paper-title">${esc(p.title) || 'Untitled'}</span>
+                    <div class="profile-paper-links">${paperLink}${slackLink}</div>
+                </div>`;
+            }).join('');
+
+            body.innerHTML = `
+                <div class="profile-section">
+                    <div class="profile-section-title">Top Contributors</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;">${contribHTML}</div>
+                </div>
+                <div class="profile-section">
+                    <div class="profile-section-title">Top Topics</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;">${clusterHTML}</div>
+                </div>
+                <div class="profile-section">
+                    <div class="profile-section-title">Top Papers</div>
+                    <div class="profile-paper-list">${paperListHTML}</div>
+                </div>
+                <div class="profile-actions">
+                    <a href="${slackChannelUrl(channel)}" target="_blank" class="profile-action-btn primary">${SLACK_ICON_SVG} Open in Slack</a>
+                    <button class="profile-action-btn" onclick="document.getElementById('topicModal').classList.remove('visible');selectedChannels.clear();selectedChannels.add('${esc(channel).replace(/'/g, "\\'")}');document.querySelectorAll('.channel-button').forEach(b=>{b.classList.toggle('active',b.dataset.channel==='${esc(channel).replace(/'/g, "\\'")}')});filterPapers();">Show Only This Channel</button>
+                </div>
+            `;
+
+            modal.classList.add('visible');
+            modal.addEventListener('click', function handler(e) {
+                if (e.target === modal) { modal.classList.remove('visible'); modal.removeEventListener('click', handler); }
+            });
+        }
+
         // ===== ALL CLUSTERS OVERVIEW =====
         function showAllClusters() {
             const clusters = {};
