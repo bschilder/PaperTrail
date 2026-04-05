@@ -3630,7 +3630,7 @@
                     <div class="profile-paper-list">${paperListHTML}</div>
                 </div>
                 <div class="profile-actions">
-                    <a href="https://koolab.slack.com/team/" target="_blank" class="profile-action-btn primary">${SLACK_ICON_SVG} Message in Slack</a>
+                    <a href="${papers[0]?.slack_url ? papers[0].slack_url.split('/archives/')[0] : slackWorkspaceUrl}" target="_blank" class="profile-action-btn primary">${SLACK_ICON_SVG} View in Slack</a>
                     <button class="profile-action-btn" id="profileSearchBtn">&#128269; Search their papers</button>
                 </div>
             `;
