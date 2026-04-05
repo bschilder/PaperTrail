@@ -1148,25 +1148,18 @@
 
         /* ===== DETAIL PANEL (right slide-out) ===== */
         .detail-panel-right {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 340px;
-            height: 100%;
+            width: 0;
+            overflow: hidden;
             background: #1a1a2e;
-            border-left: 1px solid #2a2a3e;
-            display: none;
+            border-left: 1px solid transparent;
+            display: flex;
             flex-direction: column;
-            z-index: 50;
-            box-shadow: -4px 0 20px rgba(0,0,0,0.3);
-            animation: slideInRight 0.2s ease-out;
+            flex-shrink: 0;
+            transition: width 0.25s ease, border-color 0.25s ease;
         }
         .detail-panel-right.visible {
-            display: flex;
-        }
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            width: 340px;
+            border-left-color: #2a2a3e;
         }
         .detail-panel-header {
             display: flex;
@@ -2464,19 +2457,22 @@
                 ctx.fill();
 
                 if (isSelected) {
-                    // Bright outer ring for visibility
-                    ctx.globalAlpha = 0.4;
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 4;
+                    // Outer glow in point's own color
+                    const glowGrad = ctx.createRadialGradient(sx, sy, radius, sx, sy, radius + 14);
+                    glowGrad.addColorStop(0, color.replace('rgb', 'rgba').replace(')', ', 0.6)'));
+                    glowGrad.addColorStop(0.5, color.replace('rgb', 'rgba').replace(')', ', 0.2)'));
+                    glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.globalAlpha = 0.8;
+                    ctx.fillStyle = glowGrad;
                     ctx.beginPath();
-                    ctx.arc(sx, sy, radius + 6, 0, Math.PI * 2);
-                    ctx.stroke();
-                    // Sharp inner ring
-                    ctx.globalAlpha = 1;
+                    ctx.arc(sx, sy, radius + 14, 0, Math.PI * 2);
+                    ctx.fill();
+                    // Crisp white diamond ring
+                    ctx.globalAlpha = 0.9;
                     ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 2;
+                    ctx.lineWidth = 1.5;
                     ctx.beginPath();
-                    ctx.arc(sx, sy, radius + 3, 0, Math.PI * 2);
+                    ctx.arc(sx, sy, radius + 4, 0, Math.PI * 2);
                     ctx.stroke();
                 }
                 if (isHovered && !isSelected) {
@@ -2967,8 +2963,7 @@
                     } else {
                         // Clicked blank space — clear selection and collapse panel
                         selectedPapers.clear();
-                        document.getElementById('detailPanel').classList.remove('visible');
-                        document.getElementById('panelContent').innerHTML = '';
+                        hideDetailPanel();
                         renderMap();
                     }
                 }
@@ -3147,18 +3142,25 @@
         }
 
         // ===== DETAIL PANEL =====
+        function hideDetailPanel() {
+            document.getElementById('detailPanel').classList.remove('visible');
+            document.getElementById('panelContent').innerHTML = '';
+            setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 300);
+        }
+
         function showDetailPanel(papers) {
             const panel = document.getElementById('detailPanel');
             const content = document.getElementById('panelContent');
 
             if (papers.length === 0) {
-                panel.classList.remove('visible');
-                content.innerHTML = '';
+                hideDetailPanel();
                 return;
             }
 
             panel.classList.add('visible');
             document.getElementById('detailPanelTitle').textContent = `Selected Papers (${papers.length})`;
+            // Resize canvas after panel transition
+            setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 300);
 
             content.innerHTML = `
                 <div class="select-all-checkbox">
@@ -4834,8 +4836,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             if (panelCloseBtn) {
                 panelCloseBtn.addEventListener('click', () => {
                     selectedPapers.clear();
-                    document.getElementById('detailPanel').classList.remove('visible');
-                    document.getElementById('panelContent').innerHTML = '';
+                    hideDetailPanel();
                     renderMap();
                 });
             }
@@ -4855,8 +4856,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 switch(e.key) {
                     case 'Escape':
                         selectedPapers.clear();
-                        document.getElementById('detailPanel').classList.remove('visible');
-                        document.getElementById('panelContent').innerHTML = '';
+                        hideDetailPanel();
                         document.getElementById('chatbotResults').classList.remove('visible');
                         renderMap();
                         break;
