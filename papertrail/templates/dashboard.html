@@ -2569,6 +2569,7 @@
                 <div class="shortcut-row"><kbd>Scroll</kbd><span>Zoom in/out</span></div>
                 <div style="font-size:10px;color:#64b5f6;text-transform:uppercase;letter-spacing:1px;padding:8px 0 4px;">General</div>
                 <div class="shortcut-row"><kbd>/</kbd><span>Open AI Agent search</span></div>
+                <div class="shortcut-row"><kbd>Cmd+A</kbd><span>Toggle AI Agent panel</span></div>
                 <div class="shortcut-row"><kbd>Esc</kbd><span>Clear selection / close panels</span></div>
                 <div class="shortcut-row"><kbd>?</kbd><span>Show this help</span></div>
             </div>
@@ -7362,6 +7363,13 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     case '3':
                         document.querySelectorAll('.proj-btn').forEach(b => b.classList.toggle('active', b.dataset.proj === 'pca'));
                         animateProjectionChange('pca');
+                        break;
+                    case 'a':
+                    case 'A':
+                        if (e.metaKey || e.ctrlKey) {
+                            e.preventDefault();
+                            document.getElementById('agentMascotBtn').click();
+                        }
                         break;
                     case '/':
                         e.preventDefault();
