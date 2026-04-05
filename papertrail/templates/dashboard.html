@@ -2238,7 +2238,7 @@
                 </div>
 
                 <div class="sidebar-section">
-                    <div class="sidebar-label">Projection</div>
+                    <div class="sidebar-label" style="cursor:help;" title="Switch: Cmd+Left/Right · Keys: 1/2/3">Projection</div>
                     <div class="projection-buttons" id="projectionButtons">
                         <button class="proj-btn active" data-proj="umap">UMAP</button>
                         <button class="proj-btn" data-proj="tsne">t-SNE</button>
@@ -3121,6 +3121,7 @@
             `;
 
             modal.classList.add('visible');
+            updateBackButtons();
             modal.addEventListener('click', function handler(e) {
                 if (e.target === modal) { modal.classList.remove('visible'); modalHistory = []; updateBackButtons(); modal.removeEventListener('click', handler); }
             });
@@ -3187,6 +3188,7 @@
             `;
 
             modal.classList.add('visible');
+            updateBackButtons();
             modal.addEventListener('click', function handler(e) {
                 if (e.target === modal) { modal.classList.remove('visible'); modalHistory = []; updateBackButtons(); modal.removeEventListener('click', handler); }
             });
@@ -3471,6 +3473,7 @@
             `;
 
             modal.classList.add('visible');
+            updateBackButtons();
 
             // Wire up search button
             document.getElementById('profileSearchBtn').addEventListener('click', () => {
