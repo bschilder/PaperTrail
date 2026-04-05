@@ -2563,8 +2563,15 @@
                     <div class="three-d-view" id="threeDView">
                         <div id="threeDContainer" style="width:100%;height:100%;"></div>
                         <div class="map-legend" id="threeDLegend" style="z-index:10;"></div>
+                        <!-- 3D Toolbar -->
+                        <div class="map-toolbar" style="z-index:10;">
+                            <button class="toolbar-button active" id="threeD_orbitBtn" data-tooltip="Orbit (drag)">&#x1F310;</button>
+                            <button class="toolbar-button" id="threeD_selectBtn" data-tooltip="Sphere Select (click near a point)">&#x25CE;</button>
+                            <button class="toolbar-button" id="threeD_flyBtn" data-tooltip="Fly to Cluster (double-click)">&#x2708;</button>
+                            <button class="toolbar-button" id="threeD_resetBtn" data-tooltip="Reset Camera">&#x21BA;</button>
+                        </div>
                         <div class="three-d-controls">
-                            <span style="font-size:11px;color:#888;">Drag to orbit · Shift+drag to pan · Scroll to zoom · Click for details · Double-click to fly to cluster</span>
+                            <span style="font-size:11px;color:#888;">Drag to orbit · Shift+drag to pan · Scroll to zoom · Click to sphere-select · Dbl-click to fly</span>
                         </div>
                     </div>
                 </div>
@@ -7739,6 +7746,26 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             });
             document.getElementById('topicInfoBtn').addEventListener('click', () => {
                 if (currentTopicLabel) showTopicInfo(currentTopicLabel);
+            });
+
+            // 3D toolbar buttons
+            document.getElementById('threeD_orbitBtn')?.addEventListener('click', () => {
+                document.querySelectorAll('#threeDView .toolbar-button').forEach(b => b.classList.remove('active'));
+                document.getElementById('threeD_orbitBtn').classList.add('active');
+            });
+            document.getElementById('threeD_selectBtn')?.addEventListener('click', () => {
+                document.querySelectorAll('#threeDView .toolbar-button').forEach(b => b.classList.remove('active'));
+                document.getElementById('threeD_selectBtn').classList.add('active');
+            });
+            document.getElementById('threeD_flyBtn')?.addEventListener('click', () => {
+                document.querySelectorAll('#threeDView .toolbar-button').forEach(b => b.classList.remove('active'));
+                document.getElementById('threeD_flyBtn').classList.add('active');
+            });
+            document.getElementById('threeD_resetBtn')?.addEventListener('click', () => {
+                theta3D = 0; phi3D = Math.PI / 4; radius3D = 50;
+                panOffset3D = { x: 0, y: 0, z: 0 };
+                flyTarget3D = null;
+                velTheta = 0; velPhi = 0;
             });
 
             // Agent mascot toggle
