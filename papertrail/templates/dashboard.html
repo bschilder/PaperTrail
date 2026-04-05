@@ -6109,6 +6109,7 @@
         // ===== LLM AGENT =====
         let claudeApiKey = null;
         let claudeModel = 'claude-sonnet-4-20250514';
+        let conversationHistory = []; // persistent message history for multi-turn
 
         function buildDatasetSummary() {
             const people = new Set();
@@ -6531,7 +6532,8 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
         let agentStatusCallback = null;
 
         async function callClaudeAgent(query) {
-            const messages = [{ role: 'user', content: query }];
+            conversationHistory.push({ role: 'user', content: query });
+            const messages = [...conversationHistory];
             let allPapersFound = [];
             let allToolCalls = [];
             const maxRounds = 4;
@@ -6598,6 +6600,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         ).join('\n');
                     }
 
+                    conversationHistory.push({ role: 'assistant', content: answerText || 'No response' });
                     return {
                         text: answerText,
                         results: [],
@@ -6643,6 +6646,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             }
 
             // Fallback if we hit max rounds
+            conversationHistory.push({ role: 'assistant', content: 'Agent reached maximum reasoning steps.' });
             return { text: 'Agent reached maximum reasoning steps.', results: [], _full_papers: allPapersFound, toolCalls: allToolCalls };
         }
 
@@ -6719,6 +6723,14 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     }
 
                     renderChatResults(resultsPanel, thinkingHTML + agentResult.text, agentResult._full_papers || [], 'llm');
+
+                    // Show conversation count
+                    if (conversationHistory.length > 2) {
+                        const convIndicator = document.createElement('div');
+                        convIndicator.style.cssText = 'padding:6px 14px;font-size:10px;color:#555;border-top:1px solid #2a2a3e;display:flex;justify-content:space-between;align-items:center;';
+                        convIndicator.innerHTML = `<span>${Math.floor(conversationHistory.length/2)} messages in conversation</span><button onclick="conversationHistory=[];this.parentElement.remove();" style="background:none;border:1px solid #3a3a4e;color:#888;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px;">Clear history</button>`;
+                        resultsPanel.appendChild(convIndicator);
+                    }
                 } catch (err) {
                     console.error('LLM agent error:', err);
                     // Fall back to local
@@ -7605,6 +7617,17 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 const input = document.getElementById('chatbotInput');
                 if (input.value.trim()) {
                     runChatSearch(input.value.trim());
+                }
+            });
+
+            // Clear conversation on double-click of input
+            document.getElementById('chatbotInput').addEventListener('dblclick', () => {
+                if (conversationHistory.length > 0) {
+                    document.getElementById('chatbotInput').placeholder = 'Conversation cleared. Ask a new question...';
+                    conversationHistory = [];
+                    setTimeout(() => {
+                        document.getElementById('chatbotInput').placeholder = 'Ask about papers... try @person, #channel, or keywords';
+                    }, 2000);
                 }
             });
 
