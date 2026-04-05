@@ -1318,6 +1318,27 @@
             border-color: #64b5f6;
             color: #fff;
         }
+        .toolbar-button[data-tooltip] {
+            position: relative;
+        }
+        .toolbar-button[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            right: calc(100% + 8px);
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #1e1e32, #252540);
+            border: 1px solid rgba(100,181,246,0.2);
+            color: #e0e0e0;
+            font-size: 11px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            z-index: 50;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            pointer-events: none;
+            animation: tooltipFadeIn 0.1s ease-out;
+        }
 
         .tooltip {
             position: fixed;
@@ -2321,10 +2342,10 @@
                             <span class="tt-label" id="ttLabel">All time</span>
                         </div>
                         <div class="map-toolbar">
-                            <button class="toolbar-button" id="panBtn" title="Pan / Move (V)">✋</button>
-                            <button class="toolbar-button" id="lassoBtn" title="Lasso Select (L)">∿</button>
-                            <button class="toolbar-button" id="rectBtn" title="Rectangle Select (R)">◻</button>
-                            <button class="toolbar-button" id="resetBtn" title="Reset Zoom (0)">↺</button>
+                            <button class="toolbar-button" id="panBtn" data-tooltip="Pan / Move (V)">✋</button>
+                            <button class="toolbar-button" id="lassoBtn" data-tooltip="Lasso Select (L)">∿</button>
+                            <button class="toolbar-button" id="rectBtn" data-tooltip="Rectangle Select (R)">◻</button>
+                            <button class="toolbar-button" id="resetBtn" data-tooltip="Reset Zoom (0)">↺</button>
                         </div>
                     </div>
 
