@@ -791,6 +791,93 @@
             cursor: default;
         }
 
+        /* Leaderboard view */
+        .leaderboard-view {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow-y: auto;
+            padding: 24px;
+            background: #0f0f17;
+        }
+        .leaderboard-view.visible { display: block; }
+        .lb-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .lb-section {
+            margin-bottom: 28px;
+        }
+        .lb-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .lb-section-title .lb-icon { font-size: 16px; }
+        .lb-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px;
+        }
+        .lb-card {
+            background: #1a1a2e;
+            border: 1px solid #2a2a3e;
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.15s;
+        }
+        .lb-card:hover { background: #1f1f35; border-color: #3a3a4e; }
+        .lb-rank {
+            font-size: 18px;
+            font-weight: 700;
+            color: #64b5f6;
+            min-width: 28px;
+            text-align: center;
+        }
+        .lb-rank.gold { color: #ffca28; }
+        .lb-rank.silver { color: #b0bec5; }
+        .lb-rank.bronze { color: #ff8a65; }
+        .lb-card-body { flex: 1; min-width: 0; }
+        .lb-card-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e0e0e0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .lb-card-meta {
+            font-size: 11px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .lb-bar-wrap {
+            height: 4px;
+            background: #252538;
+            border-radius: 2px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+        .lb-bar {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+        .lb-stat {
+            font-size: 18px;
+            font-weight: 700;
+            color: #64b5f6;
+            text-align: right;
+            min-width: 40px;
+        }
+
         /* Time travel control */
         .time-travel {
             position: absolute;
@@ -1389,6 +1476,7 @@
                 <div class="view-toggle">
                     <button id="mapToggle" class="active">Map</button>
                     <button id="tableToggle">Table</button>
+                    <button id="leaderboardToggle">Leaderboard</button>
                 </div>
             </div>
 
@@ -1615,6 +1703,10 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    <!-- Leaderboard View -->
+                    <div class="leaderboard-view" id="leaderboardView">
+                        <div class="lb-container" id="leaderboardContent"></div>
                     </div>
                 </div>
             </div>
@@ -1911,6 +2003,82 @@
         }
 
         // ===== TABLE VIEW =====
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboardContent');
+
+            // Compute stats
+            const people = {};
+            const topPapers = [];
+            allPapers.forEach(p => {
+                if (p.shared_by) {
+                    if (!people[p.shared_by]) people[p.shared_by] = { count: 0, channels: new Set(), totalCites: 0 };
+                    people[p.shared_by].count++;
+                    people[p.shared_by].totalCites += p.cited_by_count || 0;
+                    (p.channels || []).forEach(ch => people[p.shared_by].channels.add(ch));
+                }
+                topPapers.push(p);
+            });
+
+            const sortedPeople = Object.entries(people).sort((a, b) => b[1].count - a[1].count);
+            const maxPapers = sortedPeople[0]?.[1].count || 1;
+            const topCited = [...topPapers].sort((a, b) => (b.cited_by_count || 0) - (a.cited_by_count || 0)).slice(0, 10);
+            const recentHits = [...topPapers].filter(p => p.first_shared).sort((a, b) => b.first_shared.localeCompare(a.first_shared)).slice(0, 10);
+
+            function rankClass(i) { return i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''; }
+
+            let html = `
+                <div class="lb-section">
+                    <div class="lb-section-title"><span class="lb-icon">&#127942;</span> Top Contributors</div>
+                    <div class="lb-grid">
+                        ${sortedPeople.slice(0, 12).map(([name, data], i) => `
+                            <div class="lb-card">
+                                <div class="lb-rank ${rankClass(i)}">${i + 1}</div>
+                                <div class="lb-card-body">
+                                    <div class="lb-card-name">${esc(name)}</div>
+                                    <div class="lb-card-meta">${data.count} papers · ${data.channels.size} channels · ${data.totalCites} total cites</div>
+                                    <div class="lb-bar-wrap"><div class="lb-bar" style="width:${(data.count / maxPapers * 100).toFixed(0)}%;background:#64b5f6;"></div></div>
+                                </div>
+                                <div class="lb-stat">${data.count}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="lb-section">
+                    <div class="lb-section-title"><span class="lb-icon">&#128293;</span> Most Cited Papers</div>
+                    <div class="lb-grid">
+                        ${topCited.map((p, i) => `
+                            <div class="lb-card">
+                                <div class="lb-rank ${rankClass(i)}">${i + 1}</div>
+                                <div class="lb-card-body">
+                                    <div class="lb-card-name">${esc(p.title) || 'Untitled'}</div>
+                                    <div class="lb-card-meta">${p.year || '?'} · ${esc(p.journal || 'Preprint')} · shared by ${esc(p.shared_by || '?')}</div>
+                                </div>
+                                <div class="lb-stat" style="color:#ffca28;">${p.cited_by_count || 0}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="lb-section">
+                    <div class="lb-section-title"><span class="lb-icon">&#128161;</span> Recently Shared</div>
+                    <div class="lb-grid">
+                        ${recentHits.map((p, i) => `
+                            <div class="lb-card">
+                                <div class="lb-rank">${i + 1}</div>
+                                <div class="lb-card-body">
+                                    <div class="lb-card-name">${esc(p.title) || 'Untitled'}</div>
+                                    <div class="lb-card-meta">${p.first_shared ? new Date(p.first_shared).toLocaleDateString() : '?'} · ${esc(p.shared_by || '?')} · ${(p.channels || []).map(ch => channelDisplayName(ch)).join(', ')}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
         function renderTable() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
@@ -4681,26 +4849,22 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             }
 
             // ===== EVENT LISTENERS =====
-            document.getElementById('mapToggle').addEventListener('click', () => {
-                currentView = 'map';
-                document.getElementById('mapToggle').classList.add('active');
-                document.getElementById('tableToggle').classList.remove('active');
-                document.getElementById('mapView').classList.add('visible');
-                document.getElementById('tableView').classList.remove('visible');
-                document.getElementById('exportButtons').classList.remove('visible');
-                renderMap();
-            });
+            function switchView(view) {
+                currentView = view;
+                document.getElementById('mapToggle').classList.toggle('active', view === 'map');
+                document.getElementById('tableToggle').classList.toggle('active', view === 'table');
+                document.getElementById('leaderboardToggle').classList.toggle('active', view === 'leaderboard');
+                document.getElementById('mapView').classList.toggle('visible', view === 'map');
+                document.getElementById('tableView').classList.toggle('visible', view === 'table');
+                document.getElementById('leaderboardView').classList.toggle('visible', view === 'leaderboard');
+                if (view === 'map') renderMap();
+                if (view === 'table') { renderTable(); setupTableEvents(); }
+                if (view === 'leaderboard') renderLeaderboard();
+            }
 
-            document.getElementById('tableToggle').addEventListener('click', () => {
-                currentView = 'table';
-                document.getElementById('mapToggle').classList.remove('active');
-                document.getElementById('tableToggle').classList.add('active');
-                document.getElementById('mapView').classList.remove('visible');
-                document.getElementById('tableView').classList.add('visible');
-                document.getElementById('exportButtons').classList.add('visible');
-                renderTable();
-                setupTableEvents();
-            });
+            document.getElementById('mapToggle').addEventListener('click', () => switchView('map'));
+            document.getElementById('tableToggle').addEventListener('click', () => switchView('table'));
+            document.getElementById('leaderboardToggle').addEventListener('click', () => switchView('leaderboard'));
 
             document.querySelectorAll('.proj-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
