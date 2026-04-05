@@ -79,7 +79,7 @@ def build_preview(
     data_b64 = base64.b64encode(data_json.encode()).decode()
 
     html = template.replace("{{TITLE}}", title)
-    html = html.replace("{{DATA_BASE64}}", data_b64)
+    html = html.replace("{{DATA_B64}}", data_b64)
 
     Path(output_path).write_text(html, encoding="utf-8")
     logger.info("Dashboard written to %s (%d KB)", output_path, len(html) // 1024)

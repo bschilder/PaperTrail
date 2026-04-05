@@ -1988,12 +1988,12 @@
             const content = document.getElementById('panelContent');
 
             if (papers.length === 0) {
-                panel.classList.remove('expanded');
+                panel.style.display = 'none';
+                content.innerHTML = '';
                 return;
             }
 
-            panel.classList.add('expanded');
-            document.getElementById('panelToggle').textContent = '\u25BC';
+            panel.style.display = 'block';
 
             content.innerHTML = `
                 <div class="select-all-checkbox">
@@ -3232,88 +3232,6 @@ Be concise and conversational. 2-3 sentences max for the answer.`;
             document.getElementById('autocompleteDropdown').classList.remove('visible');
         }
 
-        // ===== EVENT LISTENERS =====
-        document.getElementById('mapToggle').addEventListener('click', () => {
-            currentView = 'map';
-            document.getElementById('mapToggle').classList.add('active');
-            document.getElementById('tableToggle').classList.remove('active');
-            document.getElementById('mapView').classList.add('visible');
-            document.getElementById('tableView').classList.remove('visible');
-            document.getElementById('exportButtons').classList.remove('visible');
-            renderMap();
-        });
-
-        document.getElementById('tableToggle').addEventListener('click', () => {
-            currentView = 'table';
-            document.getElementById('mapToggle').classList.remove('active');
-            document.getElementById('tableToggle').classList.add('active');
-            document.getElementById('mapView').classList.remove('visible');
-            document.getElementById('tableView').classList.add('visible');
-            document.getElementById('exportButtons').classList.add('visible');
-            renderTable();
-            setupTableEvents();
-        });
-
-        document.getElementById('projectionSelect').addEventListener('change', (e) => {
-            currentProjection = e.target.value;
-            zoomLevel = 1; panX = 0; panY = 0;
-            computeBounds();
-            renderMap();
-        });
-
-        document.getElementById('colorBySelect').addEventListener('change', (e) => {
-            colorByMode = e.target.value;
-            renderMap();
-        });
-
-        document.getElementById('scaleBySelect').addEventListener('change', (e) => {
-            scaleByMode = e.target.value;
-            renderMap();
-        });
-
-        document.getElementById('semanticSearch').addEventListener('click', () => {
-            const query = document.getElementById('semanticQuery').value.trim();
-            if (!query) return;
-
-            semanticQuery = query;
-            computeSemanticSimilarity(query);
-            document.getElementById('semanticActive').style.display = 'block';
-            document.getElementById('semanticClear').style.display = 'block';
-            document.getElementById('topNSection').style.display = 'block';
-            document.getElementById('scaleBySelect').value = 'relevance';
-            scaleByMode = 'relevance';
-            // Auto-select top N immediately
-            autoSelectTopN();
-        });
-
-        document.getElementById('semanticClear').addEventListener('click', () => {
-            semanticQuery = null;
-            semanticScores.clear();
-            document.getElementById('semanticQuery').value = '';
-            document.getElementById('semanticActive').style.display = 'none';
-            document.getElementById('semanticClear').style.display = 'none';
-            document.getElementById('topNSection').style.display = 'none';
-            document.getElementById('scaleBySelect').value = 'uniform';
-            scaleByMode = 'uniform';
-            selectedPapers.clear();
-            renderMap();
-        });
-
-        document.getElementById('selectTopN').addEventListener('input', (e) => {
-            document.getElementById('topNDisplay').textContent = e.target.value;
-            // Auto-select as slider moves
-            autoSelectTopN();
-        });
-
-        document.getElementById('exportCsv').addEventListener('click', () => downloadFiltered('csv'));
-        document.getElementById('exportXlsx').addEventListener('click', () => downloadFiltered('xlsx'));
-
-        document.getElementById('panelToggle').addEventListener('click', () => {
-            const panel = document.getElementById('detailPanel');
-            panel.classList.toggle('expanded');
-            document.getElementById('panelToggle').textContent = panel.classList.contains('expanded') ? '\u25BC' : '\u25B6';
-        });
-
         // ===== INITIALIZATION =====
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
@@ -3321,6 +3239,144 @@ Be concise and conversational. 2-3 sentences max for the answer.`;
             initChatbot();
             initTableResize();
             setSelectionMode('pan');
+
+            // ===== EVENT LISTENERS =====
+            document.getElementById('mapToggle').addEventListener('click', () => {
+                currentView = 'map';
+                document.getElementById('mapToggle').classList.add('active');
+                document.getElementById('tableToggle').classList.remove('active');
+                document.getElementById('mapView').classList.add('visible');
+                document.getElementById('tableView').classList.remove('visible');
+                document.getElementById('exportButtons').classList.remove('visible');
+                renderMap();
+            });
+
+            document.getElementById('tableToggle').addEventListener('click', () => {
+                currentView = 'table';
+                document.getElementById('mapToggle').classList.remove('active');
+                document.getElementById('tableToggle').classList.add('active');
+                document.getElementById('mapView').classList.remove('visible');
+                document.getElementById('tableView').classList.add('visible');
+                document.getElementById('exportButtons').classList.add('visible');
+                renderTable();
+                setupTableEvents();
+            });
+
+            document.getElementById('projectionSelect').addEventListener('change', (e) => {
+                currentProjection = e.target.value;
+                zoomLevel = 1; panX = 0; panY = 0;
+                computeBounds();
+                renderMap();
+            });
+
+            document.getElementById('colorBySelect').addEventListener('change', (e) => {
+                colorByMode = e.target.value;
+                renderMap();
+            });
+
+            document.getElementById('scaleBySelect').addEventListener('change', (e) => {
+                scaleByMode = e.target.value;
+                renderMap();
+            });
+
+            document.getElementById('semanticSearch').addEventListener('click', () => {
+                const query = document.getElementById('semanticQuery').value.trim();
+                if (!query) return;
+
+                semanticQuery = query;
+                computeSemanticSimilarity(query);
+                document.getElementById('semanticActive').style.display = 'block';
+                document.getElementById('semanticClear').style.display = 'block';
+                document.getElementById('topNSection').style.display = 'block';
+                document.getElementById('scaleBySelect').value = 'relevance';
+                scaleByMode = 'relevance';
+                autoSelectTopN();
+            });
+
+            document.getElementById('semanticClear').addEventListener('click', () => {
+                semanticQuery = null;
+                semanticScores.clear();
+                document.getElementById('semanticQuery').value = '';
+                document.getElementById('semanticActive').style.display = 'none';
+                document.getElementById('semanticClear').style.display = 'none';
+                document.getElementById('topNSection').style.display = 'none';
+                document.getElementById('scaleBySelect').value = 'uniform';
+                scaleByMode = 'uniform';
+                selectedPapers.clear();
+                renderMap();
+            });
+
+            document.getElementById('selectTopN').addEventListener('input', (e) => {
+                document.getElementById('topNDisplay').textContent = e.target.value;
+                autoSelectTopN();
+            });
+
+            document.getElementById('exportCsv').addEventListener('click', () => downloadFiltered('csv'));
+            document.getElementById('exportXlsx').addEventListener('click', () => downloadFiltered('xlsx'));
+
+            // Panel close button
+            const panelCloseBtn = document.getElementById('panelClose');
+            if (panelCloseBtn) {
+                panelCloseBtn.addEventListener('click', () => {
+                    selectedPapers.clear();
+                    document.getElementById('detailPanel').style.display = 'none';
+                    document.getElementById('panelContent').innerHTML = '';
+                    renderMap();
+                });
+            }
+
+            // Semantic search on Enter key
+            document.getElementById('semanticQuery').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    document.getElementById('semanticSearch').click();
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Don't trigger shortcuts when typing in inputs
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+
+                switch(e.key) {
+                    case 'Escape':
+                        selectedPapers.clear();
+                        document.getElementById('detailPanel').style.display = 'none';
+                        document.getElementById('panelContent').innerHTML = '';
+                        document.getElementById('chatbotResults').classList.remove('visible');
+                        renderMap();
+                        break;
+                    case '1':
+                        document.getElementById('projectionSelect').value = 'umap';
+                        currentProjection = 'umap';
+                        zoomLevel = 1; panX = 0; panY = 0;
+                        computeBounds(); renderMap();
+                        break;
+                    case '2':
+                        document.getElementById('projectionSelect').value = 'tsne';
+                        currentProjection = 'tsne';
+                        zoomLevel = 1; panX = 0; panY = 0;
+                        computeBounds(); renderMap();
+                        break;
+                    case '3':
+                        document.getElementById('projectionSelect').value = 'pca';
+                        currentProjection = 'pca';
+                        zoomLevel = 1; panX = 0; panY = 0;
+                        computeBounds(); renderMap();
+                        break;
+                    case '/':
+                        e.preventDefault();
+                        document.getElementById('chatbotInput').focus();
+                        break;
+                    case 't':
+                    case 'T':
+                        if (currentView === 'map') {
+                            document.getElementById('tableToggle').click();
+                        } else {
+                            document.getElementById('mapToggle').click();
+                        }
+                        break;
+                }
+            });
         });
     </script>
 </body>
