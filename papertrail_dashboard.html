@@ -7396,6 +7396,10 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 if (match) {
                     parsed.people.push(match);
                     parsed.explanation.push(`by @${match}`);
+                } else {
+                    // Person mentioned but not found — use impossible filter to return 0
+                    parsed.people.push('__UNKNOWN_PERSON__');
+                    parsed.explanation.push(`by @${name} (not found)`);
                 }
             }
             q = q.replace(/@[\w\s]+?(?=\s+(?:in|from|shared|on|during|last|this|since|before|after|#|@|$)|\s*$)/gi, ' ');
@@ -7708,8 +7712,9 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         }
                     }
 
-                    // Require at least one keyword match if we have keywords
-                    if (matchedKeywords === 0) {
+                    // Require at least half of keywords to match for multi-word queries
+                    const minMatchRatio = parsed.keywords.length >= 3 ? 0.5 : (parsed.keywords.length >= 2 ? 0.5 : 0);
+                    if (matchedKeywords === 0 || (matchedKeywords / parsed.keywords.length) < minMatchRatio) {
                         passes = false;
                     } else {
                         score = keywordScore * (matchedKeywords / parsed.keywords.length);
@@ -7740,8 +7745,11 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 results.sort((a, b) => b.score - a.score);
             }
 
+            // Apply limit (default 50 for keyword searches, no limit for person/channel filters)
             if (parsed.limit) {
                 results = results.slice(0, parsed.limit);
+            } else if (parsed.keywords.length > 0 && parsed.people.length === 0 && parsed.channels.length === 0) {
+                results = results.slice(0, 50);
             }
 
             // Attach parsed info for UI display
