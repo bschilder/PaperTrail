@@ -1368,6 +1368,7 @@
         let animationProgress = 1; // 0-1, 1 = complete
         let animationRAF = null;
         let previousPositions = new Map(); // paper index -> {x, y}
+        let hoveredPaperIdx = -1; // index into filteredPapers
         let currentProjection = 'umap';
 
         // Canvas state
@@ -1918,19 +1919,25 @@
                 const allIdx = allPapers.indexOf(paper);
                 const isSelected = selectedPapers.has(allIdx);
 
-                // Glow effect for selected points
-                if (isSelected) {
-                    ctx.globalAlpha = 0.3;
-                    ctx.fillStyle = color;
+                const isHovered = (idx === hoveredPaperIdx);
+
+                // Glow effect for hovered/selected points
+                if (isHovered || isSelected) {
+                    const glowRadius = isHovered ? radius + 12 : radius + 6;
+                    const grad = ctx.createRadialGradient(sx, sy, radius, sx, sy, glowRadius);
+                    grad.addColorStop(0, color.replace('rgb', 'rgba').replace(')', ', 0.4)'));
+                    grad.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.globalAlpha = 0.6;
+                    ctx.fillStyle = grad;
                     ctx.beginPath();
-                    ctx.arc(sx, sy, radius + 6, 0, Math.PI * 2);
+                    ctx.arc(sx, sy, glowRadius, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
-                ctx.globalAlpha = paper.title ? (isSelected ? 1 : 0.75) : 0.25;
+                ctx.globalAlpha = paper.title ? (isSelected || isHovered ? 1 : 0.75) : 0.25;
                 ctx.fillStyle = color;
                 ctx.beginPath();
-                ctx.arc(sx, sy, radius, 0, Math.PI * 2);
+                ctx.arc(sx, sy, isHovered ? radius + 1.5 : radius, 0, Math.PI * 2);
                 ctx.fill();
 
                 if (isSelected) {
@@ -1939,6 +1946,14 @@
                     ctx.lineWidth = 2;
                     ctx.beginPath();
                     ctx.arc(sx, sy, radius + 3, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                if (isHovered) {
+                    ctx.globalAlpha = 1;
+                    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, radius + 4, 0, Math.PI * 2);
                     ctx.stroke();
                 }
             });
@@ -2459,6 +2474,7 @@
             const tooltip = document.getElementById('tooltip');
             let hoveredPaper = null;
             let minDist = 12;
+            let newHoveredIdx = -1;
 
             filteredPapers.forEach((paper, idx) => {
                 if (paper._sx === undefined) return;
@@ -2466,8 +2482,17 @@
                 if (distance < minDist) {
                     minDist = distance;
                     hoveredPaper = paper;
+                    newHoveredIdx = idx;
                 }
             });
+
+            // Update hover state and re-render if changed
+            if (newHoveredIdx !== hoveredPaperIdx) {
+                hoveredPaperIdx = newHoveredIdx;
+                if (!isDragging && selectionMode === 'pan') {
+                    requestRenderMap();
+                }
+            }
 
             if (hoveredPaper) {
                 const channels = Array.isArray(hoveredPaper.channels) ? hoveredPaper.channels : [];
