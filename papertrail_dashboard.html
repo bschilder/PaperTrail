@@ -594,12 +594,7 @@
         }
 
         .channel-button::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            border-radius: 3px;
-            flex-shrink: 0;
-            background: var(--channel-color, #64b5f6);
+            display: none;
         }
 
         .channel-button:hover {
@@ -616,9 +611,6 @@
 
         .channel-button:not(.active) {
             opacity: 0.35;
-        }
-        .channel-button:not(.active)::before {
-            background: #555;
         }
         .channel-button:not(.active):hover {
             opacity: 0.55;
