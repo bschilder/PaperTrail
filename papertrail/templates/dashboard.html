@@ -2618,10 +2618,17 @@
                     ctx.fill();
                 }
 
+                const r = isHovered ? radius + 1.5 : radius;
                 ctx.globalAlpha = paper.title ? (isSelected || isHovered ? 1 : 0.75) : 0.25;
-                ctx.fillStyle = color;
+
+                // Orb effect: radial gradient with highlight
+                const orbGrad = ctx.createRadialGradient(sx - r * 0.3, sy - r * 0.3, r * 0.1, sx, sy, r);
+                orbGrad.addColorStop(0, 'rgba(255,255,255,0.35)');
+                orbGrad.addColorStop(0.3, color);
+                orbGrad.addColorStop(1, color.replace('rgb', 'rgba').replace(')', ', 0.6)'));
+                ctx.fillStyle = orbGrad;
                 ctx.beginPath();
-                ctx.arc(sx, sy, isHovered ? radius + 1.5 : radius, 0, Math.PI * 2);
+                ctx.arc(sx, sy, r, 0, Math.PI * 2);
                 ctx.fill();
 
                 if (isSelected) {
@@ -2659,6 +2666,16 @@
 
             // Draw color legend
             drawLegend();
+
+            // Subtle vignette for depth
+            const vigGrad = ctx.createRadialGradient(
+                canvas.width / 2, canvas.height / 2, Math.min(canvas.width, canvas.height) * 0.3,
+                canvas.width / 2, canvas.height / 2, Math.max(canvas.width, canvas.height) * 0.7
+            );
+            vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
+            vigGrad.addColorStop(1, 'rgba(0,0,0,0.25)');
+            ctx.fillStyle = vigGrad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // Footer info
             ctx.fillStyle = 'rgba(255,255,255,0.35)';
