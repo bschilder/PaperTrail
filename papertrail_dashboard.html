@@ -2864,12 +2864,12 @@
                 return;
             }
 
-            // Range slider
+            // Range slider (Up = increase, Down = decrease)
             const slider = section.querySelector('input[type="range"]');
             if (slider) {
                 const step = parseFloat(slider.step) || 1;
                 const val = parseFloat(slider.value);
-                const newVal = direction === 'down'
+                const newVal = direction === 'up'
                     ? Math.min(val + step, parseFloat(slider.max))
                     : Math.max(val - step, parseFloat(slider.min));
                 slider.value = newVal;
