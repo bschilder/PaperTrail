@@ -6754,6 +6754,10 @@
 
         // ===== LLM AGENT =====
         let claudeApiKey = null;
+        // HuggingFace token injected at build time for zero-config AI
+        let hfToken = "{{HF_TOKEN}}";
+        if (hfToken === "{" + "{HF_TOKEN}}") hfToken = null; // template not replaced
+        let hfModel = 'Qwen/Qwen2.5-72B-Instruct';
         let claudeModel = 'claude-sonnet-4-20250514';
         let conversationHistory = []; // persistent message history for multi-turn
 
@@ -7177,6 +7181,56 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
         // Status callback for thinking UI
         let agentStatusCallback = null;
 
+        async function callHFAgent(query) {
+            const messages = [...conversationHistory, { role: 'user', content: query }];
+            const tools = ALL_TOOLS.map(t => ({ type: 'function', function: { name: t.name, description: t.description, parameters: t.input_schema } }));
+
+            if (agentStatusCallback) agentStatusCallback('Thinking...');
+
+            const resp = await fetch(`https://router.huggingface.co/hf-inference/models/${hfModel}/v1/chat/completions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${hfToken}` },
+                body: JSON.stringify({
+                    model: hfModel,
+                    messages: [{ role: 'system', content: buildSystemPrompt() }, ...messages],
+                    tools,
+                    tool_choice: 'auto',
+                    max_tokens: 1024,
+                })
+            });
+
+            if (!resp.ok) throw new Error(`HF API error ${resp.status}: ${(await resp.text()).substring(0, 200)}`);
+            const data = await resp.json();
+            const choice = data.choices?.[0];
+            const msg = choice?.message;
+
+            if (msg?.tool_calls?.length > 0) {
+                const tc = msg.tool_calls[0];
+                if (agentStatusCallback) agentStatusCallback(`Running ${tc.function.name}...`);
+                const params = JSON.parse(tc.function.arguments || '{}');
+                const result = executeTool(tc.function.name, params);
+                const fullPapers = result._full_papers || [];
+                delete result._full_papers;
+
+                // Second call with tool result
+                const msgs2 = [...messages, msg, { role: 'tool', tool_call_id: tc.id, content: JSON.stringify(result) }];
+                const resp2 = await fetch(`https://router.huggingface.co/hf-inference/models/${hfModel}/v1/chat/completions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${hfToken}` },
+                    body: JSON.stringify({ model: hfModel, messages: [{ role: 'system', content: buildSystemPrompt() }, ...msgs2], max_tokens: 1024 })
+                });
+                if (!resp2.ok) throw new Error(`HF API error ${resp2.status}`);
+                const data2 = await resp2.json();
+                const answer = data2.choices?.[0]?.message?.content || '';
+                conversationHistory.push({ role: 'user', content: query }, { role: 'assistant', content: answer });
+                return { text: answer, results: [], _full_papers: fullPapers, toolCalls: [{ name: tc.function.name, input: params }] };
+            }
+
+            const answer = msg?.content || '';
+            conversationHistory.push({ role: 'user', content: query }, { role: 'assistant', content: answer });
+            return { text: answer, results: [], _full_papers: [], toolCalls: [] };
+        }
+
         async function callClaudeAgent(query) {
             conversationHistory.push({ role: 'user', content: query });
             const messages = [...conversationHistory];
@@ -7498,12 +7552,13 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             resultsPanel.innerHTML = '';
             resultsPanel.classList.add('visible');
 
-            if (claudeApiKey) {
-                // LLM Agent mode
+            if (claudeApiKey || hfToken) {
+                // LLM Agent mode (Claude or HuggingFace)
+                const usingHF = !claudeApiKey && hfToken;
                 const thinkingEl = document.createElement('div');
                 resultsPanel.innerHTML = `
                     <div class="chatbot-results-header">
-                        <span>Thinking<span class="ai-mode-badge llm">${claudeModel.includes('opus') ? 'Opus' : claudeModel.includes('haiku') ? 'Haiku' : 'Sonnet'}</span></span>
+                        <span>Thinking<span class="ai-mode-badge llm">${usingHF ? 'Qwen (HF)' : claudeModel.includes('opus') ? 'Opus' : claudeModel.includes('haiku') ? 'Haiku' : 'Sonnet'}</span></span>
                         <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
                     </div>
                     <div class="ai-thinking" id="agentThinkingStatus">
@@ -7519,7 +7574,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 };
 
                 try {
-                    const agentResult = await callClaudeAgent(query);
+                    const agentResult = usingHF ? await callHFAgent(query) : await callClaudeAgent(query);
                     agentStatusCallback = null;
 
                     // Show tool calls as expandable thinking
