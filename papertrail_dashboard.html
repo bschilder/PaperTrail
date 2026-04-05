@@ -2423,6 +2423,7 @@
                             <button class="toolbar-button" id="lassoBtn" data-tooltip="Lasso Select (L)">∿</button>
                             <button class="toolbar-button" id="rectBtn" data-tooltip="Rectangle Select (R)">◻</button>
                             <button class="toolbar-button" id="resetBtn" data-tooltip="Reset Zoom (0)">↺</button>
+                            <button class="toolbar-button" id="screenshotBtn" data-tooltip="Save as PNG (S)" title="Save as PNG">&#128247;</button>
                         </div>
                     </div>
 
@@ -3693,14 +3694,24 @@
                     <td style="white-space:nowrap;">${linksHtml}</td>
                 `;
 
-                row.addEventListener('click', () => {
-                    selectedPapers.clear();
-                    const allIdx = (paperIndexMap.get(paper) ?? -1);
-                    if (allIdx !== -1) selectedPapers.add(allIdx);
-                    showDetailPanel([paper]);
-                });
-
                 tbody.appendChild(row);
+
+                // Expandable abstract row
+                if (paper.abstract) {
+                    const detailRow = document.createElement('tr');
+                    detailRow.className = 'abstract-row';
+                    detailRow.style.display = 'none';
+                    detailRow.innerHTML = `<td colspan="13" style="padding:8px 16px;font-size:12px;color:#a0a0b0;line-height:1.5;background:#141425;border-bottom:1px solid #2a2a3e;white-space:normal;max-width:none;">${esc(paper.abstract)}</td>`;
+                    tbody.appendChild(detailRow);
+
+                    // Toggle on row click
+                    row.style.cursor = 'pointer';
+                    row.addEventListener('click', (e) => {
+                        if (e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.closest('.table-action-icon') || e.target.closest('.card-tag')) return;
+                        detailRow.style.display = detailRow.style.display === 'none' ? 'table-row' : 'none';
+                        row.style.background = detailRow.style.display === 'none' ? '' : '#1a1a2e';
+                    });
+                }
             });
 
             // Table select all
@@ -3802,6 +3813,12 @@
             document.getElementById('lassoBtn').addEventListener('click', () => setSelectionMode('lasso'));
             document.getElementById('rectBtn').addEventListener('click', () => setSelectionMode('rect'));
             document.getElementById('resetBtn').addEventListener('click', resetZoom);
+            document.getElementById('screenshotBtn').addEventListener('click', () => {
+                const link = document.createElement('a');
+                link.download = 'papertrail_map.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
         }
 
         function setSelectionMode(mode) {
@@ -7629,6 +7646,15 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         break;
                     case '0':
                         resetZoom();
+                        break;
+                    case 's':
+                    case 'S':
+                        if (!e.metaKey && !e.ctrlKey) {
+                            const link = document.createElement('a');
+                            link.download = 'papertrail_map.png';
+                            link.href = document.getElementById('canvas').toDataURL('image/png');
+                            link.click();
+                        }
                         break;
                     case '?':
                         document.getElementById('shortcutsOverlay').classList.toggle('visible');
