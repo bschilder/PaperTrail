@@ -7246,7 +7246,97 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
         async function runChatSearch(query) {
             if (!query) return;
 
-            // Smart entity queries — provide conversational answer with link to full profile
+            function handleSmartLocalQuery(query) {
+            const q = query.toLowerCase().trim();
+
+            // "compare X vs Y" / "X vs Y" / "compare X and Y"
+            const compareMatch = q.match(/(?:compare\s+)?(?:#?)(\w[\w-]*)\s+(?:vs|versus|and|with)\s+(?:#?)(\w[\w-]*)/i);
+            if (compareMatch) {
+                const ch1 = findBestChannelMatch(compareMatch[1]);
+                const ch2 = findBestChannelMatch(compareMatch[2]);
+                if (ch1 && ch2) {
+                    const result = executeCompareChannels({ channels: [ch1, ch2] });
+                    const d1 = result[ch1] || {}, d2 = result[ch2] || {};
+                    return {
+                        title: `${channelDisplayName(ch1)} vs ${channelDisplayName(ch2)}`,
+                        html: `<table style="width:100%;font-size:12px;color:#a0a0b0;">
+                            <tr><td></td><td style="color:#64b5f6;font-weight:600;">${channelDisplayName(ch1)}</td><td style="color:#bb86fc;font-weight:600;">${channelDisplayName(ch2)}</td></tr>
+                            <tr><td>Papers</td><td><strong>${d1.paper_count || 0}</strong></td><td><strong>${d2.paper_count || 0}</strong></td></tr>
+                            <tr><td>Avg Citations</td><td>${d1.avg_citations || 0}</td><td>${d2.avg_citations || 0}</td></tr>
+                            <tr><td>Top Topics</td><td>${(d1.top_topics || []).slice(0,2).join(', ')}</td><td>${(d2.top_topics || []).slice(0,2).join(', ')}</td></tr>
+                            <tr><td>Top Contributors</td><td>${(d1.top_contributors || []).slice(0,2).join(', ')}</td><td>${(d2.top_contributors || []).slice(0,2).join(', ')}</td></tr>
+                        </table>`
+                    };
+                }
+            }
+
+            // "trending" / "what's trending" / "trends"
+            if (/trend|trending|hot\s+topics|what.*new/i.test(q)) {
+                const result = executeAnalyzeTrends({ granularity: 'quarterly' });
+                const recent = result.periods.slice(-4);
+                const allWords = {};
+                recent.forEach(p => (p.top_words || []).forEach(w => allWords[w] = (allWords[w] || 0) + 1));
+                const topWords = Object.entries(allWords).sort((a,b) => b[1]-a[1]).slice(0, 8).map(([w]) => w);
+                return {
+                    title: 'Trending Topics',
+                    html: `<p>Recent quarters show focus on: <strong>${topWords.join(', ')}</strong></p>
+                        <p style="margin-top:6px;">${recent.map(p => `${p.period}: ${p.total_papers} papers`).join(' → ')}</p>
+                        <p style="margin-top:6px;color:#888;">Total trend: ${result.periods[0]?.total_papers || 0} → ${result.periods[result.periods.length-1]?.total_papers || 0} papers/quarter</p>`
+                };
+            }
+
+            // "summarize" / "overview" / "landscape"
+            if (/summar|overview|landscape|describe.*data/i.test(q)) {
+                const clusters = {};
+                allPapers.forEach(p => { if (p.cluster_label) clusters[p.cluster_label] = (clusters[p.cluster_label] || 0) + 1; });
+                const sorted = Object.entries(clusters).sort((a,b) => b[1]-a[1]);
+                const people = {};
+                allPapers.forEach(p => { if (p.shared_by) people[p.shared_by] = (people[p.shared_by] || 0) + 1; });
+                const topPerson = Object.entries(people).sort((a,b) => b[1]-a[1])[0];
+                return {
+                    title: 'Research Landscape',
+                    html: `<p>Your team has shared <strong>${allPapers.length} papers</strong> across <strong>${sorted.length} topic clusters</strong>.</p>
+                        <p style="margin-top:4px;">Largest: <strong>${sorted[0]?.[0]}</strong> (${sorted[0]?.[1]} papers)</p>
+                        <p>Most active: <strong>${topPerson?.[0]}</strong> (${topPerson?.[1]} papers)</p>
+                        <p style="margin-top:6px;">Topics: ${sorted.slice(0,6).map(([l,c]) => `<span class="card-tag cluster-tag" style="cursor:pointer;font-size:10px;" onclick="document.getElementById('chatbotResults').classList.remove('visible');showTopicInfo('${esc(l).replace(/'/g, "\\'")}')">${esc(l)}</span>`).join(' ')}</p>`,
+                    action: () => { showAllClusters(); }
+                };
+            }
+
+            // "most cited" / "top papers" / "best papers"
+            if (/most cited|top papers|best papers|influential/i.test(q)) {
+                const top = [...allPapers].sort((a,b) => (b.cited_by_count||0)-(a.cited_by_count||0)).slice(0, 5);
+                return {
+                    title: 'Most Cited Papers',
+                    html: top.map((p, i) =>
+                        `<div style="margin-bottom:6px;"><strong style="color:#ffca28;">${p.cited_by_count||0}x</strong> ${esc(p.title?.substring(0,70)||'Untitled')} <span style="color:#666;">(${p.year||'?'})</span></div>`
+                    ).join(''),
+                    papers: top
+                };
+            }
+
+            // "help" / "what can you do" / "capabilities"
+            if (/^help$|what can|capabilities|how.*use|how.*work/i.test(q)) {
+                return {
+                    title: 'What I Can Do',
+                    html: `<p>Try these queries:</p>
+                        <ul style="margin:6px 0;padding-left:16px;color:#a0a0b0;font-size:12px;line-height:1.8;">
+                            <li><strong>who is @Peter Koo</strong> — contributor profile</li>
+                            <li><strong>what is Deep Learning Methods</strong> — topic deep-dive</li>
+                            <li><strong>compare dl vs genomics</strong> — channel comparison</li>
+                            <li><strong>what's trending</strong> — recent trends</li>
+                            <li><strong>most cited papers</strong> — top papers by citations</li>
+                            <li><strong>summarize the landscape</strong> — full overview</li>
+                            <li><strong>papers about transformers in genomics</strong> — filtered search</li>
+                        </ul>
+                        <p style="color:#64b5f6;">&#x2728; Add an API key (gear icon) for AI-powered answers, web search, and multi-turn conversation.</p>`
+                };
+            }
+
+            return null; // no smart match, fall through to regular search
+        }
+
+        // Smart entity queries — provide conversational answer with link to full profile
             const whoIsMatch = query.match(/^(?:who is|about|profile)\s+@?(.+)/i);
             if (whoIsMatch) {
                 const name = whoIsMatch[1].trim();
@@ -7311,6 +7401,23 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         </div>`;
                     return;
                 }
+            }
+
+            // Smart local agent: handle analytical queries without API key
+            const smartResult = handleSmartLocalQuery(query);
+            if (smartResult) {
+                const resultsPanel = document.getElementById('chatbotResults');
+                resultsPanel.innerHTML = '';
+                resultsPanel.classList.add('visible');
+                resultsPanel.innerHTML = `
+                    <div class="chatbot-results-header">
+                        <span>${esc(smartResult.title)}<span class="ai-mode-badge local">smart local</span></span>
+                        <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
+                    </div>
+                    <div class="ai-response">${smartResult.html}</div>
+                    ${smartResult.papers ? `<div style="padding:6px 14px;font-size:11px;color:#555;">${smartResult.papers.length} papers found</div>` : ''}`;
+                if (smartResult.action) smartResult.action();
+                return;
             }
 
             const resultsPanel = document.getElementById('chatbotResults');
