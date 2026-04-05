@@ -317,8 +317,12 @@
             border: 1px solid rgba(100,181,246,0.25);
             border-radius: 12px;
             padding: 16px;
-            z-index: 300;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            z-index: 700;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .chatbot-settings-popup.visible {
@@ -2271,6 +2275,7 @@
                 </svg>
                 <span class="mascot-label">Ask AI</span>
             </button>
+            <button class="chatbot-settings-btn" id="chatbotSettingsBtn" title="AI Settings" style="margin-left:-6px;">⚙</button>
 
         </div>
 
@@ -2303,7 +2308,6 @@
                     <button class="chatbot-example-btn" data-query="What topics are trending in the last 6 months?">trending</button>
                     <button class="chatbot-example-btn" data-query="Who are the most active contributors and what do they focus on?">contributors</button>
                 </div>
-                <button class="chatbot-settings-btn" id="chatbotSettingsBtn" title="Configure AI (API key)">⚙</button>
                 <div class="chatbot-settings-popup" id="chatbotSettingsPopup" style="width:380px;">
                     <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:10px;">AI Agent Setup</div>
 
