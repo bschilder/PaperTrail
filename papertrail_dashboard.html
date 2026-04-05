@@ -2662,7 +2662,7 @@
 
     <!-- Settings modal overlay -->
     <div class="profile-modal" id="settingsOverlay">
-        <div class="profile-card" style="width:400px;max-width:95vw;">
+        <div class="profile-card" style="width:420px;max-width:95vw;padding:24px 28px;">
             <button class="profile-close" onclick="document.getElementById('settingsOverlay').classList.remove('visible')">&times;</button>
             <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#64b5f6;margin-bottom:4px;">&#x2699; Settings</div>
             <div class="profile-name" style="font-size:18px;">AI Agent Setup</div>
@@ -6654,13 +6654,13 @@
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('.chatbot-bar') && !e.target.closest('.agent-panel')) {
                     resultsPanel.classList.remove('visible');
-                    document.getElementById('chatbotSettingsPopup').classList.remove('visible');
+                    document.getElementById('settingsOverlay')?.classList.remove('visible');
                 }
             });
 
             // Settings gear
             const settingsBtn = document.getElementById('chatbotSettingsBtn');
-            const settingsPopup = document.getElementById('chatbotSettingsPopup');
+            const settingsPopup = document.getElementById('settingsOverlay');
             settingsBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 // Use the modal overlay instead of inline popup
