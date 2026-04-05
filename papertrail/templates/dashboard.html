@@ -3513,66 +3513,88 @@
             });
             const topClusters = Object.entries(clusters).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-            // Build GitHub-style heatmap (last 12 months, 7 days per week)
-            const now = new Date();
-            const weeks = 52;
+            // Build GitHub-style heatmap with year selector
             const heatmapData = {};
+            let firstYear = 9999, lastYear = 0;
             papers.forEach(p => {
                 if (!p.first_shared) return;
                 const d = new Date(p.first_shared);
                 const key = d.toISOString().slice(0, 10);
                 heatmapData[key] = (heatmapData[key] || 0) + 1;
+                const yr = d.getFullYear();
+                if (yr < firstYear) firstYear = yr;
+                if (yr > lastYear) lastYear = yr;
             });
+            const currentYear = new Date().getFullYear();
+            if (firstYear > lastYear) { firstYear = currentYear; lastYear = currentYear; }
 
-            // Day labels (left axis)
-            let heatmapHTML = '<div style="display:flex;">';
-            heatmapHTML += '<div class="heatmap-day-labels">';
-            const dayLabels = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
-            dayLabels.forEach(l => { heatmapHTML += `<div class="heatmap-day-label">${l}</div>`; });
-            heatmapHTML += '</div>';
-
-            heatmapHTML += '<div><div class="heatmap-wrap" id="heatmapWrap"><div class="heatmap-grid">';
-            const startDate = new Date(now);
-            startDate.setDate(startDate.getDate() - (weeks * 7));
-            startDate.setDate(startDate.getDate() - startDate.getDay());
-
-            const monthMarkers = [];
-            for (let w = 0; w < weeks; w++) {
-                heatmapHTML += '<div class="heatmap-col">';
-                for (let d = 0; d < 7; d++) {
-                    const date = new Date(startDate);
-                    date.setDate(date.getDate() + w * 7 + d);
-                    const key = date.toISOString().slice(0, 10);
-                    const count = heatmapData[key] || 0;
-                    const level = count === 0 ? '' : count === 1 ? 'l1' : count <= 3 ? 'l2' : count <= 5 ? 'l3' : 'l4';
-                    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                    const dayName = dayNames[date.getDay()];
-                    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                    heatmapHTML += `<div class="heatmap-cell ${level}" title="${dayName}, ${dateStr}: ${count} paper${count !== 1 ? 's' : ''}"></div>`;
-                    // Track month starts
-                    if (d === 0 && date.getDate() <= 7) {
-                        monthMarkers.push({ week: w, label: date.toLocaleDateString('en-US', { month: 'short' }) });
-                    }
-                }
-                heatmapHTML += '</div>';
+            // Year selector
+            let yearOptions = '';
+            for (let y = lastYear; y >= firstYear; y--) {
+                yearOptions += `<option value="${y}"${y === currentYear ? ' selected' : ''}>${y}</option>`;
             }
-            heatmapHTML += '</div></div>';
 
-            // Month labels (bottom axis)
-            heatmapHTML += '<div class="heatmap-month-labels">';
-            let lastWeek = -1;
-            monthMarkers.forEach(m => {
-                const gap = m.week - lastWeek - 1;
-                if (gap > 0) heatmapHTML += `<span style="width:${gap * 12}px;"></span>`;
-                heatmapHTML += `<span class="heatmap-month-label">${m.label}</span>`;
-                lastWeek = m.week;
-            });
-            heatmapHTML += '</div></div></div>';
+            function buildHeatmapForYear(year) {
+                const startDate = new Date(year, 0, 1);
+                startDate.setDate(startDate.getDate() - startDate.getDay()); // align to Sunday
+                const endDate = new Date(year, 11, 31);
+                const weeks = Math.ceil((endDate - startDate) / (7 * 86400000)) + 1;
 
-            // Auto-scroll heatmap to most recent (right end)
+                let html = '<div style="display:flex;">';
+                html += '<div class="heatmap-day-labels">';
+                ['', 'Mon', '', 'Wed', '', 'Fri', ''].forEach(l => { html += `<div class="heatmap-day-label">${l}</div>`; });
+                html += '</div>';
+                html += '<div><div class="heatmap-wrap" id="heatmapWrap"><div class="heatmap-grid">';
+
+                const monthMarkers = [];
+                for (let w = 0; w < weeks; w++) {
+                    html += '<div class="heatmap-col">';
+                    for (let d = 0; d < 7; d++) {
+                        const date = new Date(startDate);
+                        date.setDate(date.getDate() + w * 7 + d);
+                        const key = date.toISOString().slice(0, 10);
+                        const count = heatmapData[key] || 0;
+                        const level = count === 0 ? '' : count === 1 ? 'l1' : count <= 3 ? 'l2' : count <= 5 ? 'l3' : 'l4';
+                        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                        const dayName = dayNames[date.getDay()];
+                        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        html += `<div class="heatmap-cell ${level}" title="${dayName}, ${dateStr}: ${count} paper${count !== 1 ? 's' : ''}"></div>`;
+                        if (d === 0 && date.getDate() <= 7) {
+                            monthMarkers.push({ week: w, label: date.toLocaleDateString('en-US', { month: 'short' }) });
+                        }
+                    }
+                    html += '</div>';
+                }
+                html += '</div></div>';
+                html += '<div class="heatmap-month-labels">';
+                let lastW = -1;
+                monthMarkers.forEach(m => {
+                    const gap = m.week - lastW - 1;
+                    if (gap > 0) html += `<span style="width:${gap * 12}px;"></span>`;
+                    html += `<span class="heatmap-month-label">${m.label}</span>`;
+                    lastW = m.week;
+                });
+                html += '</div></div></div>';
+                return html;
+            }
+
+            let heatmapHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span style="font-size:10px;color:#888;">Sharing Activity</span>
+                <select id="heatmapYearSelect" class="color-by-select" style="font-size:10px;padding:2px 4px;width:auto;">${yearOptions}</select>
+            </div>`;
+            heatmapHTML += `<div id="heatmapContainer">${buildHeatmapForYear(currentYear)}</div>`;
+
+            // Auto-scroll + year change handler wired after innerHTML set
             setTimeout(() => {
                 const wrap = document.getElementById('heatmapWrap');
                 if (wrap) wrap.scrollLeft = wrap.scrollWidth;
+                const select = document.getElementById('heatmapYearSelect');
+                if (select) {
+                    select.addEventListener('change', () => {
+                        const container = document.getElementById('heatmapContainer');
+                        if (container) container.innerHTML = buildHeatmapForYear(parseInt(select.value));
+                    });
+                }
             }, 100);
 
             // Channel badges
