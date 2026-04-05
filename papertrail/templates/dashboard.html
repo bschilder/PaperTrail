@@ -3218,7 +3218,7 @@
             ).join(' ');
 
             const paperListHTML = topPapers.map(p => {
-                const paperLink = p.url ? `<a href="${esc(p.url)}" target="_blank" onclick="event.stopPropagation()"><span style="color:#64b5f6;">&#128196;</span></a>` : '';
+                const paperLink = p.url ? `<a href="${esc(p.url)}" target="_blank" onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 16 16" fill="#64b5f6" style="vertical-align:middle;"><path d="M4 1h5l4 4v9a1 1 0 01-1 1H4a1 1 0 01-1-1V2a1 1 0 011-1zm4.5 0v4H13L8.5 1z"/></svg></a>` : '';
                 const slackLink = p.slack_url ? `<a href="${esc(p.slack_url)}" target="_blank" onclick="event.stopPropagation()">${SLACK_ICON_SVG}</a>` : '';
                 return `<div class="profile-paper-item">
                     <span style="color:#ffca28;font-size:11px;min-width:40px;">${p.cited_by_count || 0}x</span>
@@ -3421,7 +3421,7 @@
 
             // Papers
             const paperListHTML = topPapers.map(p => {
-                const paperLink = p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()"><span style="color:#64b5f6;">&#128196;</span></a>` : '';
+                const paperLink = p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 16 16" fill="#64b5f6" style="vertical-align:middle;"><path d="M4 1h5l4 4v9a1 1 0 01-1 1H4a1 1 0 01-1-1V2a1 1 0 011-1zm4.5 0v4H13L8.5 1z"/></svg></a>` : '';
                 const slackLink = p.slack_url ? `<a href="${esc(p.slack_url)}" target="_blank" title="View in Slack" onclick="event.stopPropagation()">${SLACK_ICON_SVG}</a>` : '';
                 return `<div class="profile-paper-item">
                     <span style="color:#ffca28;font-size:11px;min-width:40px;">${p.cited_by_count || 0}x</span>
@@ -3581,7 +3581,7 @@
             // Top papers with links
             const topPapers = [...papers].sort((a, b) => (b.cited_by_count || 0) - (a.cited_by_count || 0)).slice(0, 8);
             const paperListHTML = topPapers.map(p => {
-                const paperLink = p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper"><span style="color:#64b5f6;">&#128196;</span></a>` : '';
+                const paperLink = p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper"><svg width="14" height="14" viewBox="0 0 16 16" fill="#64b5f6" style="vertical-align:middle;"><path d="M4 1h5l4 4v9a1 1 0 01-1 1H4a1 1 0 01-1-1V2a1 1 0 011-1zm4.5 0v4H13L8.5 1z"/></svg></a>` : '';
                 const slackLink = p.slack_url ? `<a href="${esc(p.slack_url)}" target="_blank" title="View in Slack">${SLACK_ICON_SVG}</a>` : '';
                 return `<div class="profile-paper-item">
                     <span style="color:#ffca28;font-size:11px;min-width:35px;">${p.cited_by_count || 0}x</span>
@@ -3679,7 +3679,7 @@
                                     <div class="lb-card-meta">${p.year || '?'} · ${esc(p.journal || 'Preprint')} · <span style="cursor:pointer;color:#bb86fc;" onclick="event.stopPropagation();showContributorProfile('${esc(p.shared_by || '').replace(/'/g, "\\'")}')">${esc(p.shared_by || '?')}</span></div>
                                 </div>
                                 <div class="profile-paper-links" style="flex-shrink:0;">
-                                    ${p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()"><span style="color:#64b5f6;">&#128196;</span></a>` : ''}
+                                    ${p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 16 16" fill="#64b5f6" style="vertical-align:middle;"><path d="M4 1h5l4 4v9a1 1 0 01-1 1H4a1 1 0 01-1-1V2a1 1 0 011-1zm4.5 0v4H13L8.5 1z"/></svg></a>` : ''}
                                     ${p.slack_url ? `<a href="${esc(p.slack_url)}" target="_blank" title="View in Slack" onclick="event.stopPropagation()">${SLACK_ICON_SVG}</a>` : ''}
                                 </div>
                                 <div class="lb-stat" style="color:#ff7043;">${p.engagement || 0}</div>
@@ -3699,7 +3699,7 @@
                                     <div class="lb-card-meta">${p.year || '?'} · ${esc(p.journal || 'Preprint')} · <span style="cursor:pointer;color:#bb86fc;" onclick="event.stopPropagation();showContributorProfile('${esc(p.shared_by || '').replace(/'/g, "\\'")}')">${esc(p.shared_by || '?')}</span></div>
                                 </div>
                                 <div class="profile-paper-links" style="flex-shrink:0;">
-                                    ${p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()"><span style="color:#64b5f6;">&#128196;</span></a>` : ''}
+                                    ${p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 16 16" fill="#64b5f6" style="vertical-align:middle;"><path d="M4 1h5l4 4v9a1 1 0 01-1 1H4a1 1 0 01-1-1V2a1 1 0 011-1zm4.5 0v4H13L8.5 1z"/></svg></a>` : ''}
                                     ${p.slack_url ? `<a href="${esc(p.slack_url)}" target="_blank" title="View in Slack" onclick="event.stopPropagation()">${SLACK_ICON_SVG}</a>` : ''}
                                 </div>
                                 <div class="lb-stat" style="color:#ffca28;">${p.cited_by_count || 0}</div>
@@ -3719,7 +3719,7 @@
                                     <div class="lb-card-meta">${p.first_shared ? new Date(p.first_shared).toLocaleDateString() : '?'} · <span style="cursor:pointer;color:#bb86fc;" onclick="event.stopPropagation();showContributorProfile('${esc(p.shared_by || '').replace(/'/g, "\\'")}')">${esc(p.shared_by || '?')}</span> · ${(p.channels || []).map(ch => channelDisplayName(ch)).join(', ')}</div>
                                 </div>
                                 <div class="profile-paper-links" style="flex-shrink:0;">
-                                    ${p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()"><span style="color:#64b5f6;">&#128196;</span></a>` : ''}
+                                    ${p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 16 16" fill="#64b5f6" style="vertical-align:middle;"><path d="M4 1h5l4 4v9a1 1 0 01-1 1H4a1 1 0 01-1-1V2a1 1 0 011-1zm4.5 0v4H13L8.5 1z"/></svg></a>` : ''}
                                     ${p.slack_url ? `<a href="${esc(p.slack_url)}" target="_blank" title="View in Slack" onclick="event.stopPropagation()">${SLACK_ICON_SVG}</a>` : ''}
                                 </div>
                             </div>
@@ -3759,7 +3759,7 @@
                 // Build links cell: paper link, slack icon, openalex logo
                 let linksHtml = '';
                 if (paper.url) {
-                    linksHtml += `<a href="${paper.url}" target="_blank" class="table-action-icon" title="Open paper"><span style="color:#64b5f6;">&#128196;</span></a>`;
+                    linksHtml += `<a href="${paper.url}" target="_blank" class="table-action-icon" title="Open paper"><svg width="14" height="14" viewBox="0 0 16 16" fill="#64b5f6" style="vertical-align:middle;"><path d="M4 1h5l4 4v9a1 1 0 01-1 1H4a1 1 0 01-1-1V2a1 1 0 011-1zm4.5 0v4H13L8.5 1z"/></svg></a>`;
                 }
                 // Slack link from first share
                 const slackUrl = paper.slack_url || (paper.shares && paper.shares[0] && paper.shares[0].slack_url);
@@ -3805,6 +3805,27 @@
                     });
                 }
             });
+
+            // Drag-select rows
+            let tableDragging = false;
+            let tableDragAction = null;
+            tbody.addEventListener('mousedown', (e) => {
+                if (e.target.type === 'checkbox') {
+                    tableDragging = true;
+                    tableDragAction = e.target.checked ? 'uncheck' : 'check';
+                }
+            });
+            document.addEventListener('mouseup', () => { tableDragging = false; tableDragAction = null; });
+            tbody.addEventListener('mouseover', (e) => {
+                if (tableDragging) {
+                    const cb = e.target.closest('tr')?.querySelector('.table-row-checkbox');
+                    if (cb) {
+                        cb.checked = tableDragAction === 'check';
+                    }
+                }
+            });
+            // Prevent text selection during drag
+            tbody.style.userSelect = 'none';
 
             // Table select all
             const selectAllCb = document.getElementById('tableSelectAll');
@@ -7720,6 +7741,21 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 if (view === 'table') { renderTable(); setupTableEvents(); }
                 if (view === 'leaderboard') renderLeaderboard();
                 if (view === 'threeD') init3DView();
+
+                // Hide map-specific sidebar controls on non-map views
+                const mapOnlyControls = ['projectionButtons', 'colorBySelect', 'pointSizeSlider', 'kdeBandwidth', 'scaleBySelect', 'transformButtons'];
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) {
+                    const sections = sidebar.querySelectorAll('.sidebar-section');
+                    // Show all sections for map, hide projection/color/etc for table/leaderboard
+                    const isMapLike = (view === 'map' || view === 'threeD');
+                    sections.forEach(s => {
+                        const label = s.querySelector('.sidebar-label')?.textContent?.trim();
+                        if (['Projection', 'Color By', 'Scale Factor', 'KDE Background', 'Scale By', 'Transform'].includes(label)) {
+                            s.style.display = isMapLike ? '' : 'none';
+                        }
+                    });
+                }
             }
 
             document.getElementById('mapToggle').addEventListener('click', () => switchView('map'));
