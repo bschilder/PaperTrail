@@ -1075,7 +1075,9 @@
         .lb-card.lb-focused {
             border-color: #64b5f6;
             background: #1f1f38;
-            box-shadow: 0 0 0 2px rgba(100,181,246,0.2);
+            box-shadow: 0 0 0 3px rgba(100,181,246,0.3);
+            transform: scale(1.01);
+            transition: all 0.15s;
         }
         .lb-card {
             animation: cardBrickIn 0.4s ease-out both;
@@ -8564,6 +8566,53 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     if (semanticPanel?.classList.contains('visible') && (e.target.id === 'semanticPanelInput')) {
                         semanticPanel.classList.remove('visible');
                         document.getElementById('semanticMascotBtn').classList.remove('active');
+                        return;
+                    }
+                }
+
+                // Arrow keys while modal is open from leaderboard: cycle items
+                if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && leaderboardFocusSection >= 0) {
+                    const profileOpen = document.getElementById('profileModal')?.classList.contains('visible');
+                    const topicOpen = document.getElementById('topicModal')?.classList.contains('visible');
+                    if (profileOpen || topicOpen) {
+                        e.preventDefault();
+                        const sections = document.querySelectorAll('.lb-section');
+                        if (sections[leaderboardFocusSection]) {
+                            const cards = sections[leaderboardFocusSection].querySelectorAll('.lb-card');
+                            if (cards.length > 0) {
+                                leaderboardFocusIdx = e.key === 'ArrowRight'
+                                    ? (leaderboardFocusIdx + 1) % cards.length
+                                    : (leaderboardFocusIdx - 1 + cards.length) % cards.length;
+                                // Close current modal and open the new item
+                                document.querySelectorAll('.lb-card.lb-focused').forEach(c => c.classList.remove('lb-focused'));
+                                cards[leaderboardFocusIdx]?.classList.add('lb-focused');
+                                // Trigger the click on the new card
+                                if (profileOpen) document.getElementById('profileModal').classList.remove('visible');
+                                if (topicOpen) document.getElementById('topicModal').classList.remove('visible');
+                                modalHistory = [];
+                                cards[leaderboardFocusIdx]?.click();
+                            }
+                        }
+                        return;
+                    }
+                }
+                if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && leaderboardFocusSection >= 0) {
+                    const profileOpen = document.getElementById('profileModal')?.classList.contains('visible');
+                    const topicOpen = document.getElementById('topicModal')?.classList.contains('visible');
+                    if (profileOpen || topicOpen) {
+                        e.preventDefault();
+                        const sections = document.querySelectorAll('.lb-section');
+                        leaderboardFocusSection = e.key === 'ArrowDown'
+                            ? Math.min(leaderboardFocusSection + 1, sections.length - 1)
+                            : Math.max(leaderboardFocusSection - 1, 0);
+                        leaderboardFocusIdx = 0;
+                        document.querySelectorAll('.lb-card.lb-focused').forEach(c => c.classList.remove('lb-focused'));
+                        const cards = sections[leaderboardFocusSection]?.querySelectorAll('.lb-card');
+                        cards?.[0]?.classList.add('lb-focused');
+                        if (profileOpen) document.getElementById('profileModal').classList.remove('visible');
+                        if (topicOpen) document.getElementById('topicModal').classList.remove('visible');
+                        modalHistory = [];
+                        cards?.[0]?.click();
                         return;
                     }
                 }
