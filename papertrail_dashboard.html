@@ -2445,7 +2445,7 @@
                     <div class="three-d-view" id="threeDView">
                         <div id="threeDContainer" style="width:100%;height:100%;"></div>
                         <div class="three-d-controls">
-                            <span style="font-size:11px;color:#888;">Drag to orbit · Scroll to zoom · Click point for details</span>
+                            <span style="font-size:11px;color:#888;">Drag to orbit · Shift+drag to pan · Scroll to zoom · Click for details · Double-click to fly to cluster</span>
                         </div>
                     </div>
                 </div>
@@ -3871,30 +3871,63 @@
         let idleTimer3D = 0;
 
         function computePCA3D(papers) {
-            // Use current 2D projection for x,y and compute z from orthogonal info
-            // Strategy: x,y from current projection, z from the DIFFERENCE between
-            // two projection methods (captures structure not in the 2D view)
+            // Strategy: x,y from current projection, z computed as the
+            // Gram-Schmidt residual of a second projection (what it captures
+            // that x,y don't). This guarantees z is orthogonal to the x,y plane.
+
             const proj1 = currentProjection;
             const proj2 = proj1 === 'umap' ? 'tsne' : (proj1 === 'tsne' ? 'pca' : 'umap');
 
-            return papers.map(p => {
-                const p1 = p.projections && p.projections[proj1];
-                const p2 = p.projections && p.projections[proj2];
-                if (!p1) return [0, 0, 0];
-
-                const x = p1[0];
-                const y = p1[1];
-                // Z from orthogonal projection difference + cluster spread
-                let z = 0;
-                if (p2) {
-                    // Normalize second projection's contribution
-                    z = (p2[0] * 0.4 + p2[1] * 0.6);
-                }
-                // Add slight cluster-based jitter for separation
-                z += ((p.cluster_id || 0) % 7 - 3) * 0.5;
-
-                return [x, y, z];
+            // Step 1: collect raw coordinates
+            const raw = papers.map(p => {
+                const p1 = p.projections?.[proj1];
+                const p2 = p.projections?.[proj2];
+                return { x: p1?.[0] || 0, y: p1?.[1] || 0, u: p2?.[0] || 0, v: p2?.[1] || 0 };
             });
+
+            // Step 2: center all
+            const n = raw.length;
+            let mx = 0, my = 0, mu = 0, mv = 0;
+            raw.forEach(r => { mx += r.x; my += r.y; mu += r.u; mv += r.v; });
+            mx /= n; my /= n; mu /= n; mv /= n;
+            raw.forEach(r => { r.x -= mx; r.y -= my; r.u -= mu; r.v -= mv; });
+
+            // Step 3: Gram-Schmidt — project (u,v) onto (x,y) plane and take residual
+            // z_i = u_i - proj_x(u)*x_i - proj_y(u)*y_i  (same for v, then combine)
+            let xx = 0, yy = 0, xu = 0, yu = 0, xv = 0, yv = 0;
+            raw.forEach(r => {
+                xx += r.x * r.x; yy += r.y * r.y;
+                xu += r.x * r.u; yu += r.y * r.u;
+                xv += r.x * r.v; yv += r.y * r.v;
+            });
+
+            // Projection coefficients
+            const ax = xx > 0 ? xu / xx : 0;
+            const ay = yy > 0 ? yu / yy : 0;
+            const bx = xx > 0 ? xv / xx : 0;
+            const by = yy > 0 ? yv / yy : 0;
+
+            // Compute residuals as z
+            const coords = raw.map(r => {
+                const resU = r.u - ax * r.x - ay * r.y;
+                const resV = r.v - bx * r.x - by * r.y;
+                return [r.x + mx, r.y + my, resU + resV];
+            });
+
+            // Ensure z has meaningful spread — if residuals are tiny, use cluster jitter
+            let zRange = 0;
+            coords.forEach(c => { zRange = Math.max(zRange, Math.abs(c[2])); });
+            const xRange = Math.max(...coords.map(c => Math.abs(c[0]))) || 1;
+
+            if (zRange < xRange * 0.05) {
+                // Residuals too small — augment with cluster-based spread
+                papers.forEach((p, i) => {
+                    coords[i][2] += ((p.cluster_id || 0) % 7 - 3) * xRange * 0.08;
+                    coords[i][2] += (Math.random() - 0.5) * xRange * 0.03;
+                });
+            }
+
+            return coords;
         }
 
         function init3DView() {
@@ -3927,12 +3960,13 @@
 
             // Orbit controls with momentum
             let isDragging3D = false, prevMouse3D = { x: 0, y: 0 };
+            let panOffset3D = { x: 0, y: 0, z: 0 };
 
             function updateCamera() {
-                camera3D.position.x = radius3D * Math.sin(phi3D) * Math.cos(theta3D);
-                camera3D.position.y = radius3D * Math.cos(phi3D);
-                camera3D.position.z = radius3D * Math.sin(phi3D) * Math.sin(theta3D);
-                camera3D.lookAt(0, 0, 0);
+                camera3D.position.x = panOffset3D.x + radius3D * Math.sin(phi3D) * Math.cos(theta3D);
+                camera3D.position.y = panOffset3D.y + radius3D * Math.cos(phi3D);
+                camera3D.position.z = panOffset3D.z + radius3D * Math.sin(phi3D) * Math.sin(theta3D);
+                camera3D.lookAt(panOffset3D.x, panOffset3D.y, panOffset3D.z);
             }
 
             renderer3D.domElement.addEventListener('mousedown', (e) => {
@@ -3942,7 +3976,6 @@
                 idleTimer3D = 0;
             });
             renderer3D.domElement.addEventListener('mousemove', (e) => {
-                // Raycasting for hover (throttled)
                 const rect = renderer3D.domElement.getBoundingClientRect();
                 mouse3D.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
                 mouse3D.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
@@ -3950,10 +3983,20 @@
                 if (isDragging3D) {
                     const dx = e.clientX - prevMouse3D.x;
                     const dy = e.clientY - prevMouse3D.y;
-                    velTheta = -dx * 0.005;
-                    velPhi = -dy * 0.005;
-                    theta3D += velTheta;
-                    phi3D = Math.max(0.1, Math.min(Math.PI - 0.1, phi3D + velPhi));
+
+                    if (e.shiftKey) {
+                        // Shift+drag: pan (translate look-at target)
+                        const panSpeed = radius3D * 0.002;
+                        panOffset3D.x += -dx * panSpeed * Math.cos(theta3D) + dy * panSpeed * Math.sin(theta3D) * Math.cos(phi3D);
+                        panOffset3D.y += dy * panSpeed * Math.sin(phi3D);
+                        panOffset3D.z += dx * panSpeed * Math.sin(theta3D) + dy * panSpeed * Math.cos(theta3D) * Math.cos(phi3D);
+                    } else {
+                        // Normal drag: orbit
+                        velTheta = -dx * 0.005;
+                        velPhi = -dy * 0.005;
+                        theta3D += velTheta;
+                        phi3D = Math.max(0.1, Math.min(Math.PI - 0.1, phi3D + velPhi));
+                    }
                     prevMouse3D = { x: e.clientX, y: e.clientY };
                     updateCamera();
                     idleTimer3D = 0;
@@ -3978,22 +4021,21 @@
                 }
             });
 
-            // Star field (two layers for parallax)
-            [2000, 1000].forEach((count, layer) => {
-                const geom = new THREE.BufferGeometry();
-                const pos = new Float32Array(count * 3);
-                const spread = layer === 0 ? 300 : 600;
-                for (let i = 0; i < count * 3; i++) pos[i] = (Math.random() - 0.5) * spread;
-                geom.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-                const mat = new THREE.PointsMaterial({ color: layer === 0 ? 0x444466 : 0x222244, size: layer === 0 ? 0.3 : 0.15 });
-                const stars = new THREE.Points(geom, mat);
-                stars.userData.layer = layer;
-                scene3D.add(stars);
-            });
+            // Subtle grid plane for spatial reference
+            const gridHelper = new THREE.GridHelper(60, 20, 0x1a1a3e, 0x111128);
+            gridHelper.position.y = -20;
+            scene3D.add(gridHelper);
 
-            // Compute 3D positions
+            // Compute 3D positions — use native 3D projections if available
             papers3DRef = filteredPapers.filter(p => p.projections && p.projections[currentProjection]);
-            const coords3D = computePCA3D(papers3DRef);
+            const proj3DKey = currentProjection + '3d'; // e.g. "umap3d"
+            const has3D = papers3DRef.length > 0 && papers3DRef[0].projections?.[proj3DKey];
+            const coords3D = has3D
+                ? papers3DRef.map(p => {
+                    const c = p.projections[proj3DKey];
+                    return c ? [c[0], c[1], c[2]] : [0, 0, 0];
+                })
+                : computePCA3D(papers3DRef);
 
             // Normalize to fit in a sphere
             let maxDist = 0;
@@ -4148,10 +4190,6 @@
                 }
             }
 
-            // Star parallax
-            scene3D.children.forEach(child => {
-                if (child.userData.layer === 1) child.rotation.y += 0.0002;
-            });
 
             // Raycasting (throttled)
             if (instancedMesh3D && raycaster3D) {

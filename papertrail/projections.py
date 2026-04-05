@@ -89,6 +89,64 @@ def compute_projections(
     return results
 
 
+def compute_projections_3d(
+    embeddings: np.ndarray,
+    seed: int = 42,
+) -> dict[str, np.ndarray]:
+    """
+    Compute 3D projections from embedding matrix.
+
+    Parameters
+    ----------
+    embeddings : np.ndarray
+        Matrix of shape (n_papers, dim).
+    seed : int
+        Random seed for reproducibility.
+
+    Returns
+    -------
+    dict[str, np.ndarray]
+        Keys "umap3d", "tsne3d", "pca3d", each mapping to (n_papers, 3) arrays.
+    """
+    n = embeddings.shape[0]
+    results = {}
+
+    # PCA-3D
+    logger.info("Computing PCA-3D...")
+    pca3 = PCA(n_components=3, random_state=seed)
+    results["pca3d"] = pca3.fit_transform(embeddings)
+
+    # t-SNE-3D
+    logger.info("Computing t-SNE-3D...")
+    perplexity = min(30, n - 1)
+    tsne3 = TSNE(
+        n_components=3,
+        perplexity=perplexity,
+        random_state=seed,
+        metric="cosine",
+    )
+    results["tsne3d"] = tsne3.fit_transform(embeddings)
+
+    # UMAP-3D
+    logger.info("Computing UMAP-3D...")
+    try:
+        import umap
+
+        reducer3 = umap.UMAP(
+            n_components=3,
+            n_neighbors=15,
+            min_dist=0.1,
+            random_state=seed,
+            metric="cosine",
+        )
+        results["umap3d"] = reducer3.fit_transform(embeddings)
+    except ImportError:
+        logger.warning("umap-learn not installed; using t-SNE-3D fallback for UMAP-3D slot")
+        results["umap3d"] = results["tsne3d"].copy()
+
+    return results
+
+
 def cluster_papers(
     embeddings: np.ndarray,
     texts: list[str],
