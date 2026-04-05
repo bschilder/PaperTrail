@@ -1076,12 +1076,14 @@
             padding: 4px 10px 4px 8px;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background 0.2s, color 0.2s;
             font-size: 12px;
             color: rgba(255,255,255,0.6);
             background: rgba(15,15,23,0.5);
             user-select: none;
             position: relative;
+            height: 24px;
+            box-sizing: content-box;
         }
         .legend-item:hover {
             background: rgba(15,15,23,0.85);
@@ -2241,10 +2243,10 @@
                             <span class="tt-label" id="ttLabel">All time</span>
                         </div>
                         <div class="map-toolbar">
-                            <button class="toolbar-button" id="panBtn" title="Pan (or hold Shift)">✋</button>
-                            <button class="toolbar-button" id="lassoBtn" title="Lasso Select">∿</button>
-                            <button class="toolbar-button" id="rectBtn" title="Rectangle Select">◻</button>
-                            <button class="toolbar-button" id="resetBtn" title="Reset Zoom">↺</button>
+                            <button class="toolbar-button" id="panBtn" title="Pan / Move (V)">✋</button>
+                            <button class="toolbar-button" id="lassoBtn" title="Lasso Select (L)">∿</button>
+                            <button class="toolbar-button" id="rectBtn" title="Rectangle Select (R)">◻</button>
+                            <button class="toolbar-button" id="resetBtn" title="Reset Zoom (0)">↺</button>
                         </div>
                     </div>
 
@@ -4123,19 +4125,44 @@
                     </div>`;
                 }).join('');
 
-                // Click to toggle visibility
+                // Click + drag-select to toggle visibility
+                let legendDragging = false, legendDragAction = null;
+                container.addEventListener('mousedown', () => { legendDragging = true; legendDragAction = null; });
+                document.addEventListener('mouseup', () => { legendDragging = false; legendDragAction = null; });
+
                 container.querySelectorAll('.legend-item[data-cluster]').forEach(item => {
-                    item.addEventListener('click', (e) => {
-                        if (e.target.closest('.legend-info-btn')) return; // don't toggle on info click
-                        const label = item.dataset.cluster;
+                    function toggleCluster(label, el) {
                         if (hiddenClusters.has(label)) {
                             hiddenClusters.delete(label);
-                            item.classList.remove('dimmed');
+                            el.classList.remove('dimmed');
                         } else {
                             hiddenClusters.add(label);
-                            item.classList.add('dimmed');
+                            el.classList.add('dimmed');
                         }
+                    }
+
+                    item.addEventListener('click', (e) => {
+                        if (e.target.closest('.legend-info-btn')) return;
+                        toggleCluster(item.dataset.cluster, item);
                         filterPapers();
+                    });
+
+                    item.addEventListener('mouseenter', () => {
+                        if (legendDragging) {
+                            const label = item.dataset.cluster;
+                            if (legendDragAction === null) {
+                                legendDragAction = hiddenClusters.has(label) ? 'show' : 'hide';
+                            }
+                            if (legendDragAction === 'hide' && !hiddenClusters.has(label)) {
+                                hiddenClusters.add(label);
+                                item.classList.add('dimmed');
+                                filterPapers();
+                            } else if (legendDragAction === 'show' && hiddenClusters.has(label)) {
+                                hiddenClusters.delete(label);
+                                item.classList.remove('dimmed');
+                                filterPapers();
+                            }
+                        }
                     });
                 });
 
@@ -6647,6 +6674,23 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         } else {
                             document.getElementById('mapToggle').click();
                         }
+                        break;
+                    case 'v':
+                    case 'V':
+                        setSelectionMode('pan');
+                        break;
+                    case 'l':
+                    case 'L':
+                        setSelectionMode('lasso');
+                        break;
+                    case 'r':
+                    case 'R':
+                        if (!e.metaKey && !e.ctrlKey) {
+                            setSelectionMode('rect');
+                        }
+                        break;
+                    case '0':
+                        resetZoom();
                         break;
                     case '?':
                         document.getElementById('shortcutsOverlay').classList.toggle('visible');
