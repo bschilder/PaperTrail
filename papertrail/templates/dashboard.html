@@ -3829,9 +3829,9 @@
 
             const sortedPeople = Object.entries(people).sort((a, b) => b[1].count - a[1].count);
             const maxPapers = sortedPeople[0]?.[1].count || 1;
-            const topCited = [...topPapers].sort((a, b) => (b.cited_by_count || 0) - (a.cited_by_count || 0)).slice(0, 10);
-            const topEngaged = [...topPapers].sort((a, b) => (b.engagement || 0) - (a.engagement || 0)).slice(0, 10);
-            const recentHits = [...topPapers].filter(p => p.first_shared).sort((a, b) => b.first_shared.localeCompare(a.first_shared)).slice(0, 10);
+            const topCited = [...topPapers].sort((a, b) => (b.cited_by_count || 0) - (a.cited_by_count || 0)).slice(0, 12);
+            const topEngaged = [...topPapers].sort((a, b) => (b.engagement || 0) - (a.engagement || 0)).slice(0, 12);
+            const recentHits = [...topPapers].filter(p => p.first_shared).sort((a, b) => b.first_shared.localeCompare(a.first_shared)).slice(0, 12);
 
             function rankClass(i) { return i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''; }
 
