@@ -1476,6 +1476,26 @@
             transition: all 0.15s;
         }
         .profile-close:hover { color: #fff; background: #3a3a4e; }
+        .modal-back-btn {
+            position: absolute;
+            top: 12px;
+            left: 14px;
+            background: #252538;
+            border: 1px solid #3a3a4e;
+            color: #888;
+            font-size: 16px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .modal-back-btn:hover { color: #fff; background: #3a3a4e; }
+        .modal-back-btn.visible { display: flex; }
         .profile-header {
             padding: 24px 24px 16px;
             border-bottom: 1px solid #2a2a3e;
@@ -2468,7 +2488,8 @@
     <!-- Contributor profile modal -->
     <div class="profile-modal" id="profileModal">
         <div class="profile-card">
-            <button class="profile-close" onclick="document.getElementById('profileModal').classList.remove('visible')">&times;</button>
+            <button class="modal-back-btn" id="profileBackBtn" onclick="modalGoBack()" title="Go back">&#8592;</button>
+            <button class="profile-close" onclick="closeModalAndClearHistory('profileModal')">&times;</button>
             <div class="profile-header" id="profileHeader"></div>
             <div class="profile-body" id="profileBody"></div>
         </div>
@@ -2477,7 +2498,8 @@
     <!-- Topic info modal -->
     <div class="profile-modal" id="topicModal">
         <div class="profile-card" style="width:560px;">
-            <button class="profile-close" onclick="document.getElementById('topicModal').classList.remove('visible')">&times;</button>
+            <button class="modal-back-btn" id="topicBackBtn" onclick="modalGoBack()" title="Go back">&#8592;</button>
+            <button class="profile-close" onclick="closeModalAndClearHistory('topicModal')">&times;</button>
             <div class="profile-header" id="topicHeader"></div>
             <div class="profile-body" id="topicBody"></div>
         </div>
@@ -2583,6 +2605,64 @@
         let semanticScores = new Map();
         let colorByMode = 'channel';
         let scaleByMode = 'uniform';
+
+        // Modal history stack for back navigation
+        let modalHistory = [];
+
+        function pushModalHistory() {
+            const profileModal = document.getElementById('profileModal');
+            const topicModal = document.getElementById('topicModal');
+            if (profileModal.classList.contains('visible')) {
+                modalHistory.push({
+                    modal: 'profileModal',
+                    header: document.getElementById('profileHeader').innerHTML,
+                    body: document.getElementById('profileBody').innerHTML
+                });
+                profileModal.classList.remove('visible');
+            } else if (topicModal.classList.contains('visible')) {
+                modalHistory.push({
+                    modal: 'topicModal',
+                    header: document.getElementById('topicHeader').innerHTML,
+                    body: document.getElementById('topicBody').innerHTML
+                });
+                topicModal.classList.remove('visible');
+            }
+            updateBackButtons();
+        }
+
+        function modalGoBack() {
+            if (modalHistory.length === 0) return;
+            const prev = modalHistory.pop();
+            // Hide both modals first
+            document.getElementById('profileModal').classList.remove('visible');
+            document.getElementById('topicModal').classList.remove('visible');
+            // Restore the previous modal
+            const modal = document.getElementById(prev.modal);
+            const headerKey = prev.modal === 'profileModal' ? 'profileHeader' : 'topicHeader';
+            const bodyKey = prev.modal === 'profileModal' ? 'profileBody' : 'topicBody';
+            document.getElementById(headerKey).innerHTML = prev.header;
+            document.getElementById(bodyKey).innerHTML = prev.body;
+            modal.classList.add('visible');
+            updateBackButtons();
+        }
+
+        function closeModalAndClearHistory(modalId) {
+            document.getElementById(modalId).classList.remove('visible');
+            modalHistory = [];
+            updateBackButtons();
+        }
+
+        function updateBackButtons() {
+            const profileBtn = document.getElementById('profileBackBtn');
+            const topicBtn = document.getElementById('topicBackBtn');
+            if (modalHistory.length > 0) {
+                profileBtn.classList.add('visible');
+                topicBtn.classList.add('visible');
+            } else {
+                profileBtn.classList.remove('visible');
+                topicBtn.classList.remove('visible');
+            }
+        }
 
         // Animation state
         let animationProgress = 1; // 0-1, 1 = complete
@@ -2955,6 +3035,7 @@
         // ===== TABLE VIEW =====
         // ===== CHANNEL INFO =====
         function showChannelInfo(channel) {
+            pushModalHistory();
             const papers = allPapers.filter(p => (p.channels || []).includes(channel));
             const modal = document.getElementById('topicModal');
             const header = document.getElementById('topicHeader');
@@ -3003,11 +3084,11 @@
             `;
 
             const contribHTML = topContribs.map(([name, count]) =>
-                `<span class="card-tag person-tag" style="cursor:pointer;" onclick="document.getElementById('topicModal').classList.remove('visible');showContributorProfile('${esc(name).replace(/'/g, "\\'")}')">${esc(name)} (${count})</span>`
+                `<span class="card-tag person-tag" style="cursor:pointer;" onclick="showContributorProfile('${esc(name).replace(/'/g, "\\'")}')">${esc(name)} (${count})</span>`
             ).join(' ');
 
             const clusterHTML = topClusters.map(([label, count]) =>
-                `<span class="card-tag cluster-tag" style="cursor:pointer;" onclick="document.getElementById('topicModal').classList.remove('visible');showTopicInfo('${esc(label).replace(/'/g, "\\'")}')">${esc(label)} (${count})</span>`
+                `<span class="card-tag cluster-tag" style="cursor:pointer;" onclick="showTopicInfo('${esc(label).replace(/'/g, "\\'")}')">${esc(label)} (${count})</span>`
             ).join(' ');
 
             const paperListHTML = topPapers.map(p => {
@@ -3035,18 +3116,19 @@
                 </div>
                 <div class="profile-actions">
                     <a href="${slackChannelUrl(channel)}" target="_blank" class="profile-action-btn primary">${SLACK_ICON_SVG} Open in Slack</a>
-                    <button class="profile-action-btn" onclick="document.getElementById('topicModal').classList.remove('visible');selectedChannels.clear();selectedChannels.add('${esc(channel).replace(/'/g, "\\'")}');document.querySelectorAll('.channel-button').forEach(b=>{b.classList.toggle('active',b.dataset.channel==='${esc(channel).replace(/'/g, "\\'")}')});filterPapers();">Show Only This Channel</button>
+                    <button class="profile-action-btn" onclick="closeModalAndClearHistory('topicModal');selectedChannels.clear();selectedChannels.add('${esc(channel).replace(/'/g, "\\'")}');document.querySelectorAll('.channel-button').forEach(b=>{b.classList.toggle('active',b.dataset.channel==='${esc(channel).replace(/'/g, "\\'")}')});filterPapers();">Show Only This Channel</button>
                 </div>
             `;
 
             modal.classList.add('visible');
             modal.addEventListener('click', function handler(e) {
-                if (e.target === modal) { modal.classList.remove('visible'); modal.removeEventListener('click', handler); }
+                if (e.target === modal) { modal.classList.remove('visible'); modalHistory = []; updateBackButtons(); modal.removeEventListener('click', handler); }
             });
         }
 
         // ===== ALL CLUSTERS OVERVIEW =====
         function showAllClusters() {
+            pushModalHistory();
             const clusters = {};
             allPapers.forEach(p => {
                 const label = p.cluster_label || 'Uncategorized';
@@ -3089,7 +3171,7 @@
             body.innerHTML = `
                 <div class="profile-section" style="max-height:400px;overflow-y:auto;">
                     ${sorted.map(([label, data], i) => `
-                        <div class="profile-paper-item" style="cursor:pointer;padding:10px 12px;" onclick="document.getElementById('topicModal').classList.remove('visible');showTopicInfo('${esc(label).replace(/'/g, "\\'")}')">
+                        <div class="profile-paper-item" style="cursor:pointer;padding:10px 12px;" onclick="showTopicInfo('${esc(label).replace(/'/g, "\\'")}')">
                             <div style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_COLORS[i % CLUSTER_COLORS.length]};flex-shrink:0;"></div>
                             <div style="flex:1;min-width:0;">
                                 <div style="font-weight:600;color:#e0e0e0;font-size:13px;">${esc(label)}</div>
@@ -3100,13 +3182,13 @@
                     `).join('')}
                 </div>
                 <div class="profile-actions">
-                    <button class="profile-action-btn primary" onclick="document.getElementById('topicModal').classList.remove('visible');document.getElementById('colorBySelect').value='cluster';colorByMode='cluster';renderMap();">&#x1F30D; View Cluster Map</button>
+                    <button class="profile-action-btn primary" onclick="closeModalAndClearHistory('topicModal');document.getElementById('colorBySelect').value='cluster';colorByMode='cluster';renderMap();">&#x1F30D; View Cluster Map</button>
                 </div>
             `;
 
             modal.classList.add('visible');
             modal.addEventListener('click', function handler(e) {
-                if (e.target === modal) { modal.classList.remove('visible'); modal.removeEventListener('click', handler); }
+                if (e.target === modal) { modal.classList.remove('visible'); modalHistory = []; updateBackButtons(); modal.removeEventListener('click', handler); }
             });
         }
 
@@ -3150,6 +3232,7 @@
         }
 
         function showTopicInfo(label) {
+            pushModalHistory();
             document.getElementById('topicActionPopup').classList.remove('visible');
             const lbl = label.toLowerCase();
             const papers = allPapers.filter(p => (p.cluster_label || '').toLowerCase().includes(lbl));
@@ -3188,7 +3271,7 @@
                         <div class="profile-stat-label">Total Cites</div>
                     </div>
                     <div class="profile-stat">
-                        <div class="profile-stat-value" style="cursor:pointer;font-size:16px;" onclick="document.getElementById('topicModal').classList.remove('visible');showContributorProfile('${topContribs.length > 0 ? esc(topContribs[0][0]).replace(/'/g, "\\'") : ''}')">${topContribs.length > 0 ? esc(topContribs[0][0].split(' ')[0]) : 'N/A'}</div>
+                        <div class="profile-stat-value" style="cursor:pointer;font-size:16px;" onclick="showContributorProfile('${topContribs.length > 0 ? esc(topContribs[0][0]).replace(/'/g, "\\'") : ''}')">${topContribs.length > 0 ? esc(topContribs[0][0].split(' ')[0]) : 'N/A'}</div>
                         <div class="profile-stat-label">Top Sharer</div>
                     </div>
                     <div class="profile-stat">
@@ -3200,7 +3283,7 @@
 
             // Contributors
             const contribHTML = topContribs.map(([name, count]) =>
-                `<span class="card-tag person-tag" style="cursor:pointer;" onclick="document.getElementById('topicModal').classList.remove('visible');showContributorProfile('${esc(name).replace(/'/g, "\\'")}')">${esc(name)} (${count})</span>`
+                `<span class="card-tag person-tag" style="cursor:pointer;" onclick="showContributorProfile('${esc(name).replace(/'/g, "\\'")}')">${esc(name)} (${count})</span>`
             ).join(' ');
 
             // Papers
@@ -3224,16 +3307,18 @@
                     <div class="profile-paper-list" style="max-height:250px;">${paperListHTML}</div>
                 </div>
                 <div class="profile-actions">
-                    <button class="profile-action-btn primary" onclick="document.getElementById('topicModal').classList.remove('visible');selectTopicOnMap('${esc(label).replace(/'/g, "\\'")}')">&#9745; Select All ${papers.length} Papers</button>
+                    <button class="profile-action-btn primary" onclick="closeModalAndClearHistory('topicModal');selectTopicOnMap('${esc(label).replace(/'/g, "\\'")}')">&#9745; Select All ${papers.length} Papers</button>
                     <button class="profile-action-btn" onclick="downloadPapers(allPapers.filter(p=>(p.cluster_label||'').toLowerCase().includes('${esc(lbl).replace(/'/g, "\\'")}')), 'csv')">&#128190; Download CSV</button>
                 </div>
             `;
 
             modal.classList.add('visible');
+            updateBackButtons();
 
             // Click outside to close
             modal.addEventListener('click', function handler(e) {
                 if (e.target === modal) {
+                    modalHistory = []; updateBackButtons();
                     modal.classList.remove('visible');
                     modal.removeEventListener('click', handler);
                 }
@@ -3241,6 +3326,7 @@
         }
 
         function showContributorProfile(name) {
+            pushModalHistory();
             const papers = allPapers.filter(p => p.shared_by === name);
             const modal = document.getElementById('profileModal');
             const header = document.getElementById('profileHeader');
@@ -3362,7 +3448,7 @@
 
             // Topic breakdown
             const topicHTML = topClusters.map(([label, count]) =>
-                `<span class="card-tag cluster-tag" style="margin-bottom:4px;cursor:pointer;" onclick="document.getElementById('profileModal').classList.remove('visible');document.getElementById('chatbotInput').value='${esc(label).replace(/'/g, "\\'")}';runChatSearch('${esc(label).replace(/'/g, "\\'")}');">${esc(label)} (${count})</span>`
+                `<span class="card-tag cluster-tag" style="margin-bottom:4px;cursor:pointer;" onclick="closeModalAndClearHistory('profileModal');document.getElementById('chatbotInput').value='${esc(label).replace(/'/g, "\\'")}';runChatSearch('${esc(label).replace(/'/g, "\\'")}');">${esc(label)} (${count})</span>`
             ).join(' ');
 
             body.innerHTML = `
@@ -3388,7 +3474,7 @@
 
             // Wire up search button
             document.getElementById('profileSearchBtn').addEventListener('click', () => {
-                modal.classList.remove('visible');
+                closeModalAndClearHistory('profileModal');
                 const query = 'papers by ' + name;
                 document.getElementById('chatbotInput').value = query;
                 runChatSearch(query);
@@ -7239,7 +7325,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             // Profile modal: click outside to close
             document.getElementById('profileModal').addEventListener('click', (e) => {
                 if (e.target === document.getElementById('profileModal')) {
-                    document.getElementById('profileModal').classList.remove('visible');
+                    closeModalAndClearHistory('profileModal');
                 }
             });
 
