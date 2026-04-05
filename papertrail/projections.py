@@ -147,10 +147,37 @@ def compute_projections_3d(
     return results
 
 
+def estimate_n_clusters(embeddings: np.ndarray, min_k: int = 5, max_k: int = 30, seed: int = 42) -> int:
+    """
+    Estimate optimal cluster count using silhouette score.
+
+    Tests k from min_k to max_k and returns the k with highest silhouette.
+    """
+    from sklearn.metrics import silhouette_score
+
+    n = embeddings.shape[0]
+    max_k = min(max_k, n - 1)
+    if max_k <= min_k:
+        return min_k
+
+    best_k, best_score = min_k, -1
+    for k in range(min_k, max_k + 1, 2):  # step by 2 for speed
+        kmeans = KMeans(n_clusters=k, random_state=seed, n_init=5, max_iter=100)
+        labels = kmeans.fit_predict(embeddings)
+        score = silhouette_score(embeddings, labels, sample_size=min(1000, n))
+        logger.info("k=%d silhouette=%.3f", k, score)
+        if score > best_score:
+            best_score = score
+            best_k = k
+
+    logger.info("Optimal k=%d (silhouette=%.3f)", best_k, best_score)
+    return best_k
+
+
 def cluster_papers(
     embeddings: np.ndarray,
     texts: list[str],
-    n_clusters: int = 10,
+    n_clusters: int | str = "auto",
     seed: int = 42,
 ) -> tuple[np.ndarray, dict[int, str]]:
     """
@@ -162,8 +189,8 @@ def cluster_papers(
         Embedding matrix.
     texts : list[str]
         Paper texts for label generation.
-    n_clusters : int
-        Number of clusters.
+    n_clusters : int or "auto"
+        Number of clusters. "auto" uses silhouette-based estimation.
     seed : int
         Random seed.
 
@@ -172,11 +199,17 @@ def cluster_papers(
     tuple[np.ndarray, dict[int, str]]
         Cluster IDs array and {cluster_id: label} dict.
     """
+    if n_clusters == "auto":
+        n_clusters = estimate_n_clusters(embeddings, seed=seed)
+        logger.info("Auto-detected %d clusters", n_clusters)
+    else:
+        n_clusters = int(n_clusters)
+
     kmeans = KMeans(n_clusters=n_clusters, random_state=seed, n_init=10)
     cluster_ids = kmeans.fit_predict(embeddings)
 
     # Generate labels from TF-IDF
-    tfidf = TfidfVectorizer(max_features=200, stop_words="english")
+    tfidf = TfidfVectorizer(max_features=500, stop_words="english")
     tfidf_matrix = tfidf.fit_transform(texts)
     feature_names = tfidf.get_feature_names_out()
 

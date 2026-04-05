@@ -91,14 +91,14 @@ def enrich(input_file: str, output: str) -> None:
     help="Embedding backend (auto-detected if omitted).",
 )
 @click.option("--model", default=None, help="Model name override.")
-@click.option("--n-clusters", default=10, help="Number of clusters.")
+@click.option("--n-clusters", default="auto", help="Number of clusters ('auto' for silhouette-based).")
 @click.option("--faiss-dir", default="faiss_index", help="FAISS index output directory.")
 def embed(
     input_file: str,
     output: str,
     backend: str | None,
     model: str | None,
-    n_clusters: int,
+    n_clusters: str | int,
     faiss_dir: str,
 ) -> None:
     """Compute embeddings, projections, clusters, and build FAISS index."""
