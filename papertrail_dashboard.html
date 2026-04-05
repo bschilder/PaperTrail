@@ -3624,12 +3624,47 @@
         let threeDInitialized = false;
         let threeDRAF = null;
 
+        let papers3DRef = []; // reference for raycasting
+        let instancedMesh3D = null;
+        let raycaster3D = null;
+        let mouse3D = new (typeof THREE !== 'undefined' ? THREE.Vector2 : Object)();
+        let hovered3DIdx = -1;
+        let velTheta = 0, velPhi = 0;
+        let theta3D = 0, phi3D = Math.PI / 4, radius3D = 50;
+        let idleTimer3D = 0;
+
+        function computePCA3D(papers) {
+            // Simple PCA-3D in browser: center data, compute covariance, extract top 3 eigenvectors
+            // Using projection coordinates as input features (fast approximation)
+            const projs = ['umap', 'tsne', 'pca'];
+            const features = papers.map(p => {
+                const coords = [];
+                projs.forEach(pr => {
+                    const proj = p.projections && p.projections[pr];
+                    if (proj) { coords.push(proj[0], proj[1]); }
+                    else { coords.push(0, 0); }
+                });
+                return coords; // 6 features
+            });
+
+            const n = features.length;
+            const dim = features[0].length;
+            // Center
+            const means = Array(dim).fill(0);
+            features.forEach(f => f.forEach((v, i) => means[i] += v));
+            means.forEach((_, i) => means[i] /= n);
+            const centered = features.map(f => f.map((v, i) => v - means[i]));
+
+            // Simple SVD approximation: use first 3 components via power iteration
+            // For speed, just use the first 3 centered dimensions scaled
+            return centered.map(f => [f[0], f[1], f[2] || f[0] * 0.5 + f[1] * 0.3]);
+        }
+
         function init3DView() {
             const container = document.getElementById('threeDContainer');
             if (!container || typeof THREE === 'undefined') return;
 
             if (threeDInitialized) {
-                // Resize on re-entry
                 camera3D.aspect = container.clientWidth / container.clientHeight;
                 camera3D.updateProjectionMatrix();
                 renderer3D.setSize(container.clientWidth, container.clientHeight);
@@ -3637,24 +3672,24 @@
                 return;
             }
 
-            // Scene
             scene3D = new THREE.Scene();
             scene3D.background = new THREE.Color(0x050510);
-            scene3D.fog = new THREE.FogExp2(0x050510, 0.015);
+            scene3D.fog = new THREE.FogExp2(0x050510, 0.012);
 
-            // Camera
             camera3D = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
             camera3D.position.set(0, 0, 50);
 
-            // Renderer
-            renderer3D = new THREE.WebGLRenderer({ antialias: true });
+            renderer3D = new THREE.WebGLRenderer({ antialias: true, alpha: false });
             renderer3D.setSize(container.clientWidth, container.clientHeight);
-            renderer3D.setPixelRatio(window.devicePixelRatio);
+            renderer3D.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer3D.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer3D.toneMappingExposure = 1.2;
             container.appendChild(renderer3D.domElement);
 
-            // Simple orbit controls (manual since we can't import OrbitControls from CDN easily)
+            raycaster3D = new THREE.Raycaster();
+
+            // Orbit controls with momentum
             let isDragging3D = false, prevMouse3D = { x: 0, y: 0 };
-            let theta3D = 0, phi3D = Math.PI / 4, radius3D = 50;
 
             function updateCamera() {
                 camera3D.position.x = radius3D * Math.sin(phi3D) * Math.cos(theta3D);
@@ -3666,78 +3701,106 @@
             renderer3D.domElement.addEventListener('mousedown', (e) => {
                 isDragging3D = true;
                 prevMouse3D = { x: e.clientX, y: e.clientY };
+                velTheta = 0; velPhi = 0;
+                idleTimer3D = 0;
             });
             renderer3D.domElement.addEventListener('mousemove', (e) => {
-                if (!isDragging3D) return;
-                const dx = e.clientX - prevMouse3D.x;
-                const dy = e.clientY - prevMouse3D.y;
-                theta3D -= dx * 0.005;
-                phi3D = Math.max(0.1, Math.min(Math.PI - 0.1, phi3D - dy * 0.005));
-                prevMouse3D = { x: e.clientX, y: e.clientY };
-                updateCamera();
+                // Raycasting for hover (throttled)
+                const rect = renderer3D.domElement.getBoundingClientRect();
+                mouse3D.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse3D.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+                if (isDragging3D) {
+                    const dx = e.clientX - prevMouse3D.x;
+                    const dy = e.clientY - prevMouse3D.y;
+                    velTheta = -dx * 0.005;
+                    velPhi = -dy * 0.005;
+                    theta3D += velTheta;
+                    phi3D = Math.max(0.1, Math.min(Math.PI - 0.1, phi3D + velPhi));
+                    prevMouse3D = { x: e.clientX, y: e.clientY };
+                    updateCamera();
+                    idleTimer3D = 0;
+                }
             });
             renderer3D.domElement.addEventListener('mouseup', () => { isDragging3D = false; });
             renderer3D.domElement.addEventListener('wheel', (e) => {
                 e.preventDefault();
-                radius3D = Math.max(10, Math.min(200, radius3D + e.deltaY * 0.05));
+                radius3D = Math.max(5, Math.min(200, radius3D * (1 + e.deltaY * 0.001)));
                 updateCamera();
+                idleTimer3D = 0;
             });
 
-            // Star field background
-            const starsGeom = new THREE.BufferGeometry();
-            const starsCount = 2000;
-            const starsPos = new Float32Array(starsCount * 3);
-            for (let i = 0; i < starsCount * 3; i++) {
-                starsPos[i] = (Math.random() - 0.5) * 300;
-            }
-            starsGeom.setAttribute('position', new THREE.BufferAttribute(starsPos, 3));
-            const starsMat = new THREE.PointsMaterial({ color: 0x444466, size: 0.3 });
-            scene3D.add(new THREE.Points(starsGeom, starsMat));
+            // Click to select paper
+            renderer3D.domElement.addEventListener('click', (e) => {
+                if (hovered3DIdx >= 0 && papers3DRef[hovered3DIdx]) {
+                    const paper = papers3DRef[hovered3DIdx];
+                    const allIdx = (paperIndexMap.get(paper) ?? -1);
+                    selectedPapers.clear();
+                    if (allIdx !== -1) selectedPapers.add(allIdx);
+                    showDetailPanel([paper]);
+                }
+            });
 
-            // Paper points as instanced spheres
-            const papers3D = filteredPapers.filter(p => p.projections && p.projections[currentProjection]);
+            // Star field (two layers for parallax)
+            [2000, 1000].forEach((count, layer) => {
+                const geom = new THREE.BufferGeometry();
+                const pos = new Float32Array(count * 3);
+                const spread = layer === 0 ? 300 : 600;
+                for (let i = 0; i < count * 3; i++) pos[i] = (Math.random() - 0.5) * spread;
+                geom.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+                const mat = new THREE.PointsMaterial({ color: layer === 0 ? 0x444466 : 0x222244, size: layer === 0 ? 0.3 : 0.15 });
+                const stars = new THREE.Points(geom, mat);
+                stars.userData.layer = layer;
+                scene3D.add(stars);
+            });
 
-            // Normalize coordinates to fit in a cube
-            const xs = papers3D.map(p => p.projections[currentProjection][0]);
-            const ys = papers3D.map(p => p.projections[currentProjection][1]);
-            const xMin = Math.min(...xs), xMax = Math.max(...xs);
-            const yMin = Math.min(...ys), yMax = Math.max(...ys);
-            const range = Math.max(xMax - xMin, yMax - yMin) || 1;
+            // Compute 3D positions
+            papers3DRef = filteredPapers.filter(p => p.projections && p.projections[currentProjection]);
+            const coords3D = computePCA3D(papers3DRef);
 
-            const sphereGeo = new THREE.SphereGeometry(0.3, 8, 6);
+            // Normalize to fit in a sphere
+            let maxDist = 0;
+            coords3D.forEach(c => { const d = Math.sqrt(c[0]*c[0] + c[1]*c[1] + c[2]*c[2]); if (d > maxDist) maxDist = d; });
+            const scale = 25 / (maxDist || 1);
+
+            const sphereGeo = new THREE.SphereGeometry(1, 10, 8);
             const CLUSTER_COLORS_3D = [0x64b5f6, 0xbb86fc, 0x66bb6a, 0xffa726, 0xef5350, 0x26c6da, 0xffca28, 0xab47bc, 0x8d6e63, 0x78909c, 0xec407a, 0x7e57c2];
 
-            const instancedMesh = new THREE.InstancedMesh(sphereGeo, new THREE.MeshPhongMaterial({ shininess: 80 }), papers3D.length);
+            const mat3D = new THREE.MeshStandardMaterial({
+                roughness: 0.4,
+                metalness: 0.1,
+                emissive: new THREE.Color(0x111122),
+                emissiveIntensity: 0.3,
+            });
+            instancedMesh3D = new THREE.InstancedMesh(sphereGeo, mat3D, papers3DRef.length);
             const dummy = new THREE.Object3D();
             const color = new THREE.Color();
 
-            papers3D.forEach((paper, i) => {
-                const proj = paper.projections[currentProjection];
-                const x = ((proj[0] - xMin) / range - 0.5) * 40;
-                const y = ((proj[1] - yMin) / range - 0.5) * 40;
-                // Use cluster_id for z-axis spread
-                const z = ((paper.cluster_id || 0) % 5 - 2) * 3 + (Math.random() - 0.5) * 2;
-
-                dummy.position.set(x, y, z);
+            papers3DRef.forEach((paper, i) => {
+                const c = coords3D[i];
+                dummy.position.set(c[0] * scale, c[1] * scale, c[2] * scale);
+                // Size by citations
+                const s = 0.15 + Math.log1p(paper.cited_by_count || 0) * 0.06;
+                dummy.scale.set(s, s, s);
                 dummy.updateMatrix();
-                instancedMesh.setMatrixAt(i, dummy.matrix);
+                instancedMesh3D.setMatrixAt(i, dummy.matrix);
 
                 const cid = paper.cluster_id || 0;
                 color.set(CLUSTER_COLORS_3D[cid % CLUSTER_COLORS_3D.length]);
-                instancedMesh.setColorAt(i, color);
+                instancedMesh3D.setColorAt(i, color);
             });
 
-            instancedMesh.instanceColor.needsUpdate = true;
-            scene3D.add(instancedMesh);
+            instancedMesh3D.instanceMatrix.needsUpdate = true;
+            instancedMesh3D.instanceColor.needsUpdate = true;
+            scene3D.add(instancedMesh3D);
 
             // Lighting
-            scene3D.add(new THREE.AmbientLight(0x404060, 0.6));
+            scene3D.add(new THREE.AmbientLight(0x404060, 0.5));
             const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
             dirLight.position.set(10, 20, 15);
             scene3D.add(dirLight);
-            const pointLight = new THREE.PointLight(0x64b5f6, 0.5, 100);
-            pointLight.position.set(-10, -5, 20);
-            scene3D.add(pointLight);
+            scene3D.add(new THREE.PointLight(0x64b5f6, 0.4, 100));
+            scene3D.add(new THREE.PointLight(0xbb86fc, 0.3, 80).position.set(-15, -10, 15) && scene3D.children[scene3D.children.length - 1]);
 
             updateCamera();
             threeDInitialized = true;
@@ -3747,6 +3810,63 @@
         function animate3D() {
             if (currentView !== 'threeD') return;
             threeDRAF = requestAnimationFrame(animate3D);
+
+            // Momentum damping
+            if (!isDragging) {
+                theta3D += velTheta;
+                phi3D = Math.max(0.1, Math.min(Math.PI - 0.1, phi3D + velPhi));
+                velTheta *= 0.95;
+                velPhi *= 0.95;
+                if (Math.abs(velTheta) < 0.0001) velTheta = 0;
+                if (Math.abs(velPhi) < 0.0001) velPhi = 0;
+            }
+
+            // Auto-rotate when idle
+            idleTimer3D++;
+            if (idleTimer3D > 180 && velTheta === 0) { // ~3 seconds at 60fps
+                theta3D += 0.001;
+            }
+
+            // Update camera
+            camera3D.position.x = radius3D * Math.sin(phi3D) * Math.cos(theta3D);
+            camera3D.position.y = radius3D * Math.cos(phi3D);
+            camera3D.position.z = radius3D * Math.sin(phi3D) * Math.sin(theta3D);
+            camera3D.lookAt(0, 0, 0);
+
+            // Star parallax
+            scene3D.children.forEach(child => {
+                if (child.userData.layer === 1) child.rotation.y += 0.0002;
+            });
+
+            // Raycasting (throttled)
+            if (instancedMesh3D && raycaster3D) {
+                raycaster3D.setFromCamera(mouse3D, camera3D);
+                const intersects = raycaster3D.intersectObject(instancedMesh3D);
+                const tooltip = document.getElementById('tooltip');
+
+                if (intersects.length > 0) {
+                    const idx = intersects[0].instanceId;
+                    hovered3DIdx = idx;
+                    const paper = papers3DRef[idx];
+                    if (paper) {
+                        renderer3D.domElement.style.cursor = 'pointer';
+                        tooltip.innerHTML = `
+                            <div class="tooltip-title">${esc(paper.title) || 'Untitled'}</div>
+                            <div class="tooltip-content">${paper.year || '?'} · ${esc(paper.journal || 'Preprint')} · ${paper.cited_by_count || 0} cites</div>
+                        `;
+                        tooltip.classList.add('visible');
+                        const screenPos = intersects[0].point.clone().project(camera3D);
+                        const rect = renderer3D.domElement.getBoundingClientRect();
+                        tooltip.style.left = (rect.left + (screenPos.x + 1) / 2 * rect.width + 16) + 'px';
+                        tooltip.style.top = (rect.top + (-screenPos.y + 1) / 2 * rect.height - 20) + 'px';
+                    }
+                } else {
+                    hovered3DIdx = -1;
+                    renderer3D.domElement.style.cursor = 'grab';
+                    tooltip.classList.remove('visible');
+                }
+            }
+
             renderer3D.render(scene3D, camera3D);
         }
 
