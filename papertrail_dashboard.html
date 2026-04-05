@@ -3964,7 +3964,7 @@
                     linksHtml += `<a href="${slackUrl}" target="_blank" class="table-action-icon" title="Open in Slack">${SLACK_ICON_SVG}</a>`;
                 }
                 if (paper.openalex_url) {
-                    linksHtml += `<a href="${paper.openalex_url}" target="_blank" class="table-action-icon" title="View on OpenAlex"><img src="https://openalex.org/img/tricon.a08e3fec.png" alt="OA" style="width:16px;height:16px;filter:brightness(2) invert(0.1);"></a>`;
+                    linksHtml += `<a href="${paper.openalex_url}" target="_blank" class="table-action-icon" title="View on OpenAlex"><img src="https://openalex.org/img/tricon.a08e3fec.png" alt="OA" style="width:16px;height:16px;filter:invert(1) brightness(1.5);"></a>`;
                 }
 
                 row.innerHTML = `
