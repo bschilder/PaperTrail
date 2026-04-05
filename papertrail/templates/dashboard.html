@@ -2050,6 +2050,7 @@
             left: 0;
             cursor: crosshair;
             display: none;
+            z-index: 20;
         }
 
         #lassoCanvas.active {
@@ -2800,7 +2801,8 @@
             const body = document.getElementById('topicBody');
 
             header.innerHTML = `
-                <div class="profile-name">Research Landscape: ${sorted.length} Topic Clusters</div>
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#66bb6a;margin-bottom:4px;">&#x1F30D; Research Landscape</div>
+                <div class="profile-name">${sorted.length} Topic Clusters</div>
                 <div class="profile-subtitle">${allPapers.length} papers across ${new Set(allPapers.flatMap(p => p.channels || [])).size} channels</div>
                 <div class="profile-stats">
                     <div class="profile-stat">
@@ -2909,8 +2911,9 @@
             const yearEntries = Object.entries(byYear).sort((a, b) => a[0] - b[0]);
 
             header.innerHTML = `
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#64b5f6;margin-bottom:4px;">&#x1F9E0; Topic</div>
                 <div class="profile-name">${esc(label)}</div>
-                <div class="profile-subtitle">${Array.from(channels).map(ch => `<span class="card-tag channel-tag">${channelDisplayName(ch)}</span>`).join(' ')}</div>
+                <div class="profile-subtitle">${Array.from(channels).map(ch => `<a href="${slackChannelUrl(ch)}" target="_blank" class="card-tag channel-tag" style="text-decoration:none;cursor:pointer;">${channelDisplayName(ch)}</a>`).join(' ')}</div>
                 <div class="profile-stats">
                     <div class="profile-stat">
                         <div class="profile-stat-value">${papers.length}</div>
@@ -2921,7 +2924,7 @@
                         <div class="profile-stat-label">Total Cites</div>
                     </div>
                     <div class="profile-stat">
-                        <div class="profile-stat-value">${topContribs.length > 0 ? esc(topContribs[0][0].split(' ')[0]) : 'N/A'}</div>
+                        <div class="profile-stat-value" style="cursor:pointer;font-size:16px;" onclick="document.getElementById('topicModal').classList.remove('visible');showContributorProfile('${topContribs.length > 0 ? esc(topContribs[0][0]).replace(/'/g, "\\'") : ''}')">${topContribs.length > 0 ? esc(topContribs[0][0].split(' ')[0]) : 'N/A'}</div>
                         <div class="profile-stat-label">Top Sharer</div>
                     </div>
                     <div class="profile-stat">
@@ -3058,6 +3061,7 @@
             ).join(' ');
 
             header.innerHTML = `
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#bb86fc;margin-bottom:4px;">&#x1F451; Contributor</div>
                 <div class="profile-name">${esc(name)}</div>
                 <div class="profile-subtitle">${channelBadges}</div>
                 <div class="profile-stats">
@@ -4195,8 +4199,17 @@
                 ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
             }
 
-            // KDE background (drawn before points)
-            drawKDEBackground();
+            // Pre-pass: compute screen positions for KDE
+            filteredPapers.forEach(paper => {
+                const proj = paper.projections && paper.projections[currentProjection];
+                if (!proj) { paper._sx = -999; paper._sy = -999; return; }
+                const [sx, sy] = dataToScreen(proj[0], proj[1]);
+                paper._sx = sx;
+                paper._sy = sy;
+            });
+
+            // KDE background (needs screen positions)
+            if (kdeEnabled) { computeKDE(); drawKDEBackground(); }
 
             // Compute cluster centroids for labels
             const clusterCentroids = {};
@@ -4204,7 +4217,7 @@
 
             filteredPapers.forEach((paper, idx) => {
                 const proj = paper.projections && paper.projections[currentProjection];
-                if (!proj) { paper._sx = -999; paper._sy = -999; return; }
+                if (!proj) return; // already set in pre-pass
 
                 const [sx, sy] = dataToScreen(proj[0], proj[1]);
                 paper._sx = sx;
