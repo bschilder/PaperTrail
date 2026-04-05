@@ -673,6 +673,29 @@
             height: 14px;
         }
 
+        /* Sidebar label tooltip */
+        .sidebar-tip {
+            display: none;
+            position: absolute;
+            left: calc(100% + 8px);
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #1e1e32, #252540);
+            border: 1px solid rgba(100,181,246,0.2);
+            color: #c0c0d0;
+            font-size: 11px;
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: 0;
+            padding: 4px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            z-index: 50;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            pointer-events: none;
+        }
+        .sidebar-label-tip:hover .sidebar-tip { display: block; animation: tooltipFadeIn 0.1s ease-out; }
+
         /* Toggle switch */
         .toggle-switch {
             position: relative;
@@ -2397,7 +2420,9 @@
                 </div>
 
                 <div class="sidebar-section">
-                    <div class="sidebar-label" style="cursor:help;" title="Switch: Cmd+Left/Right · Keys: 1/2/3">Projection</div>
+                    <div class="sidebar-label sidebar-label-tip" style="cursor:help;position:relative;">Projection
+                        <span class="sidebar-tip">Cmd+&#8592;&#8594; or keys 1/2/3</span>
+                    </div>
                     <div class="projection-buttons" id="projectionButtons">
                         <button class="proj-btn active" data-proj="umap">UMAP</button>
                         <button class="proj-btn" data-proj="tsne">t-SNE</button>
