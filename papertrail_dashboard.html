@@ -1145,12 +1145,41 @@
             margin-bottom: 8px;
         }
         /* GitHub-style contribution heatmap */
+        .heatmap-wrap {
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scroll-behavior: smooth;
+        }
+        .heatmap-wrap::-webkit-scrollbar { height: 4px; }
+        .heatmap-wrap::-webkit-scrollbar-track { background: #1a1a2e; border-radius: 2px; }
+        .heatmap-wrap::-webkit-scrollbar-thumb { background: #3a3a4e; border-radius: 2px; }
         .heatmap-grid {
             display: flex;
             gap: 2px;
-            overflow-x: auto;
-            padding-bottom: 4px;
         }
+        .heatmap-day-labels {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-right: 4px;
+            flex-shrink: 0;
+        }
+        .heatmap-day-label {
+            height: 10px;
+            font-size: 8px;
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
+        .heatmap-month-labels {
+            display: flex;
+            gap: 2px;
+            font-size: 8px;
+            color: #555;
+            margin-top: 3px;
+            margin-left: 20px;
+        }
+        .heatmap-month-label { min-width: 10px; }
         .heatmap-col {
             display: flex;
             flex-direction: column;
@@ -2259,12 +2288,19 @@
                 heatmapData[key] = (heatmapData[key] || 0) + 1;
             });
 
-            let heatmapHTML = '<div class="heatmap-grid">';
+            // Day labels (left axis)
+            let heatmapHTML = '<div style="display:flex;">';
+            heatmapHTML += '<div class="heatmap-day-labels">';
+            const dayLabels = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+            dayLabels.forEach(l => { heatmapHTML += `<div class="heatmap-day-label">${l}</div>`; });
+            heatmapHTML += '</div>';
+
+            heatmapHTML += '<div><div class="heatmap-wrap" id="heatmapWrap"><div class="heatmap-grid">';
             const startDate = new Date(now);
             startDate.setDate(startDate.getDate() - (weeks * 7));
-            // Align to Sunday
             startDate.setDate(startDate.getDate() - startDate.getDay());
 
+            const monthMarkers = [];
             for (let w = 0; w < weeks; w++) {
                 heatmapHTML += '<div class="heatmap-col">';
                 for (let d = 0; d < 7; d++) {
@@ -2277,10 +2313,31 @@
                     const dayName = dayNames[date.getDay()];
                     const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                     heatmapHTML += `<div class="heatmap-cell ${level}" title="${dayName}, ${dateStr}: ${count} paper${count !== 1 ? 's' : ''}"></div>`;
+                    // Track month starts
+                    if (d === 0 && date.getDate() <= 7) {
+                        monthMarkers.push({ week: w, label: date.toLocaleDateString('en-US', { month: 'short' }) });
+                    }
                 }
                 heatmapHTML += '</div>';
             }
-            heatmapHTML += '</div>';
+            heatmapHTML += '</div></div>';
+
+            // Month labels (bottom axis)
+            heatmapHTML += '<div class="heatmap-month-labels">';
+            let lastWeek = -1;
+            monthMarkers.forEach(m => {
+                const gap = m.week - lastWeek - 1;
+                if (gap > 0) heatmapHTML += `<span style="width:${gap * 12}px;"></span>`;
+                heatmapHTML += `<span class="heatmap-month-label">${m.label}</span>`;
+                lastWeek = m.week;
+            });
+            heatmapHTML += '</div></div></div>';
+
+            // Auto-scroll heatmap to most recent (right end)
+            setTimeout(() => {
+                const wrap = document.getElementById('heatmapWrap');
+                if (wrap) wrap.scrollLeft = wrap.scrollWidth;
+            }, 100);
 
             // Channel badges
             const channelBadges = Array.from(channels).map(ch =>
@@ -2324,7 +2381,7 @@
 
             // Topic breakdown
             const topicHTML = topClusters.map(([label, count]) =>
-                `<span class="card-tag cluster-tag" style="margin-bottom:4px;">${esc(label)} (${count})</span>`
+                `<span class="card-tag cluster-tag" style="margin-bottom:4px;cursor:pointer;" onclick="document.getElementById('profileModal').classList.remove('visible');document.getElementById('chatbotInput').value='${esc(label).replace(/'/g, "\\'")}';runChatSearch('${esc(label).replace(/'/g, "\\'")}');">${esc(label)} (${count})</span>`
             ).join(' ');
 
             body.innerHTML = `
@@ -2342,11 +2399,19 @@
                 </div>
                 <div class="profile-actions">
                     <a href="https://koolab.slack.com/team/" target="_blank" class="profile-action-btn primary">${SLACK_ICON_SVG} Message in Slack</a>
-                    <button class="profile-action-btn" onclick="document.getElementById('profileModal').classList.remove('visible'); document.getElementById('chatbotInput').value='papers by ${esc(name)}'; runChatSearch('papers by ${esc(name)}');">Search their papers</button>
+                    <button class="profile-action-btn" id="profileSearchBtn">&#128269; Search their papers</button>
                 </div>
             `;
 
             modal.classList.add('visible');
+
+            // Wire up search button
+            document.getElementById('profileSearchBtn').addEventListener('click', () => {
+                modal.classList.remove('visible');
+                const query = 'papers by ' + name;
+                document.getElementById('chatbotInput').value = query;
+                runChatSearch(query);
+            });
         }
 
         function renderLeaderboard() {
