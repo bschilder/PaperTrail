@@ -1791,10 +1791,10 @@
             letter-spacing: -0.3px;
         }
         .onboarding-text {
-            font-size: 14px;
-            color: #a0a0b0;
+            font-size: 16px;
+            color: #b0b0c0;
             line-height: 1.6;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         .onboarding-text strong { color: #e0e0e0; }
         .onboarding-hints {
@@ -2531,7 +2531,7 @@
                 Explore <strong id="onboardingCount">0</strong> papers shared by your team across Slack.
                 Each dot is a paper — <strong>similar papers cluster together</strong> by topic.
             </div>
-            <div style="font-size:11px;color:#666;margin-bottom:12px;text-align:left;">
+            <div style="font-size:13px;color:#888;margin-bottom:14px;text-align:left;">
                 <div style="font-weight:600;color:#888;margin-bottom:6px;">What you can do:</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;">
                     <span>&#x1F5FA; 4 views: Map, 3D, Table, Leaderboard</span>
@@ -6450,6 +6450,31 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
 
         async function runChatSearch(query) {
             if (!query) return;
+
+            // Smart shortcuts: "who is @name" -> open profile directly
+            const whoIsMatch = query.match(/^(?:who is|about|profile)\s+@?(.+)/i);
+            if (whoIsMatch) {
+                const name = whoIsMatch[1].trim();
+                const match = findBestPersonMatch(name.toLowerCase(), new Set(allPapers.map(p => p.shared_by).filter(Boolean).map(s => s.toLowerCase())));
+                if (match) {
+                    showContributorProfile(match);
+                    return;
+                }
+            }
+
+            // Smart shortcut: "what is [topic]" -> open topic info
+            const whatIsMatch = query.match(/^(?:what is|about|tell me about)\s+(?:the\s+)?(.+?)(?:\s+cluster|\s+topic)?$/i);
+            if (whatIsMatch) {
+                const topic = whatIsMatch[1].trim().toLowerCase();
+                const clusters = {};
+                allPapers.forEach(p => { if (p.cluster_label) clusters[p.cluster_label.toLowerCase()] = p.cluster_label; });
+                const match = Object.entries(clusters).find(([k]) => k.includes(topic));
+                if (match) {
+                    showTopicInfo(match[1]);
+                    return;
+                }
+            }
+
             const resultsPanel = document.getElementById('chatbotResults');
             // Always ensure panel is visible and cleared for new search
             resultsPanel.innerHTML = '';
