@@ -6649,7 +6649,9 @@
                 overlay.classList.toggle('visible');
                 const keyInput = document.getElementById('apiKeyInput');
                 if (claudeApiKey) {
-                    keyInput.value = claudeApiKey.slice(0, 10) + '...';
+                    // Don't pre-fill with masked key — it would get saved as the actual key
+                    keyInput.value = '';
+                    keyInput.placeholder = 'Key saved (' + claudeApiKey.slice(0, 8) + '...) — paste new key to replace';
                 }
             });
 
@@ -6696,7 +6698,8 @@
                 }
                 // Pre-fill if already connected
                 if (connectedServices[svc]) {
-                    apiInput.value = connectedServices[svc].key?.slice(0, 10) + '...';
+                    apiInput.value = '';
+                    apiInput.placeholder = 'Key saved — paste new key to replace';
                     modelSelect.value = connectedServices[svc].model || modelSelect.options[0].value;
                 } else {
                     apiInput.value = '';
@@ -6707,7 +6710,7 @@
                 const key = document.getElementById('apiKeyInput').value.trim();
                 const svc = document.getElementById('serviceSelect').value;
                 const model = document.getElementById('modelSelect').value;
-                if (key && (key.startsWith('sk-') || key.length > 20)) {
+                if (key && !key.includes('...') && (key.startsWith('sk-') || key.length > 20)) {
                     connectedServices[svc] = { key, model };
                     localStorage.setItem('papertrail_services', JSON.stringify(connectedServices));
                     if (svc === 'anthropic') {
