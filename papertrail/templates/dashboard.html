@@ -7373,29 +7373,36 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
 
             // "trending" / "what's trending" / "trends"
             if (/trend|trending|hot\s+topics|what.*new/i.test(q)) {
-                const result = executeAnalyzeTrends({ granularity: 'quarterly' });
-                const recent = result.periods.slice(-4);
-                const allWords = {};
-                const stopW = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by','from','is','are','was','were','be','been','have','has','do','does','not','can','will','this','that','its','our','their','using','based','via','new','non']);
-                recent.forEach(p => (p.top_words || []).forEach(w => {
-                    if (w.length > 2 && !stopW.has(w)) allWords[w] = (allWords[w] || 0) + 1;
-                }));
-                // Deduplicate stems (remove "models" if "model" exists)
-                const wordList = Object.keys(allWords);
-                wordList.forEach(w => {
-                    if (w.endsWith('s') && allWords[w.slice(0,-1)]) {
-                        allWords[w.slice(0,-1)] += allWords[w];
-                        delete allWords[w];
-                    }
+                // Use structured data: cluster growth rates (no NLP needed)
+                const sixMonthsAgo = new Date(); sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+                const recentByCluster = {};
+                const olderByCluster = {};
+                allPapers.forEach(p => {
+                    if (!p.cluster_label || !p.first_shared) return;
+                    const d = new Date(p.first_shared);
+                    if (d > sixMonthsAgo) recentByCluster[p.cluster_label] = (recentByCluster[p.cluster_label] || 0) + 1;
+                    else olderByCluster[p.cluster_label] = (olderByCluster[p.cluster_label] || 0) + 1;
                 });
-                const topWords = Object.entries(allWords).sort((a,b) => b[1]-a[1]).slice(0, 8).map(([w]) => w);
-                const firstRecent = recent[0];
-                const lastRecent = recent[recent.length - 1];
+                // Find fastest growing clusters
+                const growth = Object.keys(recentByCluster).map(label => ({
+                    label,
+                    recent: recentByCluster[label] || 0,
+                    older: olderByCluster[label] || 0,
+                    ratio: (recentByCluster[label] || 0) / Math.max(1, olderByCluster[label] || 1)
+                })).sort((a, b) => b.recent - a.recent);
+
+                const recentTotal = Object.values(recentByCluster).reduce((s, v) => s + v, 0);
+                const topGrowing = growth.slice(0, 5);
                 return {
                     title: 'Trending Topics',
-                    html: `<p>Recent quarters show focus on: <strong>${topWords.join(', ')}</strong></p>
-                        <p style="margin-top:6px;">${recent.map(p => `${p.period}: ${p.total_papers} papers`).join(' &rarr; ')}</p>
-                        <p style="margin-top:6px;color:#888;">Recent trend: ${firstRecent?.total_papers || 0} &rarr; ${lastRecent?.total_papers || 0} papers/quarter (${firstRecent?.period} to ${lastRecent?.period})</p>`
+                    html: `<p><strong>${recentTotal} papers</strong> shared in the last 6 months across ${Object.keys(recentByCluster).length} topics.</p>
+                        <p style="margin-top:8px;">Most active topics recently:</p>
+                        ${topGrowing.map((g, i) => `<div style="margin:4px 0;display:flex;align-items:center;gap:8px;">
+                            <span style="color:#ffca28;font-weight:700;min-width:20px;">${i+1}.</span>
+                            <span class="card-tag cluster-tag" style="cursor:pointer;font-size:11px;" onclick="document.getElementById('chatbotResults').classList.remove('visible');showTopicInfo('${esc(g.label).replace(/'/g, "\\'")}')">${esc(g.label)}</span>
+                            <span style="color:#888;font-size:11px;">${g.recent} recent papers</span>
+                        </div>`).join('')}
+                        ${!claudeApiKey ? '<p style="margin-top:10px;font-size:11px;color:#64b5f6;">&#x2728; Connect an AI (gear icon) for deeper trend analysis with natural language understanding.</p>' : ''}`
                 };
             }
 
