@@ -95,6 +95,16 @@ MODEL_REGISTRY: dict[str, dict[str, Any]] = {
         "quality": "high", "cost": "free",
         "description": "Strong on scientific/technical text, 8K context",
     },
+    "nomic-ai/nomic-embed-text-v1": {
+        "backend": "huggingface", "dims": 768, "speed": "medium",
+        "quality": "high", "cost": "free",
+        "description": "First Nomic embed model, solid general performance",
+    },
+    "nomic-ai/modernbert-embed-base": {
+        "backend": "huggingface", "dims": 768, "speed": "medium",
+        "quality": "high", "cost": "free",
+        "description": "ModernBERT-based embeddings, strong on long documents",
+    },
     "Alibaba-NLP/gte-Qwen2-1.5B-instruct": {
         "backend": "huggingface", "dims": 1536, "speed": "slow",
         "quality": "highest", "cost": "free",

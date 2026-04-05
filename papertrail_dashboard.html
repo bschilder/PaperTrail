@@ -1146,7 +1146,57 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
-        /* ===== SELECTED PAPERS (in sidebar) ===== */
+        /* ===== DETAIL PANEL (right slide-out) ===== */
+        .detail-panel-right {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 340px;
+            height: 100%;
+            background: #1a1a2e;
+            border-left: 1px solid #2a2a3e;
+            display: none;
+            flex-direction: column;
+            z-index: 50;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.3);
+            animation: slideInRight 0.2s ease-out;
+        }
+        .detail-panel-right.visible {
+            display: flex;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .detail-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #2a2a3e;
+            flex-shrink: 0;
+        }
+        .detail-panel-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+        }
+        .detail-panel-close {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 4px;
+            transition: color 0.15s;
+        }
+        .detail-panel-close:hover { color: #fff; }
+        .detail-panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
         #panelContent {
             display: flex;
             flex-direction: column;
@@ -1480,14 +1530,6 @@
                     </div>
                 </div>
 
-                <!-- Selected Papers (inline in sidebar) -->
-                <div class="sidebar-section" id="detailPanel" style="display:none;">
-                    <div class="sidebar-label" style="display:flex;justify-content:space-between;align-items:center;">
-                        <span>Selected Papers</span>
-                        <button id="panelClose" style="background:none;border:none;color:#888;cursor:pointer;font-size:14px;padding:0 4px;" title="Clear selection">&times;</button>
-                    </div>
-                    <div id="panelContent"></div>
-                </div>
             </div>
 
             <!-- Center Panel -->
@@ -1584,7 +1626,14 @@
                 </div>
             </div>
 
-            <!-- Right panel removed — selection now in sidebar -->
+            <!-- Right detail panel (slides out over map) -->
+            <div class="detail-panel-right" id="detailPanel">
+                <div class="detail-panel-header">
+                    <span class="detail-panel-title" id="detailPanelTitle">Selected Papers</span>
+                    <button id="panelClose" class="detail-panel-close" title="Clear selection">&times;</button>
+                </div>
+                <div class="detail-panel-body" id="panelContent"></div>
+            </div>
         </div>
     </div>
 
@@ -2415,6 +2464,14 @@
                 ctx.fill();
 
                 if (isSelected) {
+                    // Bright outer ring for visibility
+                    ctx.globalAlpha = 0.4;
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, radius + 6, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // Sharp inner ring
                     ctx.globalAlpha = 1;
                     ctx.strokeStyle = '#fff';
                     ctx.lineWidth = 2;
@@ -2422,7 +2479,7 @@
                     ctx.arc(sx, sy, radius + 3, 0, Math.PI * 2);
                     ctx.stroke();
                 }
-                if (isHovered) {
+                if (isHovered && !isSelected) {
                     ctx.globalAlpha = 1;
                     ctx.strokeStyle = 'rgba(255,255,255,0.6)';
                     ctx.lineWidth = 1.5;
@@ -2617,8 +2674,8 @@
                 const isMedium = rank < 8;
 
                 // Opacity: larger clusters more prominent
-                const baseAlpha = isClusterMode ? 0.9 : 0.5;
-                const alpha = isMajor ? baseAlpha : (isMedium ? baseAlpha * 0.7 : baseAlpha * 0.45);
+                const baseAlpha = isClusterMode ? 1.0 : 0.75;
+                const alpha = isMajor ? baseAlpha : (isMedium ? baseAlpha * 0.8 : baseAlpha * 0.55);
 
                 const fontWeight = isMajor ? '700' : (isMedium ? '600' : '400');
                 ctx.font = `${fontWeight} ${fontSize}px -apple-system, BlinkMacSystemFont, sans-serif`;
@@ -2639,7 +2696,7 @@
 
                 // Background: subtle frosted pill for readability
                 if (isMajor || isClusterMode) {
-                    ctx.fillStyle = `rgba(15, 15, 23, ${isMajor ? 0.6 : 0.4})`;
+                    ctx.fillStyle = `rgba(15, 15, 23, ${isMajor ? 0.75 : 0.55})`;
                     const px = 8, py = 4;
                     ctx.beginPath();
                     ctx.roundRect(c.cx - tw/2 - px, c.cy - th/2 - py, tw + px*2, th + py*2, fontSize/3);
@@ -2652,7 +2709,7 @@
                 ctx.fillText(label, c.cx + 1, c.cy + 1);
 
                 ctx.globalAlpha = alpha;
-                ctx.fillStyle = isMajor ? 'rgba(255,255,255,0.95)' : `rgba(255,255,255,${isClusterMode ? 0.8 : 0.55})`;
+                ctx.fillStyle = isMajor ? '#fff' : `rgba(255,255,255,${isClusterMode ? 0.9 : 0.7})`;
                 ctx.fillText(label, c.cx, c.cy);
             });
 
@@ -2862,11 +2919,15 @@
 
             if (selectionMode === 'rect' && rectStart) {
                 lassoCtx.clearRect(0, 0, lassoCanvas.width, lassoCanvas.height);
-                lassoCtx.strokeStyle = '#64b5f6';
-                lassoCtx.lineWidth = 2;
                 const width = mouseX - rectStart[0];
                 const height = mouseY - rectStart[1];
+                lassoCtx.fillStyle = 'rgba(100, 181, 246, 0.08)';
+                lassoCtx.fillRect(rectStart[0], rectStart[1], width, height);
+                lassoCtx.strokeStyle = 'rgba(100, 181, 246, 0.7)';
+                lassoCtx.lineWidth = 2;
+                lassoCtx.setLineDash([6, 4]);
                 lassoCtx.strokeRect(rectStart[0], rectStart[1], width, height);
+                lassoCtx.setLineDash([]);
             }
 
             // Show tooltip
@@ -2906,8 +2967,7 @@
                     } else {
                         // Clicked blank space — clear selection and collapse panel
                         selectedPapers.clear();
-                        const panel = document.getElementById('detailPanel');
-                        panel.style.display = 'none';
+                        document.getElementById('detailPanel').classList.remove('visible');
                         document.getElementById('panelContent').innerHTML = '';
                         renderMap();
                     }
@@ -2930,14 +2990,21 @@
 
         function drawLasso() {
             lassoCtx.clearRect(0, 0, lassoCanvas.width, lassoCanvas.height);
-            lassoCtx.strokeStyle = '#64b5f6';
-            lassoCtx.lineWidth = 2;
+            // Semi-transparent fill
+            lassoCtx.fillStyle = 'rgba(100, 181, 246, 0.08)';
             lassoCtx.beginPath();
             lassoPoints.forEach((pt, i) => {
                 if (i === 0) lassoCtx.moveTo(pt[0], pt[1]);
                 else lassoCtx.lineTo(pt[0], pt[1]);
             });
+            lassoCtx.closePath();
+            lassoCtx.fill();
+            // Stroke
+            lassoCtx.strokeStyle = 'rgba(100, 181, 246, 0.7)';
+            lassoCtx.lineWidth = 2;
+            lassoCtx.setLineDash([6, 4]);
             lassoCtx.stroke();
+            lassoCtx.setLineDash([]);
         }
 
         function pointInPolygon(point, polygon) {
@@ -3085,12 +3152,13 @@
             const content = document.getElementById('panelContent');
 
             if (papers.length === 0) {
-                panel.style.display = 'none';
+                panel.classList.remove('visible');
                 content.innerHTML = '';
                 return;
             }
 
-            panel.style.display = 'block';
+            panel.classList.add('visible');
+            document.getElementById('detailPanelTitle').textContent = `Selected Papers (${papers.length})`;
 
             content.innerHTML = `
                 <div class="select-all-checkbox">
@@ -3142,7 +3210,7 @@
                             <div class="card-details">
                                 <div class="detail-row">
                                     <div class="detail-label">Authors</div>
-                                    <div class="detail-value">${(paper.authors || []).join(', ')}</div>
+                                    <div class="detail-value">${Array.isArray(paper.authors) ? paper.authors.join(', ') : (paper.authors || 'N/A')}</div>
                                 </div>
                                 <div class="detail-row">
                                     <div class="detail-label">Journal</div>
@@ -4545,6 +4613,57 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             initTableResize();
             setSelectionMode('pan');
 
+            // ===== URL HASH STATE =====
+            function saveHashState() {
+                const state = {
+                    p: currentProjection,
+                    c: colorByMode,
+                    s: scaleByMode,
+                    z: Math.round(zoomLevel * 100) / 100,
+                };
+                // Only include non-default values to keep URL clean
+                if (state.p === 'umap') delete state.p;
+                if (state.c === 'channel') delete state.c;
+                if (state.s === 'uniform') delete state.s;
+                if (state.z === 1) delete state.z;
+                const hash = Object.entries(state).map(([k, v]) => `${k}=${v}`).join('&');
+                if (hash) {
+                    history.replaceState(null, '', '#' + hash);
+                } else {
+                    history.replaceState(null, '', location.pathname);
+                }
+            }
+
+            function loadHashState() {
+                const hash = location.hash.slice(1);
+                if (!hash) return;
+                const params = Object.fromEntries(hash.split('&').map(p => p.split('=')));
+                if (params.p && ['umap', 'tsne', 'pca'].includes(params.p)) {
+                    currentProjection = params.p;
+                    document.querySelectorAll('.proj-btn').forEach(b => b.classList.toggle('active', b.dataset.proj === params.p));
+                }
+                if (params.c) {
+                    colorByMode = params.c;
+                    document.getElementById('colorBySelect').value = params.c;
+                }
+                if (params.s) {
+                    scaleByMode = params.s;
+                    document.getElementById('scaleBySelect').value = params.s;
+                }
+                if (params.z) {
+                    zoomLevel = parseFloat(params.z) || 1;
+                }
+            }
+
+            loadHashState();
+
+            // Update hash on state changes (debounced)
+            let hashTimeout = null;
+            function debouncedSaveHash() {
+                clearTimeout(hashTimeout);
+                hashTimeout = setTimeout(saveHashState, 300);
+            }
+
             // Generate landscape summary
             generateLandscapeSummary();
 
@@ -4586,17 +4705,20 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     document.querySelectorAll('.proj-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     animateProjectionChange(btn.dataset.proj);
+                    debouncedSaveHash();
                 });
             });
 
             document.getElementById('colorBySelect').addEventListener('change', (e) => {
                 colorByMode = e.target.value;
                 renderMap();
+                debouncedSaveHash();
             });
 
             document.getElementById('scaleBySelect').addEventListener('change', (e) => {
                 scaleByMode = e.target.value;
                 renderMap();
+                debouncedSaveHash();
             });
 
             document.getElementById('semanticSearch').addEventListener('click', () => {
@@ -4712,7 +4834,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             if (panelCloseBtn) {
                 panelCloseBtn.addEventListener('click', () => {
                     selectedPapers.clear();
-                    document.getElementById('detailPanel').style.display = 'none';
+                    document.getElementById('detailPanel').classList.remove('visible');
                     document.getElementById('panelContent').innerHTML = '';
                     renderMap();
                 });
@@ -4733,7 +4855,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 switch(e.key) {
                     case 'Escape':
                         selectedPapers.clear();
-                        document.getElementById('detailPanel').style.display = 'none';
+                        document.getElementById('detailPanel').classList.remove('visible');
                         document.getElementById('panelContent').innerHTML = '';
                         document.getElementById('chatbotResults').classList.remove('visible');
                         renderMap();

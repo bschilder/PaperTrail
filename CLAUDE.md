@@ -193,6 +193,37 @@ just feed message texts through `SlackPaperScraper.extract_paper_urls()`.
 pytest tests/ -v
 ```
 
+## Design Inspirations
+
+The dashboard draws from several best-in-class data visualization tools:
+
+- **DataMapPlot** ([github](https://github.com/TutteInstitute/datamapplot),
+  [docs](https://datamapplot.readthedocs.io/)) — Hierarchical cluster labels
+  sized proportionally to cluster population, geographic-map aesthetic with
+  labels at centroids, overlap avoidance.
+
+- **CellXGene** — Canvas-based scatter plot with lasso/rect selection, detail
+  panel for selected items, projection switching (UMAP/t-SNE/PCA).
+
+- **Nomic Atlas** ([github](https://github.com/nomic-ai/nomic),
+  [HF](https://huggingface.co/nomic-ai)) — Embedding-based paper maps,
+  interactive topic exploration, Nomic embed models for scientific text.
+
+- **Connected Papers** — Paper relationship visualization, citation-based
+  graph exploration.
+
+- **Semantic Scholar** — Paper metadata, abstract previews, citation counts,
+  author information display patterns.
+
+### Embedding Model Sources
+
+Models are drawn from multiple providers (see `embeddings.py:MODEL_REGISTRY`):
+- **OpenAI**: text-embedding-3-small/large, o3-embedding
+- **Nomic AI**: nomic-embed-text-v1/v1.5, modernbert-embed-base
+- **BAAI**: bge-small/base/large-en-v1.5
+- **Alibaba NLP**: gte-Qwen2 (1.5B, 7B), gte-large-en-v1.5
+- **Sentence Transformers**: all-MiniLM-L6-v2, all-mpnet-base-v2
+
 ## Common Pitfalls
 
 1. **Elsevier/Cell PIIs**: These are the hardest to resolve. PubMed E-utilities is the
