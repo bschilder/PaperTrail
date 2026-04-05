@@ -3620,7 +3620,7 @@
                         <div class="profile-stat-label">Total Cites</div>
                     </div>
                     <div class="profile-stat">
-                        <div class="profile-stat-value" style="font-size:14px;">${topClusters[0] ? esc(topClusters[0][0].split(' ').slice(0,2).join(' ')) : 'N/A'}</div>
+                        <div class="profile-stat-value"><span class="card-tag cluster-tag" style="cursor:pointer;font-size:11px;" onclick="document.getElementById('profileModal').classList.remove('visible');showTopicInfo('${topClusters[0] ? esc(topClusters[0][0]).replace(/'/g, "\\'") : ''}')">${topClusters[0] ? esc(topClusters[0][0].split(' ').slice(0,3).join(' ')) : 'N/A'}</span></div>
                         <div class="profile-stat-label">Top Topic</div>
                     </div>
                 </div>
@@ -3798,7 +3798,7 @@
                 const authors = Array.isArray(paper.authors) ? paper.authors.join(', ') : (paper.authors || '');
                 const channels = Array.isArray(paper.channels) ? paper.channels : [];
                 const channelBadges = channels.map(ch =>
-                    `<a href="${slackChannelUrl(ch)}" target="_blank" class="channel-badge" style="cursor:pointer;text-decoration:none;color:${CHANNEL_COLORS[ch] || '#a0a0a0'};border-color:${CHANNEL_COLORS[ch] || '#3a3a4e'};" title="Open ${channelDisplayName(ch)} in Slack">${channelDisplayName(ch)}</a>`
+                    `<span class="channel-badge" style="cursor:pointer;color:${CHANNEL_COLORS[ch] || '#a0a0a0'};border-color:${CHANNEL_COLORS[ch] || '#3a3a4e'};" onclick="event.stopPropagation();showChannelInfo('${esc(ch).replace(/'/g, "\\'")}')" title="View channel info">${channelDisplayName(ch)}</span>`
                 ).join(' ');
 
                 const dateShared = paper.first_shared ? new Date(paper.first_shared).toLocaleDateString() : '';
@@ -5667,6 +5667,8 @@
                 } else {
                     previousPositions.clear();
                     animationRAF = null;
+                    // Recompute KDE after projection change (#74)
+                    if (kdeEnabled) { computeKDE(); renderMap(); }
                 }
             }
 
