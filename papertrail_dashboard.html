@@ -2825,6 +2825,7 @@
         let scaleTransform = 'linear'; // linear, log, sqrt
         let densityMap = new Map(); // paper -> density score (0-1)
         let kdeEnabled = true; // KDE on by default
+        let kdeOpacityOverride = null; // for fade-in animation
         let kdeCanvas = null; // offscreen canvas for KDE
         let renderedLabels = []; // {x, y, w, h, label} for click detection
         let hiddenClusters = new Set(); // cluster labels hidden via legend toggle
@@ -3459,7 +3460,19 @@
                 </div>`;
             }).join('');
 
+            // Auto-generate topic description from data
+            const descParts = [];
+            descParts.push(`This cluster contains <strong>${papers.length} papers</strong> about ${esc(label)}.`);
+            if (topContribs.length > 0) descParts.push(`Top contributors: ${topContribs.slice(0,3).map(([n,c]) => `<strong>${esc(n)}</strong> (${c})`).join(', ')}.`);
+            if (topPapers[0]) descParts.push(`Most cited: "${esc((topPapers[0].title||'').substring(0,60))}" (${topPapers[0].cited_by_count||0} citations).`);
+            const yearDist = Object.entries(byYear).sort((a,b) => b[0]-a[0]);
+            if (yearDist.length > 0) descParts.push(`Most active year: ${yearDist[0][0]} (${yearDist[0][1]} papers).`);
+
             body.innerHTML = `
+                <div class="profile-section">
+                    <div class="profile-section-title">About This Topic</div>
+                    <div style="font-size:12px;color:#a0a0b0;line-height:1.6;">${descParts.join(' ')}</div>
+                </div>
                 <div class="profile-section">
                     <div class="profile-section-title">Top Contributors</div>
                     <div style="display:flex;flex-wrap:wrap;gap:4px;">${contribHTML}</div>
@@ -4266,6 +4279,7 @@
             ctx.save();
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
+            if (kdeOpacityOverride !== null) ctx.globalAlpha = kdeOpacityOverride;
             ctx.drawImage(kdeCanvas, 0, 0, canvas.width, canvas.height);
             ctx.restore();
         }
@@ -5676,8 +5690,20 @@
                 } else {
                     previousPositions.clear();
                     animationRAF = null;
-                    // Recompute KDE after projection change (#74)
-                    if (kdeEnabled) { computeKDE(); renderMap(); }
+                    // Recompute KDE with fade-in after projection change (#74, #75)
+                    if (kdeEnabled) {
+                        computeKDE();
+                        // Fade in KDE over 500ms
+                        let kdeFadeStart = performance.now();
+                        function kdeFadeStep(now) {
+                            const t = Math.min(1, (now - kdeFadeStart) / 500);
+                            kdeOpacityOverride = t;
+                            renderMap();
+                            if (t < 1) requestAnimationFrame(kdeFadeStep);
+                            else kdeOpacityOverride = null;
+                        }
+                        requestAnimationFrame(kdeFadeStep);
+                    }
                 }
             }
 
