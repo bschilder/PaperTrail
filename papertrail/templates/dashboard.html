@@ -28,7 +28,7 @@
 
         /* ===== HEADER ===== */
         .header {
-            background: #1a1a2e;
+            background: linear-gradient(180deg, #1c1c32 0%, #1a1a2e 100%);
             border-bottom: 1px solid #2a2a3e;
             padding: 8px 20px;
             display: flex;
@@ -806,16 +806,23 @@
 
         .tooltip {
             position: fixed;
-            background: #252538;
-            border: 1px solid #3a3a4e;
-            border-radius: 6px;
-            padding: 10px 12px;
+            background: linear-gradient(135deg, #1e1e32 0%, #252540 100%);
+            border: 1px solid rgba(100, 181, 246, 0.2);
+            border-radius: 10px;
+            padding: 14px 16px;
             font-size: 12px;
             z-index: 60;
             display: none;
-            max-width: 300px;
+            max-width: 380px;
             pointer-events: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(100, 181, 246, 0.05);
+            backdrop-filter: blur(8px);
+            animation: tooltipFadeIn 0.15s ease-out;
+        }
+
+        @keyframes tooltipFadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .tooltip.visible {
@@ -825,9 +832,46 @@
         .tooltip-title {
             font-weight: 600;
             color: #fff;
-            margin-bottom: 4px;
-            font-size: 12px;
-            line-height: 1.3;
+            margin-bottom: 6px;
+            font-size: 13px;
+            line-height: 1.35;
+        }
+
+        .tooltip-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+        }
+
+        .tooltip-meta-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.06);
+            color: #a0a0b0;
+        }
+
+        .tooltip-meta-item.citations {
+            background: rgba(255, 202, 40, 0.15);
+            color: #ffca28;
+        }
+
+        .tooltip-abstract {
+            font-size: 11px;
+            color: #8888a0;
+            line-height: 1.5;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            max-height: 80px;
+            overflow: hidden;
+            -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
         }
 
         .tooltip-content {
@@ -842,6 +886,14 @@
             text-decoration: none;
             cursor: pointer;
             font-size: 11px;
+        }
+
+        .tooltip-channel-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
         }
 
         /* ===== SELECTED PAPERS (in sidebar) ===== */
@@ -1146,6 +1198,12 @@
                 </div>
 
                 <div class="sidebar-section">
+                    <div class="sidebar-label">Activity</div>
+                    <canvas id="sparklineCanvas" width="230" height="48" style="width:100%;height:48px;border-radius:6px;background:#252538;cursor:crosshair;"></canvas>
+                    <div id="sparklineInfo" style="font-size:10px;color:#666;margin-top:2px;"></div>
+                </div>
+
+                <div class="sidebar-section">
                     <div class="sidebar-label">Semantic Search</div>
                     <input type="text" class="semantic-input" id="semanticQuery" placeholder="Type a query...">
                     <div class="semantic-controls">
@@ -1305,6 +1363,11 @@
         let semanticScores = new Map();
         let colorByMode = 'channel';
         let scaleByMode = 'uniform';
+
+        // Animation state
+        let animationProgress = 1; // 0-1, 1 = complete
+        let animationRAF = null;
+        let previousPositions = new Map(); // paper index -> {x, y}
         let currentProjection = 'umap';
 
         // Canvas state
@@ -1370,6 +1433,7 @@
             }
 
             filterPapers();
+            drawSparkline();
         }
 
         // ===== UI INITIALIZATION =====
@@ -1651,6 +1715,117 @@
             projMaxX += rangeX * 0.05;
             projMinY -= rangeY * 0.05;
             projMaxY += rangeY * 0.05;
+        }
+
+        function drawSparkline() {
+            const canvas = document.getElementById('sparklineCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = canvas.clientWidth * dpr;
+            canvas.height = canvas.clientHeight * dpr;
+            ctx.scale(dpr, dpr);
+            const w = canvas.clientWidth;
+            const h = canvas.clientHeight;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Bucket papers by month
+            const buckets = {};
+            let minDate = Infinity, maxDate = -Infinity;
+            allPapers.forEach(p => {
+                if (!p.first_shared) return;
+                const d = new Date(p.first_shared);
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                buckets[key] = (buckets[key] || 0) + 1;
+                const t = d.getTime();
+                if (t < minDate) minDate = t;
+                if (t > maxDate) maxDate = t;
+            });
+
+            if (Object.keys(buckets).length < 2) {
+                ctx.fillStyle = '#666';
+                ctx.font = '10px -apple-system, sans-serif';
+                ctx.fillText('Not enough date data', 8, h / 2 + 3);
+                return;
+            }
+
+            // Build sorted array of all months in range
+            const startDate = new Date(minDate);
+            const endDate = new Date(maxDate);
+            const months = [];
+            const d = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+            while (d <= endDate) {
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                months.push({ key, count: buckets[key] || 0 });
+                d.setMonth(d.getMonth() + 1);
+            }
+
+            const maxCount = Math.max(...months.map(m => m.count));
+            const pad = { top: 4, bottom: 12, left: 4, right: 4 };
+            const plotW = w - pad.left - pad.right;
+            const plotH = h - pad.top - pad.bottom;
+
+            // Draw area chart
+            ctx.beginPath();
+            months.forEach((m, i) => {
+                const x = pad.left + (i / (months.length - 1)) * plotW;
+                const y = pad.top + plotH - (m.count / maxCount) * plotH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+
+            // Close the path for fill
+            ctx.lineTo(pad.left + plotW, pad.top + plotH);
+            ctx.lineTo(pad.left, pad.top + plotH);
+            ctx.closePath();
+
+            const grad = ctx.createLinearGradient(0, pad.top, 0, h);
+            grad.addColorStop(0, 'rgba(100, 181, 246, 0.35)');
+            grad.addColorStop(1, 'rgba(100, 181, 246, 0.02)');
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Draw line on top
+            ctx.beginPath();
+            months.forEach((m, i) => {
+                const x = pad.left + (i / (months.length - 1)) * plotW;
+                const y = pad.top + plotH - (m.count / maxCount) * plotH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.strokeStyle = '#64b5f6';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // X-axis labels (first and last year)
+            ctx.fillStyle = '#555';
+            ctx.font = '9px -apple-system, sans-serif';
+            const firstYear = months[0].key.split('-')[0];
+            const lastYear = months[months.length - 1].key.split('-')[0];
+            ctx.fillText(firstYear, pad.left, h - 1);
+            ctx.textAlign = 'right';
+            ctx.fillText(lastYear, w - pad.right, h - 1);
+            ctx.textAlign = 'start';
+
+            // Hover interaction
+            canvas.onmousemove = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const idx = Math.round(((mx - pad.left) / plotW) * (months.length - 1));
+                if (idx >= 0 && idx < months.length) {
+                    const m = months[idx];
+                    document.getElementById('sparklineInfo').textContent = `${m.key}: ${m.count} papers`;
+                }
+            };
+            canvas.onmouseleave = () => {
+                const total = allPapers.length;
+                const range = `${firstYear} — ${lastYear}`;
+                document.getElementById('sparklineInfo').textContent = `${total} papers · ${range}`;
+            };
+
+            // Set default info
+            document.getElementById('sparklineInfo').textContent = `${allPapers.length} papers · ${firstYear} — ${lastYear}`;
         }
 
         function dataToScreen(dx, dy) {
@@ -1938,6 +2113,113 @@
             );
         }
 
+        function animateProjectionChange(newProjection) {
+            // Save current screen positions
+            previousPositions.clear();
+            filteredPapers.forEach((paper, idx) => {
+                if (paper._sx !== undefined && paper._sx > -900) {
+                    previousPositions.set(idx, { x: paper._sx, y: paper._sy });
+                }
+            });
+
+            // Switch projection
+            currentProjection = newProjection;
+            zoomLevel = 1; panX = 0; panY = 0;
+            computeBounds();
+
+            // Animate
+            animationProgress = 0;
+            if (animationRAF) cancelAnimationFrame(animationRAF);
+
+            const duration = 600; // ms
+            const startTime = performance.now();
+
+            function animateStep(now) {
+                const elapsed = now - startTime;
+                animationProgress = Math.min(1, elapsed / duration);
+                // Ease-out cubic
+                const t = 1 - Math.pow(1 - animationProgress, 3);
+
+                renderMapAnimated(t);
+
+                if (animationProgress < 1) {
+                    animationRAF = requestAnimationFrame(animateStep);
+                } else {
+                    previousPositions.clear();
+                    animationRAF = null;
+                }
+            }
+
+            animationRAF = requestAnimationFrame(animateStep);
+        }
+
+        function renderMapAnimated(t) {
+            if (!ctx) return;
+
+            ctx.fillStyle = '#0f0f17';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Subtle grid
+            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            ctx.lineWidth = 1;
+            const gridSize = 80;
+            for (let x = gridSize; x < canvas.width; x += gridSize) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for (let y = gridSize; y < canvas.height; y += gridSize) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+
+            filteredPapers.forEach((paper, idx) => {
+                const proj = paper.projections && paper.projections[currentProjection];
+                if (!proj) return;
+
+                const [targetX, targetY] = dataToScreen(proj[0], proj[1]);
+                const prev = previousPositions.get(idx);
+
+                let sx, sy;
+                if (prev) {
+                    sx = prev.x + (targetX - prev.x) * t;
+                    sy = prev.y + (targetY - prev.y) * t;
+                } else {
+                    // New point - fade in from center
+                    sx = canvas.width / 2 + (targetX - canvas.width / 2) * t;
+                    sy = canvas.height / 2 + (targetY - canvas.height / 2) * t;
+                }
+
+                paper._sx = sx;
+                paper._sy = sy;
+
+                if (sx < -50 || sx > canvas.width + 50 || sy < -50 || sy > canvas.height + 50) return;
+
+                const radius = getPointRadius(paper);
+                const color = getPointColor(paper);
+                const allIdx = allPapers.indexOf(paper);
+                const isSelected = selectedPapers.has(allIdx);
+
+                ctx.globalAlpha = paper.title ? (isSelected ? 1 : 0.75) * t : 0.25 * t;
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(sx, sy, radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (isSelected) {
+                    ctx.globalAlpha = t;
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, radius + 3, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            });
+            ctx.globalAlpha = 1;
+
+            // Footer
+            ctx.fillStyle = 'rgba(255,255,255,0.35)';
+            ctx.font = '11px -apple-system, sans-serif';
+            ctx.fillText(`${currentProjection.toUpperCase()} · ${filteredPapers.length} papers`, 12, canvas.height - 12);
+        }
+
         function handleZoom(e) {
             e.preventDefault();
             const [mx, my] = canvasCoords(e);
@@ -2188,24 +2470,50 @@
             });
 
             if (hoveredPaper) {
-                const channels = Array.isArray(hoveredPaper.channels) ? hoveredPaper.channels.map(ch => channelDisplayName(ch)).join(', ') : '';
+                const channels = Array.isArray(hoveredPaper.channels) ? hoveredPaper.channels : [];
                 const dateShared = hoveredPaper.first_shared ? new Date(hoveredPaper.first_shared).toLocaleDateString() : '';
+                const authors = Array.isArray(hoveredPaper.authors)
+                    ? (hoveredPaper.authors.length > 3
+                        ? hoveredPaper.authors.slice(0, 3).join(', ') + ' et al.'
+                        : hoveredPaper.authors.join(', '))
+                    : '';
+
+                // Channel dots
+                const channelDots = channels.map(ch =>
+                    `<span class="tooltip-channel-dot" style="background:${CHANNEL_COLORS[ch] || '#64b5f6'};" title="${channelDisplayName(ch)}"></span>`
+                ).join('');
+
+                // Citations badge
+                const citations = hoveredPaper.cited_by_count || 0;
+                const citeBadge = citations > 0
+                    ? `<span class="tooltip-meta-item citations">${citations} cites</span>`
+                    : '';
+
+                // Abstract preview
+                const abstract = hoveredPaper.abstract || '';
+                const abstractHtml = abstract
+                    ? `<div class="tooltip-abstract">${abstract.substring(0, 250)}</div>`
+                    : '';
 
                 tooltip.innerHTML = `
                     <div class="tooltip-title">${hoveredPaper.title || 'Untitled'}</div>
-                    <div class="tooltip-content">
-                        ${personDisplay(hoveredPaper.shared_by)} · ${dateShared} · ${channels}
+                    <div class="tooltip-meta">
+                        ${channelDots}
+                        <span class="tooltip-meta-item">${hoveredPaper.year || '?'}</span>
+                        <span class="tooltip-meta-item">${hoveredPaper.journal || 'Preprint'}</span>
+                        ${citeBadge}
                     </div>
                     <div class="tooltip-content">
-                        ${hoveredPaper.year || ''} · ${hoveredPaper.journal || ''} · ${hoveredPaper.cluster_label || ''}
+                        ${authors ? authors : ''} ${dateShared ? '&middot; shared ' + dateShared : ''}
                     </div>
+                    ${abstractHtml}
                 `;
                 tooltip.classList.add('visible');
 
-                let tx = pageX + 14;
-                let ty = pageY + 14;
-                if (tx + 300 > window.innerWidth) tx = pageX - 310;
-                if (ty + 100 > window.innerHeight) ty = pageY - 110;
+                let tx = pageX + 16;
+                let ty = pageY + 16;
+                if (tx + 390 > window.innerWidth) tx = pageX - 400;
+                if (ty + 200 > window.innerHeight) ty = pageY - 220;
                 tooltip.style.left = tx + 'px';
                 tooltip.style.top = ty + 'px';
             } else {
@@ -3494,10 +3802,7 @@ Be concise and conversational. 2-3 sentences max for the answer.`;
             });
 
             document.getElementById('projectionSelect').addEventListener('change', (e) => {
-                currentProjection = e.target.value;
-                zoomLevel = 1; panX = 0; panY = 0;
-                computeBounds();
-                renderMap();
+                animateProjectionChange(e.target.value);
             });
 
             document.getElementById('colorBySelect').addEventListener('change', (e) => {
@@ -3578,21 +3883,15 @@ Be concise and conversational. 2-3 sentences max for the answer.`;
                         break;
                     case '1':
                         document.getElementById('projectionSelect').value = 'umap';
-                        currentProjection = 'umap';
-                        zoomLevel = 1; panX = 0; panY = 0;
-                        computeBounds(); renderMap();
+                        animateProjectionChange('umap');
                         break;
                     case '2':
                         document.getElementById('projectionSelect').value = 'tsne';
-                        currentProjection = 'tsne';
-                        zoomLevel = 1; panX = 0; panY = 0;
-                        computeBounds(); renderMap();
+                        animateProjectionChange('tsne');
                         break;
                     case '3':
                         document.getElementById('projectionSelect').value = 'pca';
-                        currentProjection = 'pca';
-                        zoomLevel = 1; panX = 0; panY = 0;
-                        computeBounds(); renderMap();
+                        animateProjectionChange('pca');
                         break;
                     case '/':
                         e.preventDefault();
