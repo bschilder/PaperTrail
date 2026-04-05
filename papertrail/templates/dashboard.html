@@ -791,6 +791,64 @@
             cursor: default;
         }
 
+        /* Time travel control */
+        .time-travel {
+            position: absolute;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(26, 26, 46, 0.9);
+            border: 1px solid #3a3a4e;
+            border-radius: 20px;
+            padding: 6px 14px;
+            z-index: 40;
+            backdrop-filter: blur(8px);
+        }
+        .tt-play {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: #64b5f6;
+            color: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+        .tt-play:hover { background: #42a5f5; }
+        .tt-play.playing { background: #ef5350; }
+        .tt-slider {
+            width: 200px;
+            height: 4px;
+            -webkit-appearance: none;
+            background: #2a2a3e;
+            border-radius: 2px;
+            outline: none;
+        }
+        .tt-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #64b5f6;
+            cursor: pointer;
+            border: 2px solid #fff;
+        }
+        .tt-label {
+            font-size: 11px;
+            color: #a0a0b0;
+            min-width: 60px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
         .map-toolbar {
             position: absolute;
             top: 12px;
@@ -1439,6 +1497,12 @@
                     <div class="map-view visible" id="mapView">
                         <canvas id="canvas"></canvas>
                         <canvas id="lassoCanvas"></canvas>
+                        <!-- Time travel control -->
+                        <div class="time-travel" id="timeTravelBar">
+                            <button class="tt-play" id="ttPlayBtn" title="Play / Pause time animation">&#9654;</button>
+                            <input type="range" class="tt-slider" id="ttSlider" min="0" max="100" value="100">
+                            <span class="tt-label" id="ttLabel">All time</span>
+                        </div>
                         <div class="map-toolbar">
                             <button class="toolbar-button" id="panBtn" title="Pan (or hold Shift)">✋</button>
                             <button class="toolbar-button" id="lassoBtn" title="Lasso Select">∿</button>
@@ -1626,6 +1690,9 @@
 
         // O(1) paper index lookup (built once during loadData)
         let paperIndexMap = new Map(); // paper object -> index in allPapers
+
+        // Time travel state (global so filterPapers can access)
+        let ttCutoffDate = null; // null = show all
         let currentProjection = 'umap';
 
         // Canvas state
@@ -1751,6 +1818,10 @@
         function filterPapers() {
             filteredPapers = allPapers.filter(paper => {
                 if (selectedChannels.size > 0 && (!paper.channels || !paper.channels.some(ch => selectedChannels.has(ch)))) {
+                    return false;
+                }
+                // Time travel cutoff
+                if (ttCutoffDate && paper.first_shared && new Date(paper.first_shared) > ttCutoffDate) {
                     return false;
                 }
                 // Time brush filter
@@ -4504,6 +4575,79 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
 
             document.getElementById('exportCsv').addEventListener('click', () => downloadFiltered('csv'));
             document.getElementById('exportXlsx').addEventListener('click', () => downloadFiltered('xlsx'));
+
+            // ===== TIME TRAVEL =====
+            let ttPlaying = false;
+            let ttAnimFrame = null;
+
+            // Build sorted list of paper dates
+            const paperDates = allPapers
+                .filter(p => p.first_shared)
+                .map(p => new Date(p.first_shared).getTime())
+                .sort((a, b) => a - b);
+
+            const ttSlider = document.getElementById('ttSlider');
+            const ttLabel = document.getElementById('ttLabel');
+            const ttPlayBtn = document.getElementById('ttPlayBtn');
+
+            if (paperDates.length > 0) {
+                const minT = paperDates[0];
+                const maxT = paperDates[paperDates.length - 1];
+
+                ttSlider.addEventListener('input', () => {
+                    const pct = parseInt(ttSlider.value) / 100;
+                    if (pct >= 0.99) {
+                        ttCutoffDate = null;
+                        ttLabel.textContent = 'All time';
+                    } else {
+                        ttCutoffDate = new Date(minT + (maxT - minT) * pct);
+                        ttLabel.textContent = ttCutoffDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+                    }
+                    filterPapers();
+                });
+
+                ttPlayBtn.addEventListener('click', () => {
+                    if (ttPlaying) {
+                        ttPlaying = false;
+                        ttPlayBtn.innerHTML = '&#9654;';
+                        ttPlayBtn.classList.remove('playing');
+                        if (ttAnimFrame) cancelAnimationFrame(ttAnimFrame);
+                    } else {
+                        ttPlaying = true;
+                        ttPlayBtn.innerHTML = '&#9646;&#9646;';
+                        ttPlayBtn.classList.add('playing');
+                        ttSlider.value = 0;
+                        ttCutoffDate = new Date(minT);
+
+                        const duration = 8000; // 8 seconds for full animation
+                        const startTime = performance.now();
+
+                        function ttStep(now) {
+                            if (!ttPlaying) return;
+                            const elapsed = now - startTime;
+                            const pct = Math.min(1, elapsed / duration);
+                            ttSlider.value = Math.round(pct * 100);
+
+                            if (pct >= 0.99) {
+                                ttCutoffDate = null;
+                                ttLabel.textContent = 'All time';
+                                ttPlaying = false;
+                                ttPlayBtn.innerHTML = '&#9654;';
+                                ttPlayBtn.classList.remove('playing');
+                            } else {
+                                ttCutoffDate = new Date(minT + (maxT - minT) * pct);
+                                ttLabel.textContent = ttCutoffDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+                            }
+                            filterPapers();
+
+                            if (ttPlaying) {
+                                ttAnimFrame = requestAnimationFrame(ttStep);
+                            }
+                        }
+                        ttAnimFrame = requestAnimationFrame(ttStep);
+                    }
+                });
+            }
 
             // Panel close button
             const panelCloseBtn = document.getElementById('panelClose');
