@@ -35,16 +35,73 @@ DEFAULT_MODELS: dict[Backend, str] = {
     "tfidf": "tfidf-svd-128",
 }
 
-DIMENSIONS: dict[str, int] = {
-    "text-embedding-3-small": 1536,
-    "text-embedding-3-large": 3072,
-    "text-embedding-ada-002": 1536,
-    "BAAI/bge-small-en-v1.5": 384,
-    "BAAI/bge-base-en-v1.5": 768,
-    "BAAI/bge-large-en-v1.5": 1024,
-    "tfidf-svd-128": 128,
-    "tfidf-svd-256": 256,
+# Comprehensive model registry with metadata for selection
+# fmt: off
+MODEL_REGISTRY: dict[str, dict[str, Any]] = {
+    # --- OpenAI (remote, paid) ---
+    "text-embedding-3-small": {
+        "backend": "openai", "dims": 1536, "speed": "fast",
+        "quality": "high", "cost": "low",
+        "description": "Best balance of quality and cost for most use cases",
+    },
+    "text-embedding-3-large": {
+        "backend": "openai", "dims": 3072, "speed": "fast",
+        "quality": "highest", "cost": "medium",
+        "description": "Highest quality OpenAI embeddings, best for semantic nuance",
+    },
+    "text-embedding-ada-002": {
+        "backend": "openai", "dims": 1536, "speed": "fast",
+        "quality": "good", "cost": "low",
+        "description": "Legacy model, still widely used",
+    },
+    # --- HuggingFace (remote, free tier available) ---
+    "BAAI/bge-small-en-v1.5": {
+        "backend": "huggingface", "dims": 384, "speed": "fast",
+        "quality": "good", "cost": "free",
+        "description": "Fast, compact embeddings — great for speed-sensitive use",
+    },
+    "BAAI/bge-base-en-v1.5": {
+        "backend": "huggingface", "dims": 768, "speed": "medium",
+        "quality": "high", "cost": "free",
+        "description": "Good balance of quality and speed for academic text",
+    },
+    "BAAI/bge-large-en-v1.5": {
+        "backend": "huggingface", "dims": 1024, "speed": "slow",
+        "quality": "highest", "cost": "free",
+        "description": "Best open-source quality, slower inference",
+    },
+    "sentence-transformers/all-MiniLM-L6-v2": {
+        "backend": "huggingface", "dims": 384, "speed": "fast",
+        "quality": "good", "cost": "free",
+        "description": "Popular lightweight model, strong general performance",
+    },
+    "sentence-transformers/all-mpnet-base-v2": {
+        "backend": "huggingface", "dims": 768, "speed": "medium",
+        "quality": "high", "cost": "free",
+        "description": "Strong all-round model, excellent for scientific text",
+    },
+    "nomic-ai/nomic-embed-text-v1.5": {
+        "backend": "huggingface", "dims": 768, "speed": "medium",
+        "quality": "high", "cost": "free",
+        "description": "Strong on scientific/technical text, 8K context",
+    },
+    # --- Local (offline, ONNX) ---
+    # These use the same model names as HF but run locally via fastembed
+    # --- TF-IDF (always available) ---
+    "tfidf-svd-128": {
+        "backend": "tfidf", "dims": 128, "speed": "instant",
+        "quality": "basic", "cost": "free",
+        "description": "Lexical matching only — no semantic understanding",
+    },
+    "tfidf-svd-256": {
+        "backend": "tfidf", "dims": 256, "speed": "instant",
+        "quality": "basic", "cost": "free",
+        "description": "Higher-dim TF-IDF, slightly better for large corpora",
+    },
 }
+# fmt: on
+
+DIMENSIONS: dict[str, int] = {k: v["dims"] for k, v in MODEL_REGISTRY.items()}
 
 
 def _detect_backend() -> Backend:
@@ -224,6 +281,84 @@ def list_backends() -> list[dict[str, Any]]:
             available = True  # always available
         backends.append({"name": name, "available": available, "model": model})
     return backends
+
+
+def list_models(
+    available_only: bool = False,
+    speed: str | None = None,
+    quality: str | None = None,
+) -> list[dict[str, Any]]:
+    """
+    List all supported embedding models with metadata.
+
+    Parameters
+    ----------
+    available_only : bool
+        If True, only return models whose backend is currently available.
+    speed : str, optional
+        Filter by speed: "instant", "fast", "medium", "slow".
+    quality : str, optional
+        Filter by quality: "basic", "good", "high", "highest".
+
+    Returns
+    -------
+    list[dict]
+        Model entries with name, backend, dims, speed, quality, cost, description.
+    """
+    available_backends = {b["name"] for b in list_backends() if b["available"]}
+    results = []
+    for model_name, info in MODEL_REGISTRY.items():
+        if available_only and info["backend"] not in available_backends:
+            continue
+        if speed and info["speed"] != speed:
+            continue
+        if quality and info["quality"] != quality:
+            continue
+        results.append({"model": model_name, **info})
+    return results
+
+
+def recommend_model(
+    priority: str = "balanced",
+) -> str:
+    """
+    Recommend the best available model based on priority.
+
+    Parameters
+    ----------
+    priority : str
+        One of "speed", "quality", "balanced", "free", "memory".
+
+    Returns
+    -------
+    str
+        Model name to use with embed_texts().
+    """
+    available = list_models(available_only=True)
+    if not available:
+        return "tfidf-svd-128"
+
+    quality_order = {"basic": 0, "good": 1, "high": 2, "highest": 3}
+    speed_order = {"slow": 0, "medium": 1, "fast": 2, "instant": 3}
+
+    if priority == "speed":
+        available.sort(key=lambda m: speed_order.get(m["speed"], 0), reverse=True)
+    elif priority == "quality":
+        available.sort(key=lambda m: quality_order.get(m["quality"], 0), reverse=True)
+    elif priority == "free":
+        free = [m for m in available if m["cost"] == "free"]
+        if free:
+            free.sort(key=lambda m: quality_order.get(m["quality"], 0), reverse=True)
+            return free[0]["model"]
+    elif priority == "memory":
+        available.sort(key=lambda m: m["dims"])
+    else:  # balanced
+        available.sort(
+            key=lambda m: quality_order.get(m["quality"], 0) + speed_order.get(m["speed"], 0),
+            reverse=True,
+        )
+
+    return available[0]["model"]
 
 
 # ---------------------------------------------------------------------------
