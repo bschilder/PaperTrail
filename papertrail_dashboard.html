@@ -1067,6 +1067,11 @@
             transition: all 0.15s;
         }
         .lb-card:hover { background: #1f1f35; border-color: #3a3a4e; }
+        .lb-card.lb-focused {
+            border-color: #64b5f6;
+            background: #1f1f38;
+            box-shadow: 0 0 0 2px rgba(100,181,246,0.2);
+        }
         .lb-card {
             animation: cardBrickIn 0.4s ease-out both;
         }
@@ -2784,6 +2789,8 @@
         let sortAscending = true;
         let columnFilters = {};
         let currentView = 'map';
+        let leaderboardFocusSection = -1; // -1=none, 0=contributors, 1=engaged, 2=cited, 3=recent
+        let leaderboardFocusIdx = -1;
         let semanticQuery = null;
         let semanticScores = new Map();
         let colorByMode = 'channel';
@@ -3843,6 +3850,13 @@
             html += `
                 <div style="text-align:center;padding:16px;font-size:11px;color:#555;">
                     Click any item to view details
+                </div>
+                <div style="position:fixed;bottom:20px;right:20px;background:rgba(26,26,46,0.85);border:1px solid #2a2a3e;border-radius:10px;padding:10px 14px;font-size:11px;color:#666;max-width:160px;backdrop-filter:blur(4px);">
+                    <div style="color:#888;font-weight:600;margin-bottom:4px;">Navigation</div>
+                    <div>&#8592;&#8594; Cycle items</div>
+                    <div>&#8593;&#8595; Switch sections</div>
+                    <div>Enter: Open details</div>
+                    <div>Esc: Clear focus</div>
                 </div>
             `;
 
@@ -8455,7 +8469,29 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         break;
                     case 'ArrowUp':
                     case 'ArrowDown': {
-                        if (e.metaKey || e.ctrlKey) {
+                        if (currentView === 'leaderboard' && !e.metaKey && !e.ctrlKey) {
+                            // Leaderboard: switch sections with Up/Down
+                            e.preventDefault();
+                            const sections = document.querySelectorAll('.lb-section');
+                            if (sections.length === 0) break;
+                            if (leaderboardFocusSection === -1) {
+                                leaderboardFocusSection = 0;
+                            } else {
+                                leaderboardFocusSection = e.key === 'ArrowDown'
+                                    ? Math.min(leaderboardFocusSection + 1, sections.length - 1)
+                                    : Math.max(leaderboardFocusSection - 1, 0);
+                            }
+                            leaderboardFocusIdx = 0;
+                            document.querySelectorAll('.lb-card.lb-focused').forEach(c => c.classList.remove('lb-focused'));
+                            const targetSection = sections[leaderboardFocusSection];
+                            if (targetSection) {
+                                const cards = targetSection.querySelectorAll('.lb-card');
+                                if (cards[leaderboardFocusIdx]) {
+                                    cards[leaderboardFocusIdx].classList.add('lb-focused');
+                                    cards[leaderboardFocusIdx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                                }
+                            }
+                        } else if (e.metaKey || e.ctrlKey) {
                             // CMD+Arrow Up/Down: cycle through sidebar sections
                             e.preventDefault();
                             const sections = getSidebarSections();
@@ -8476,6 +8512,14 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         break;
                     }
                     case 'Enter': {
+                        if (currentView === 'leaderboard' && leaderboardFocusSection >= 0) {
+                            const sections = document.querySelectorAll('.lb-section');
+                            const cards = sections[leaderboardFocusSection]?.querySelectorAll('.lb-card');
+                            if (cards?.[leaderboardFocusIdx]) {
+                                cards[leaderboardFocusIdx].click();
+                            }
+                            break;
+                        }
                         if (focusedSidebarIdx >= 0) {
                             e.preventDefault();
                             handleSidebarEnter();
@@ -8483,6 +8527,13 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         break;
                     }
                     case 'Escape': {
+                        if (currentView === 'leaderboard' && leaderboardFocusSection >= 0) {
+                            e.preventDefault();
+                            leaderboardFocusSection = -1;
+                            leaderboardFocusIdx = -1;
+                            document.querySelectorAll('.lb-card.lb-focused').forEach(c => c.classList.remove('lb-focused'));
+                            break;
+                        }
                         if (focusedSidebarIdx >= 0) {
                             e.preventDefault();
                             focusSidebarSection(-1);
@@ -8492,7 +8543,28 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     }
                     case 'ArrowLeft':
                     case 'ArrowRight': {
-                        if (e.metaKey || e.ctrlKey) {
+                        if (currentView === 'leaderboard' && !e.metaKey && !e.ctrlKey) {
+                            // Leaderboard: cycle items within section with Left/Right
+                            e.preventDefault();
+                            const sections = document.querySelectorAll('.lb-section');
+                            if (sections.length === 0) break;
+                            if (leaderboardFocusSection === -1) leaderboardFocusSection = 0;
+                            const cards = sections[leaderboardFocusSection]?.querySelectorAll('.lb-card') || [];
+                            if (cards.length > 0) {
+                                leaderboardFocusIdx = e.key === 'ArrowRight'
+                                    ? (leaderboardFocusIdx + 1) % cards.length
+                                    : (leaderboardFocusIdx - 1 + cards.length) % cards.length;
+                            }
+                            document.querySelectorAll('.lb-card.lb-focused').forEach(c => c.classList.remove('lb-focused'));
+                            const targetSection = sections[leaderboardFocusSection];
+                            if (targetSection) {
+                                const tCards = targetSection.querySelectorAll('.lb-card');
+                                if (tCards[leaderboardFocusIdx]) {
+                                    tCards[leaderboardFocusIdx].classList.add('lb-focused');
+                                    tCards[leaderboardFocusIdx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                                }
+                            }
+                        } else if (e.metaKey || e.ctrlKey) {
                             // CMD+Arrow: switch projection
                             e.preventDefault();
                             const projections = ['umap', 'tsne', 'pca'];
