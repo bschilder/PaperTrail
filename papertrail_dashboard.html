@@ -1056,9 +1056,19 @@
                 </div>
 
                 <div class="sidebar-section">
+                    <div class="sidebar-label">Projection</div>
+                    <select class="color-by-select" id="projectionSelect">
+                        <option value="umap">UMAP</option>
+                        <option value="tsne">t-SNE</option>
+                        <option value="pca">PCA</option>
+                    </select>
+                </div>
+
+                <div class="sidebar-section">
                     <div class="sidebar-label">Color By</div>
                     <select class="color-by-select" id="colorBySelect">
                         <option value="channel">Channel</option>
+                        <option value="cluster">Cluster</option>
                         <option value="year">Year</option>
                         <option value="citations">Citations</option>
                     </select>
@@ -1241,12 +1251,15 @@
         let semanticScores = new Map();
         let colorByMode = 'channel';
         let scaleByMode = 'uniform';
+        let currentProjection = 'umap';
 
         // Canvas state
         let canvas, ctx;
         let zoomLevel = 1;
         let panX = 0;
         let panY = 0;
+        // Computed bounds for current projection
+        let projMinX = 0, projMaxX = 1, projMinY = 0, projMaxY = 1;
         let isDragging = false;
         let dragStart = { x: 0, y: 0 };
         let selectionMode = 'pan'; // 'pan', 'lasso', 'rect'
@@ -1280,6 +1293,7 @@
 
             selectedChannels = new Set(channels);
             initChannelFilters(Array.from(channels));
+            computeBounds();
             filterPapers();
         }
 
@@ -1457,6 +1471,11 @@
                 return CHANNEL_COLORS[paper.channels[0]] || '#64b5f6';
             }
 
+            if (colorByMode === 'cluster') {
+                const CLUSTER_COLORS = ['#64b5f6','#bb86fc','#66bb6a','#ffa726','#ef5350','#26c6da','#ffca28','#ab47bc','#8d6e63','#78909c','#ec407a','#7e57c2'];
+                return CLUSTER_COLORS[(paper.cluster_id || 0) % CLUSTER_COLORS.length];
+            }
+
             if (colorByMode === 'year') {
                 const year = paper.year || 2020;
                 const normalized = Math.min(1, (year - 2015) / 10);
@@ -1479,48 +1498,125 @@
             return `rgb(${r}, ${g}, ${b})`;
         }
 
+        function computeBounds() {
+            projMinX = Infinity; projMaxX = -Infinity;
+            projMinY = Infinity; projMaxY = -Infinity;
+            filteredPapers.forEach(paper => {
+                const proj = paper.projections && paper.projections[currentProjection];
+                if (!proj) return;
+                projMinX = Math.min(projMinX, proj[0]);
+                projMaxX = Math.max(projMaxX, proj[0]);
+                projMinY = Math.min(projMinY, proj[1]);
+                projMaxY = Math.max(projMaxY, proj[1]);
+            });
+            if (projMinX === Infinity) { projMinX = 0; projMaxX = 1; projMinY = 0; projMaxY = 1; }
+            const rangeX = projMaxX - projMinX || 1;
+            const rangeY = projMaxY - projMinY || 1;
+            // Add 5% padding
+            projMinX -= rangeX * 0.05;
+            projMaxX += rangeX * 0.05;
+            projMinY -= rangeY * 0.05;
+            projMaxY += rangeY * 0.05;
+        }
+
+        function dataToScreen(dx, dy) {
+            const pad = 40;
+            const w = canvas.width - 2 * pad;
+            const h = canvas.height - 2 * pad;
+            const rangeX = projMaxX - projMinX || 1;
+            const rangeY = projMaxY - projMinY || 1;
+            const scale = Math.min(w / rangeX, h / rangeY) * zoomLevel;
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const midX = (projMinX + projMaxX) / 2;
+            const midY = (projMinY + projMaxY) / 2;
+            return [
+                cx + (dx - midX - panX) * scale,
+                cy + (dy - midY - panY) * scale
+            ];
+        }
+
+        function screenToData(sx, sy) {
+            const pad = 40;
+            const w = canvas.width - 2 * pad;
+            const h = canvas.height - 2 * pad;
+            const rangeX = projMaxX - projMinX || 1;
+            const rangeY = projMaxY - projMinY || 1;
+            const scale = Math.min(w / rangeX, h / rangeY) * zoomLevel;
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const midX = (projMinX + projMaxX) / 2;
+            const midY = (projMinY + projMaxY) / 2;
+            return [
+                (sx - cx) / scale + midX + panX,
+                (sy - cy) / scale + midY + panY
+            ];
+        }
+
         function renderMap() {
             if (!ctx) return;
 
             ctx.fillStyle = '#0f0f17';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // Store screen positions for hit testing
             filteredPapers.forEach((paper, idx) => {
-                if (!paper.projections) return;
-                const projection = paper.projections.pca || paper.projections.tsne || paper.projections.umap;
-                if (!projection) return;
+                const proj = paper.projections && paper.projections[currentProjection];
+                if (!proj) { paper._sx = -999; paper._sy = -999; return; }
 
-                const [x, y] = projection;
-                const screenX = canvas.width / 2 + (x - panX) * zoomLevel;
-                const screenY = canvas.height / 2 + (y - panY) * zoomLevel;
+                const [sx, sy] = dataToScreen(proj[0], proj[1]);
+                paper._sx = sx;
+                paper._sy = sy;
 
-                if (screenX < -50 || screenX > canvas.width + 50 || screenY < -50 || screenY > canvas.height + 50) {
-                    return;
-                }
+                if (sx < -50 || sx > canvas.width + 50 || sy < -50 || sy > canvas.height + 50) return;
 
                 const radius = getPointRadius(paper);
                 const color = getPointColor(paper);
+                const isSelected = selectedPapers.has(idx);
 
+                ctx.globalAlpha = paper.title ? (isSelected ? 1 : 0.8) : 0.3;
                 ctx.fillStyle = color;
                 ctx.beginPath();
-                ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
+                ctx.arc(sx, sy, radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                if (selectedPapers.has(idx)) {
+                if (isSelected) {
+                    ctx.globalAlpha = 1;
                     ctx.strokeStyle = '#fff';
                     ctx.lineWidth = 2;
                     ctx.beginPath();
-                    ctx.arc(screenX, screenY, radius + 3, 0, Math.PI * 2);
+                    ctx.arc(sx, sy, radius + 3, 0, Math.PI * 2);
                     ctx.stroke();
                 }
             });
+            ctx.globalAlpha = 1;
+
+            // Info text
+            ctx.fillStyle = '#666';
+            ctx.font = '11px -apple-system, sans-serif';
+            ctx.fillText(`${currentProjection.toUpperCase()} · ${filteredPapers.length} papers`, 12, canvas.height - 12);
         }
 
         function handleZoom(e) {
             e.preventDefault();
-            const delta = e.deltaY > 0 ? 0.9 : 1.1;
-            zoomLevel *= delta;
-            zoomLevel = Math.max(0.5, Math.min(5, zoomLevel));
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            // Convert mouse to data coords before zoom
+            const [dx, dy] = screenToData(mx, my);
+            const factor = e.deltaY > 0 ? 0.9 : 1.1;
+            zoomLevel *= factor;
+            zoomLevel = Math.max(0.3, Math.min(20, zoomLevel));
+            // Adjust pan so the point under cursor stays fixed
+            const [sx2, sy2] = dataToScreen(dx, dy);
+            const pad = 40;
+            const w = canvas.width - 2 * pad;
+            const h = canvas.height - 2 * pad;
+            const rangeX = projMaxX - projMinX || 1;
+            const rangeY = projMaxY - projMinY || 1;
+            const scale = Math.min(w / rangeX, h / rangeY) * zoomLevel;
+            panX += (sx2 - mx) / scale;
+            panY += (sy2 - my) / scale;
             renderMap();
         }
 
@@ -1546,8 +1642,14 @@
             if (isDragging) {
                 const dx = e.clientX - dragStart.x;
                 const dy = e.clientY - dragStart.y;
-                panX -= dx / zoomLevel;
-                panY -= dy / zoomLevel;
+                const pad = 40;
+                const w = canvas.width - 2 * pad;
+                const h = canvas.height - 2 * pad;
+                const rangeX = projMaxX - projMinX || 1;
+                const rangeY = projMaxY - projMinY || 1;
+                const scale = Math.min(w / rangeX, h / rangeY) * zoomLevel;
+                panX -= dx / scale;
+                panY -= dy / scale;
                 dragStart = { x: e.clientX, y: e.clientY };
                 renderMap();
             }
@@ -1572,7 +1674,32 @@
         }
 
         function handleCanvasMouseUp(e) {
+            const wasDragging = isDragging;
             isDragging = false;
+
+            // Single click to select in pan mode (only if we didn't drag)
+            if (selectionMode === 'pan' && wasDragging) {
+                const dx = e.clientX - dragStart.x;
+                const dy = e.clientY - dragStart.y;
+                if (Math.abs(dx) < 3 && Math.abs(dy) < 3) {
+                    // It was a click, not a drag
+                    const rect = canvas.getBoundingClientRect();
+                    const mx = e.clientX - rect.left;
+                    const my = e.clientY - rect.top;
+                    let hitIdx = -1, minDist = 12;
+                    filteredPapers.forEach((paper, idx) => {
+                        if (paper._sx === undefined) return;
+                        const d = Math.hypot(paper._sx - mx, paper._sy - my);
+                        if (d < minDist) { minDist = d; hitIdx = idx; }
+                    });
+                    if (hitIdx >= 0) {
+                        selectedPapers.clear();
+                        selectedPapers.add(hitIdx);
+                        showDetailPanel([filteredPapers[hitIdx]]);
+                        renderMap();
+                    }
+                }
+            }
 
             if (selectionMode === 'lasso' && lassoPoints.length > 0) {
                 selectByLasso();
@@ -1617,15 +1744,8 @@
         function selectByLasso() {
             selectedPapers.clear();
             filteredPapers.forEach((paper, idx) => {
-                if (!paper.projections) return;
-                const projection = paper.projections.pca || paper.projections.tsne || paper.projections.umap;
-                if (!projection) return;
-
-                const [x, y] = projection;
-                const screenX = canvas.width / 2 + (x - panX) * zoomLevel;
-                const screenY = canvas.height / 2 + (y - panY) * zoomLevel;
-
-                if (pointInPolygon([screenX, screenY], lassoPoints)) {
+                if (paper._sx === undefined) return;
+                if (pointInPolygon([paper._sx, paper._sy], lassoPoints)) {
                     selectedPapers.add(idx);
                 }
             });
@@ -1645,15 +1765,8 @@
 
             selectedPapers.clear();
             filteredPapers.forEach((paper, idx) => {
-                if (!paper.projections) return;
-                const projection = paper.projections.pca || paper.projections.tsne || paper.projections.umap;
-                if (!projection) return;
-
-                const [x, y] = projection;
-                const screenX = canvas.width / 2 + (x - panX) * zoomLevel;
-                const screenY = canvas.height / 2 + (y - panY) * zoomLevel;
-
-                if (screenX >= minX && screenX <= maxX && screenY >= minY && screenY <= maxY) {
+                if (paper._sx === undefined) return;
+                if (paper._sx >= minX && paper._sx <= maxX && paper._sy >= minY && paper._sy <= maxY) {
                     selectedPapers.add(idx);
                 }
             });
@@ -1669,6 +1782,7 @@
             zoomLevel = 1;
             panX = 0;
             panY = 0;
+            computeBounds();
             renderMap();
         }
 
@@ -1676,18 +1790,14 @@
             const tooltip = document.getElementById('tooltip');
             let hoveredPaper = null;
             let hoveredIdx = -1;
+            let minDist = 12;
 
             filteredPapers.forEach((paper, idx) => {
-                if (!paper.projections) return;
-                const projection = paper.projections.pca || paper.projections.tsne || paper.projections.umap;
-                if (!projection) return;
+                if (paper._sx === undefined) return;
+                const distance = Math.hypot(paper._sx - mouseX, paper._sy - mouseY);
 
-                const [x, y] = projection;
-                const screenX = canvas.width / 2 + (x - panX) * zoomLevel;
-                const screenY = canvas.height / 2 + (y - panY) * zoomLevel;
-                const distance = Math.hypot(screenX - mouseX, screenY - mouseY);
-
-                if (distance < 10) {
+                if (distance < minDist) {
+                    minDist = distance;
                     hoveredPaper = paper;
                     hoveredIdx = idx;
                 }
@@ -2100,6 +2210,13 @@
             document.getElementById('tableView').classList.add('visible');
             document.getElementById('exportButtons').classList.add('visible');
             setupTableEvents();
+        });
+
+        document.getElementById('projectionSelect').addEventListener('change', (e) => {
+            currentProjection = e.target.value;
+            zoomLevel = 1; panX = 0; panY = 0;
+            computeBounds();
+            renderMap();
         });
 
         document.getElementById('colorBySelect').addEventListener('change', (e) => {
