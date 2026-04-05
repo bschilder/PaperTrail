@@ -2696,19 +2696,32 @@
             <button class="profile-close" onclick="document.getElementById('settingsOverlay').classList.remove('visible')">&times;</button>
             <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#64b5f6;margin-bottom:4px;">&#x2699; Settings</div>
             <div class="profile-name" style="font-size:18px;">AI Agent Setup</div>
-            <div style="font-size:12px;color:#888;margin:8px 0 12px;">Connect an AI service to unlock powerful search, analysis, and web search.</div>
+            <div style="font-size:13px;color:#a0a0b0;margin:8px 0 14px;line-height:1.5;">Connect an AI service to unlock natural language search, trend analysis, and web search.</div>
 
-            <div style="margin-bottom:10px;">
-                <div style="font-size:11px;color:#888;margin-bottom:4px;">Service</div>
-                <select id="serviceSelect" class="color-by-select" style="width:100%;font-size:12px;">
-                    <option value="anthropic">Anthropic (Claude) — recommended</option>
-                    <option value="openai">OpenAI (GPT-4)</option>
-                </select>
+            <!-- Step 1: Get API Key -->
+            <div style="background:#141428;border:1px solid #2a2a3e;border-radius:10px;padding:12px 14px;margin-bottom:12px;">
+                <div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:6px;">Step 1: Get an API Key</div>
+                <div style="font-size:11px;color:#888;margin-bottom:8px;">Click below to open your provider's API key page. Create a key and copy it.</div>
+                <div style="display:flex;gap:6px;">
+                    <a href="https://console.anthropic.com/settings/keys" target="_blank" style="flex:1;padding:8px;background:linear-gradient(135deg,#d97706,#b45309);border:none;color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;text-align:center;text-decoration:none;display:block;">Get Claude API Key &#x2197;</a>
+                    <a href="https://platform.openai.com/api-keys" target="_blank" style="padding:8px 12px;background:#3a3a4e;border:1px solid #4a4a5e;color:#e0e0e0;border-radius:8px;cursor:pointer;font-size:12px;text-decoration:none;display:block;">OpenAI &#x2197;</a>
+                </div>
             </div>
 
-            <div style="margin-bottom:8px;">
-                <div style="font-size:11px;color:#888;margin-bottom:4px;">API Key</div>
-                <input type="password" class="chatbot-bar-input" id="apiKeyInput" placeholder="sk-ant-..." style="font-size:13px;">
+            <!-- Step 2: Paste and connect -->
+            <div style="background:#141428;border:1px solid #2a2a3e;border-radius:10px;padding:12px 14px;margin-bottom:12px;">
+                <div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:6px;">Step 2: Paste and Connect</div>
+                <div style="margin-bottom:8px;">
+                    <div style="font-size:11px;color:#888;margin-bottom:4px;">Service</div>
+                    <select id="serviceSelect" class="color-by-select" style="width:100%;font-size:12px;">
+                        <option value="anthropic">Anthropic (Claude) — recommended</option>
+                        <option value="openai">OpenAI (GPT-4)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:8px;">
+                    <div style="font-size:11px;color:#888;margin-bottom:4px;">API Key</div>
+                    <input type="password" class="chatbot-bar-input" id="apiKeyInput" placeholder="Paste your API key here..." style="font-size:13px;">
+                </div>
             </div>
 
             <div style="margin-bottom:8px;">
