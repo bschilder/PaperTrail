@@ -4507,7 +4507,7 @@
                 roughness: 0.4,
                 metalness: 0.1,
                 emissive: new THREE.Color(0x111122),
-                emissiveIntensity: 0.3,
+                emissiveIntensity: 0.5,
             });
             instancedMesh3D = new THREE.InstancedMesh(sphereGeo, mat3D, papers3DRef.length);
             const dummy = new THREE.Object3D();
@@ -4529,6 +4529,43 @@
 
             instancedMesh3D.instanceMatrix.needsUpdate = true;
             instancedMesh3D.instanceColor.needsUpdate = true;
+
+            // Compute local density for emissive glow
+            const positions3D = [];
+            papers3DRef.forEach((p, i) => {
+                const c = coords3D[i];
+                positions3D.push({ x: c[0] * scale, y: c[1] * scale, z: c[2] * scale });
+            });
+
+            // Count neighbors within radius
+            const glowRadius = 5;
+            const glowRadiusSq = glowRadius * glowRadius;
+            const densities = positions3D.map(pos => {
+                let count = 0;
+                for (const other of positions3D) {
+                    const dx = pos.x - other.x, dy = pos.y - other.y, dz = pos.z - other.z;
+                    if (dx*dx + dy*dy + dz*dz < glowRadiusSq) count++;
+                }
+                return count;
+            });
+            const maxDensity = Math.max(...densities);
+
+            // Apply emissive intensity by updating material
+            // Since InstancedMesh shares one material, we simulate glow via point scale
+            // Denser points are slightly larger
+            const dummyUpdate = new THREE.Object3D();
+            papers3DRef.forEach((paper, i) => {
+                const c = coords3D[i];
+                dummyUpdate.position.set(c[0] * scale, c[1] * scale, c[2] * scale);
+                const baseSz = 0.15 + Math.log1p(paper.cited_by_count || 0) * 0.06;
+                const densityBoost = 1 + (densities[i] / maxDensity) * 0.5;
+                const s = baseSz * densityBoost;
+                dummyUpdate.scale.set(s, s, s);
+                dummyUpdate.updateMatrix();
+                instancedMesh3D.setMatrixAt(i, dummyUpdate.matrix);
+            });
+            instancedMesh3D.instanceMatrix.needsUpdate = true;
+
             scene3D.add(instancedMesh3D);
 
             // Lighting
@@ -4819,6 +4856,25 @@
 
             // KDE background (needs screen positions)
             if (kdeEnabled) { computeKDE(); drawKDEBackground(); }
+
+            // Draw subtle density contours for terrain effect
+            if (!kdeEnabled) {
+                // Light contour rings around dense areas
+                const contourPoints = filteredPapers.filter(p => p._sx > 0 && p._sx < canvas.width);
+                if (contourPoints.length > 20) {
+                    ctx.globalAlpha = 0.04;
+                    ctx.strokeStyle = '#64b5f6';
+                    ctx.lineWidth = 1;
+                    contourPoints.forEach(p => {
+                        if (p._sx < 0 || p._sx > canvas.width) return;
+                        // Draw faint circle at each point position
+                        ctx.beginPath();
+                        ctx.arc(p._sx, p._sy, 15, 0, Math.PI * 2);
+                        ctx.stroke();
+                    });
+                    ctx.globalAlpha = 1;
+                }
+            }
 
             // Compute cluster centroids from ALL papers (stable across filter changes)
             const clusterCentroids = {};
