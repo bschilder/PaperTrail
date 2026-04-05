@@ -2329,7 +2329,7 @@
                     <input type="text" class="chatbot-bar-input" id="chatbotInput" placeholder="Ask about papers... try @person, #channel, or keywords">
                     <button class="agent-send-btn" id="agentSendBtn" title="Send">&#10148;</button>
                     <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
-                    <div class="chatbot-results" id="chatbotResults"></div>
+                    <!-- results moved to body level for fixed positioning -->
                 </div>
                 <div class="chatbot-examples">
                     <button class="chatbot-example-btn" data-query="Compare the focus areas of papers-dl vs papers-genomics">dl vs genomics</button>
@@ -2686,6 +2686,9 @@
 
     <!-- Tooltip -->
     <div class="tooltip" id="tooltip"></div>
+
+    <!-- Agent results overlay -->
+    <div class="chatbot-results" id="chatbotResults"></div>
 
     <!-- Settings modal overlay -->
     <div class="profile-modal" id="settingsOverlay">
@@ -6679,7 +6682,7 @@
 
             // Close results when clicking outside
             document.addEventListener('click', (e) => {
-                if (!e.target.closest('.chatbot-bar') && !e.target.closest('.agent-panel')) {
+                if (!e.target.closest('.chatbot-bar') && !e.target.closest('.agent-panel') && !e.target.closest('.chatbot-results')) {
                     resultsPanel.classList.remove('visible');
                     document.getElementById('settingsOverlay')?.classList.remove('visible');
                 }
@@ -8541,7 +8544,8 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             });
 
             // Agent send button
-            document.getElementById('agentSendBtn').addEventListener('click', () => {
+            document.getElementById('agentSendBtn').addEventListener('click', (e) => {
+                e.stopPropagation(); // prevent document click from closing results
                 const input = document.getElementById('chatbotInput');
                 if (input.value.trim()) {
                     runChatSearch(input.value.trim());
