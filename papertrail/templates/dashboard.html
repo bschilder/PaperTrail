@@ -665,6 +665,45 @@
             height: 14px;
         }
 
+        /* Toggle switch */
+        .toggle-switch {
+            position: relative;
+            width: 32px;
+            height: 16px;
+            display: inline-block;
+        }
+        .toggle-switch input { display: none; }
+        .toggle-slider {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #2a2a3e;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            left: 2px;
+            top: 2px;
+            background: #666;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background: #64b5f6;
+        }
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(16px);
+            background: #fff;
+        }
+        .collapsible-options {
+            padding-top: 6px;
+            animation: fadeIn 0.2s ease;
+        }
+
         .projection-buttons {
             display: flex;
             gap: 4px;
@@ -2154,6 +2193,37 @@
                 </div>
 
                 <div class="sidebar-section">
+                    <div class="sidebar-label" style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>KDE Background</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="kdeToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="collapsible-options" id="kdeOptions" style="display:none;">
+                        <div class="select-controls" style="margin-bottom:4px;">
+                            <span style="font-size:10px;color:#666;min-width:55px;">Bandwidth</span>
+                            <input type="range" id="kdeBandwidth" min="1" max="10" value="4" step="0.5" style="flex:1;">
+                            <span class="threshold-display" id="kdeBwDisplay" style="min-width:20px;">4</span>
+                        </div>
+                        <div class="select-controls" style="margin-bottom:4px;">
+                            <span style="font-size:10px;color:#666;min-width:55px;">Opacity</span>
+                            <input type="range" id="kdeOpacity" min="10" max="80" value="40" style="flex:1;">
+                            <span class="threshold-display" id="kdeOpDisplay" style="min-width:25px;">40%</span>
+                        </div>
+                        <div class="select-controls">
+                            <span style="font-size:10px;color:#666;min-width:55px;">Palette</span>
+                            <select class="color-by-select" id="kdePalette" style="flex:1;">
+                                <option value="viridis">Viridis</option>
+                                <option value="plasma">Plasma</option>
+                                <option value="inferno">Inferno</option>
+                                <option value="blues">Blues</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
                     <div class="sidebar-label">Scale By</div>
                     <select class="scale-by-select" id="scaleBySelect">
                         <option value="uniform">Uniform</option>
@@ -2473,6 +2543,8 @@
         let basePointSize = 3; // global point size multiplier
         let scaleTransform = 'linear'; // linear, log, sqrt
         let densityMap = new Map(); // paper -> density score (0-1)
+        let kdeEnabled = false;
+        let kdeCanvas = null; // offscreen canvas for KDE
         let renderedLabels = []; // {x, y, w, h, label} for click detection
         let hiddenClusters = new Set(); // cluster labels hidden via legend toggle
         let currentProjection = 'umap';
@@ -2866,7 +2938,7 @@
 
             // Papers
             const paperListHTML = topPapers.map(p => {
-                const paperLink = p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()">📄</a>` : '';
+                const paperLink = p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()"><span style="color:#64b5f6;">&#128196;</span></a>` : '';
                 const slackLink = p.slack_url ? `<a href="${esc(p.slack_url)}" target="_blank" title="View in Slack" onclick="event.stopPropagation()">${SLACK_ICON_SVG}</a>` : '';
                 return `<div class="profile-paper-item">
                     <span style="color:#ffca28;font-size:11px;min-width:40px;">${p.cited_by_count || 0}x</span>
@@ -3011,7 +3083,7 @@
             // Top papers with links
             const topPapers = [...papers].sort((a, b) => (b.cited_by_count || 0) - (a.cited_by_count || 0)).slice(0, 8);
             const paperListHTML = topPapers.map(p => {
-                const paperLink = p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper">📄</a>` : '';
+                const paperLink = p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper"><span style="color:#64b5f6;">&#128196;</span></a>` : '';
                 const slackLink = p.slack_url ? `<a href="${esc(p.slack_url)}" target="_blank" title="View in Slack">${SLACK_ICON_SVG}</a>` : '';
                 return `<div class="profile-paper-item">
                     <span style="color:#ffca28;font-size:11px;min-width:35px;">${p.cited_by_count || 0}x</span>
@@ -3107,7 +3179,7 @@
                                     <div class="lb-card-meta">${p.year || '?'} · ${esc(p.journal || 'Preprint')} · <span style="cursor:pointer;color:#bb86fc;" onclick="event.stopPropagation();showContributorProfile('${esc(p.shared_by || '').replace(/'/g, "\\'")}')">${esc(p.shared_by || '?')}</span></div>
                                 </div>
                                 <div class="profile-paper-links" style="flex-shrink:0;">
-                                    ${p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()">📄</a>` : ''}
+                                    ${p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()"><span style="color:#64b5f6;">&#128196;</span></a>` : ''}
                                     ${p.slack_url ? `<a href="${esc(p.slack_url)}" target="_blank" title="View in Slack" onclick="event.stopPropagation()">${SLACK_ICON_SVG}</a>` : ''}
                                 </div>
                                 <div class="lb-stat" style="color:#ffca28;">${p.cited_by_count || 0}</div>
@@ -3127,7 +3199,7 @@
                                     <div class="lb-card-meta">${p.first_shared ? new Date(p.first_shared).toLocaleDateString() : '?'} · <span style="cursor:pointer;color:#bb86fc;" onclick="event.stopPropagation();showContributorProfile('${esc(p.shared_by || '').replace(/'/g, "\\'")}')">${esc(p.shared_by || '?')}</span> · ${(p.channels || []).map(ch => channelDisplayName(ch)).join(', ')}</div>
                                 </div>
                                 <div class="profile-paper-links" style="flex-shrink:0;">
-                                    ${p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()">📄</a>` : ''}
+                                    ${p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()"><span style="color:#64b5f6;">&#128196;</span></a>` : ''}
                                     ${p.slack_url ? `<a href="${esc(p.slack_url)}" target="_blank" title="View in Slack" onclick="event.stopPropagation()">${SLACK_ICON_SVG}</a>` : ''}
                                 </div>
                             </div>
@@ -3157,7 +3229,7 @@
                 // Build links cell: paper link, slack icon, openalex logo
                 let linksHtml = '';
                 if (paper.url) {
-                    linksHtml += `<a href="${paper.url}" target="_blank" class="table-action-icon" title="Open paper">📄</a>`;
+                    linksHtml += `<a href="${paper.url}" target="_blank" class="table-action-icon" title="Open paper"><span style="color:#64b5f6;">&#128196;</span></a>`;
                 }
                 // Slack link from first share
                 const slackUrl = paper.slack_url || (paper.shares && paper.shares[0] && paper.shares[0].slack_url);
@@ -3418,6 +3490,99 @@
             sorted.forEach((item, rank) => {
                 densityMap.set(item.paper, rank / (sorted.length - 1 || 1));
             });
+        }
+
+        // Color palettes for KDE
+        const KDE_PALETTES = {
+            viridis: [[68,1,84],[72,36,117],[65,68,135],[53,95,141],[42,120,142],[33,145,140],[34,168,132],[68,191,112],[122,209,81],[189,223,38],[253,231,37]],
+            plasma: [[13,8,135],[75,3,161],[126,3,168],[168,34,150],[204,71,120],[231,109,90],[250,149,64],[253,195,40],[240,249,33]],
+            inferno: [[0,0,4],[22,11,57],[66,10,104],[106,23,110],[147,38,103],[188,55,84],[221,81,58],[243,118,27],[252,165,10],[246,215,70],[252,255,164]],
+            blues: [[8,8,30],[15,20,60],[20,40,100],[25,65,140],[40,100,180],[70,140,210],[100,170,230],[140,200,240],[180,220,250]],
+        };
+
+        function computeKDE() {
+            if (!kdeEnabled || filteredPapers.length === 0) { kdeCanvas = null; return; }
+
+            const bwSlider = parseFloat(document.getElementById('kdeBandwidth').value);
+            const opacity = parseInt(document.getElementById('kdeOpacity').value) / 100;
+            const palette = KDE_PALETTES[document.getElementById('kdePalette').value] || KDE_PALETTES.viridis;
+
+            // Grid resolution
+            const res = 128;
+            const grid = new Float32Array(res * res);
+
+            // Get screen positions of all filtered papers
+            const points = [];
+            filteredPapers.forEach(paper => {
+                if (paper._sx === undefined || paper._sx < -900) return;
+                points.push({ x: paper._sx, y: paper._sy });
+            });
+
+            if (points.length === 0) { kdeCanvas = null; return; }
+
+            const cw = canvas.width;
+            const ch = canvas.height;
+            const bandwidth = (bwSlider / 100) * Math.max(cw, ch);
+
+            // Compute KDE on grid
+            const bwSq = bandwidth * bandwidth;
+            for (const pt of points) {
+                const gx0 = Math.max(0, Math.floor((pt.x - bandwidth * 3) / cw * res));
+                const gx1 = Math.min(res - 1, Math.ceil((pt.x + bandwidth * 3) / cw * res));
+                const gy0 = Math.max(0, Math.floor((pt.y - bandwidth * 3) / ch * res));
+                const gy1 = Math.min(res - 1, Math.ceil((pt.y + bandwidth * 3) / ch * res));
+
+                for (let gy = gy0; gy <= gy1; gy++) {
+                    for (let gx = gx0; gx <= gx1; gx++) {
+                        const cx = (gx + 0.5) / res * cw;
+                        const cy = (gy + 0.5) / res * ch;
+                        const dx = cx - pt.x;
+                        const dy = cy - pt.y;
+                        const distSq = dx * dx + dy * dy;
+                        grid[gy * res + gx] += Math.exp(-distSq / (2 * bwSq));
+                    }
+                }
+            }
+
+            // Find max for normalization
+            let maxVal = 0;
+            for (let i = 0; i < grid.length; i++) if (grid[i] > maxVal) maxVal = grid[i];
+            if (maxVal === 0) { kdeCanvas = null; return; }
+
+            // Render to offscreen canvas
+            kdeCanvas = document.createElement('canvas');
+            kdeCanvas.width = res;
+            kdeCanvas.height = res;
+            const kctx = kdeCanvas.getContext('2d');
+            const imgData = kctx.createImageData(res, res);
+
+            for (let i = 0; i < grid.length; i++) {
+                const t = Math.pow(grid[i] / maxVal, 0.5); // sqrt for better contrast
+                const colorIdx = Math.min(palette.length - 1, Math.floor(t * (palette.length - 1)));
+                const nextIdx = Math.min(palette.length - 1, colorIdx + 1);
+                const frac = t * (palette.length - 1) - colorIdx;
+                const c1 = palette[colorIdx], c2 = palette[nextIdx];
+                const r = c1[0] + (c2[0] - c1[0]) * frac;
+                const g = c1[1] + (c2[1] - c1[1]) * frac;
+                const b = c1[2] + (c2[2] - c1[2]) * frac;
+                const a = t > 0.01 ? opacity * 255 * Math.min(1, t * 2) : 0;
+
+                imgData.data[i * 4] = r;
+                imgData.data[i * 4 + 1] = g;
+                imgData.data[i * 4 + 2] = b;
+                imgData.data[i * 4 + 3] = a;
+            }
+
+            kctx.putImageData(imgData, 0, 0);
+        }
+
+        function drawKDEBackground() {
+            if (!kdeEnabled || !kdeCanvas) return;
+            ctx.save();
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(kdeCanvas, 0, 0, canvas.width, canvas.height);
+            ctx.restore();
         }
 
         function drawSparkline() {
@@ -4029,6 +4194,9 @@
             for (let y = gridSize; y < canvas.height; y += gridSize) {
                 ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
             }
+
+            // KDE background (drawn before points)
+            drawKDEBackground();
 
             // Compute cluster centroids for labels
             const clusterCentroids = {};
@@ -6457,11 +6625,22 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
 
             // Show onboarding if not dismissed
             if (!localStorage.getItem('papertrail_onboarding_dismissed') && allPapers.length > 0) {
+                const overlay = document.getElementById('onboardingOverlay');
                 document.getElementById('onboardingCount').textContent = allPapers.length;
-                document.getElementById('onboardingOverlay').classList.add('visible');
-                document.getElementById('onboardingOverlay').querySelector('.onboarding-btn').addEventListener('click', () => {
+                overlay.classList.add('visible');
+
+                function dismissOnboarding() {
+                    overlay.classList.remove('visible');
                     if (document.getElementById('onboardingDismiss').checked) {
                         localStorage.setItem('papertrail_onboarding_dismissed', '1');
+                    }
+                }
+                overlay.querySelector('.onboarding-btn').addEventListener('click', dismissOnboarding);
+                overlay.addEventListener('click', (e) => { if (e.target === overlay) dismissOnboarding(); });
+                document.addEventListener('keydown', function onboardingKey(e) {
+                    if (e.key === 'Enter' || e.key === 'Escape') {
+                        dismissOnboarding();
+                        document.removeEventListener('keydown', onboardingKey);
                     }
                 });
             }
@@ -6523,6 +6702,27 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 basePointSize = parseFloat(e.target.value);
                 document.getElementById('pointSizeDisplay').textContent = basePointSize;
                 renderMap();
+            });
+
+            // KDE controls
+            document.getElementById('kdeToggle').addEventListener('change', (e) => {
+                kdeEnabled = e.target.checked;
+                document.getElementById('kdeOptions').style.display = kdeEnabled ? 'block' : 'none';
+                if (kdeEnabled) computeKDE();
+                else kdeCanvas = null;
+                renderMap();
+            });
+            ['kdeBandwidth', 'kdeOpacity', 'kdePalette'].forEach(id => {
+                document.getElementById(id).addEventListener('input', () => {
+                    if (id === 'kdeBandwidth') document.getElementById('kdeBwDisplay').textContent = document.getElementById('kdeBandwidth').value;
+                    if (id === 'kdeOpacity') document.getElementById('kdeOpDisplay').textContent = document.getElementById('kdeOpacity').value + '%';
+                    if (kdeEnabled) { computeKDE(); renderMap(); }
+                });
+                if (id === 'kdePalette') {
+                    document.getElementById(id).addEventListener('change', () => {
+                        if (kdeEnabled) { computeKDE(); renderMap(); }
+                    });
+                }
             });
 
             document.getElementById('semanticSearch').addEventListener('click', () => {
@@ -6752,14 +6952,29 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         break;
                     case 'ArrowLeft':
                     case 'ArrowRight': {
-                        const views = ['map', 'threeD', 'table', 'leaderboard'];
-                        const curIdx = views.indexOf(currentView);
-                        if (curIdx >= 0) {
-                            const newIdx = e.key === 'ArrowRight'
-                                ? (curIdx + 1) % views.length
-                                : (curIdx - 1 + views.length) % views.length;
-                            const toggleId = views[newIdx] === 'threeD' ? 'threeDToggle' : views[newIdx] + 'Toggle';
-                            document.getElementById(toggleId).click();
+                        if (e.metaKey || e.ctrlKey) {
+                            // CMD+Arrow: switch projection
+                            e.preventDefault();
+                            const projections = ['umap', 'tsne', 'pca'];
+                            const curP = projections.indexOf(currentProjection);
+                            if (curP >= 0) {
+                                const newP = e.key === 'ArrowRight'
+                                    ? (curP + 1) % projections.length
+                                    : (curP - 1 + projections.length) % projections.length;
+                                document.querySelectorAll('.proj-btn').forEach(b => b.classList.toggle('active', b.dataset.proj === projections[newP]));
+                                animateProjectionChange(projections[newP]);
+                            }
+                        } else {
+                            // Arrow: switch view
+                            const views = ['map', 'threeD', 'table', 'leaderboard'];
+                            const curIdx = views.indexOf(currentView);
+                            if (curIdx >= 0) {
+                                const newIdx = e.key === 'ArrowRight'
+                                    ? (curIdx + 1) % views.length
+                                    : (curIdx - 1 + views.length) % views.length;
+                                const toggleId = views[newIdx] === 'threeD' ? 'threeDToggle' : views[newIdx] + 'Toggle';
+                                document.getElementById(toggleId).click();
+                            }
                         }
                         break;
                     }
