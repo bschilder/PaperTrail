@@ -1076,15 +1076,16 @@
             padding: 4px 10px 4px 8px;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.2s;
             font-size: 12px;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.6);
             background: rgba(15,15,23,0.5);
             user-select: none;
             position: relative;
         }
         .legend-item:hover {
-            background: rgba(15,15,23,0.8);
+            background: rgba(15,15,23,0.85);
+            color: rgba(255,255,255,1);
         }
         .legend-item.dimmed {
             opacity: 0.35;
@@ -1111,22 +1112,26 @@
             flex-shrink: 0;
         }
         .legend-info-btn {
-            display: none;
             width: 18px;
             height: 18px;
             border-radius: 50%;
-            background: rgba(100,181,246,0.2);
-            border: 1px solid rgba(100,181,246,0.3);
-            color: #64b5f6;
+            background: transparent;
+            border: 1px solid transparent;
+            color: transparent;
             font-size: 10px;
             cursor: pointer;
+            display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            transition: all 0.15s;
+            transition: all 0.2s;
         }
-        .legend-item:hover .legend-info-btn { display: flex; }
-        .legend-info-btn:hover { background: rgba(100,181,246,0.4); }
+        .legend-item:hover .legend-info-btn {
+            background: rgba(100,181,246,0.2);
+            border-color: rgba(100,181,246,0.3);
+            color: #64b5f6;
+        }
+        .legend-info-btn:hover { background: rgba(100,181,246,0.4) !important; }
 
         .legend-gradient {
             padding: 6px 10px;
@@ -4495,7 +4500,7 @@
             if (selectionMode === 'pan' && wasDragging) {
                 const dx = e.clientX - mouseDownPos.x;
                 const dy = e.clientY - mouseDownPos.y;
-                if (Math.abs(dx) < 3 && Math.abs(dy) < 3) {
+                if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
                     const [mx, my] = canvasCoords(e);
 
                     // Check if clicking a cluster label
