@@ -464,6 +464,27 @@
             color: #fff;
         }
 
+        .channel-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .channel-count {
+            background: rgba(0,0,0,0.25);
+            padding: 1px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            min-width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .channel-button:not(.active) .channel-count {
+            background: rgba(255,255,255,0.08);
+        }
+
         /* Channel colors */
         .channel-button[data-channel="papers-dl"]::before { background: #64b5f6; }
         .channel-button[data-channel="papers-genomics"]::before { background: #66bb6a; }
@@ -1362,7 +1383,9 @@
                 const btn = document.createElement('button');
                 btn.className = 'channel-button active';
                 btn.dataset.channel = channel;
-                btn.textContent = channelDisplayName(channel);
+                // Count papers in this channel
+                const count = allPapers.filter(p => (p.channels || []).includes(channel)).length;
+                btn.innerHTML = `<span class="channel-name">${channelDisplayName(channel)}</span><span class="channel-count">${count}</span>`;
                 btn.style.setProperty('--channel-color', CHANNEL_COLORS[channel] || '#64b5f6');
                 btn.addEventListener('click', () => {
                     if (selectedChannels.has(channel)) {
@@ -1664,11 +1687,35 @@
             ];
         }
 
+        let renderRAF = null;
+        function requestRenderMap() {
+            if (renderRAF) return;
+            renderRAF = requestAnimationFrame(() => {
+                renderRAF = null;
+                renderMap();
+            });
+        }
+
         function renderMap() {
             if (!ctx) return;
 
             ctx.fillStyle = '#0f0f17';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw subtle grid
+            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            ctx.lineWidth = 1;
+            const gridSize = 80;
+            for (let x = gridSize; x < canvas.width; x += gridSize) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for (let y = gridSize; y < canvas.height; y += gridSize) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+
+            // Compute cluster centroids for labels
+            const clusterCentroids = {};
+            const clusterCounts = {};
 
             filteredPapers.forEach((paper, idx) => {
                 const proj = paper.projections && paper.projections[currentProjection];
@@ -1678,6 +1725,17 @@
                 paper._sx = sx;
                 paper._sy = sy;
 
+                // Track cluster centroids
+                if (paper.cluster_label && colorByMode === 'cluster') {
+                    const cid = paper.cluster_id || 0;
+                    if (!clusterCentroids[cid]) {
+                        clusterCentroids[cid] = { x: 0, y: 0, count: 0, label: paper.cluster_label };
+                    }
+                    clusterCentroids[cid].x += sx;
+                    clusterCentroids[cid].y += sy;
+                    clusterCentroids[cid].count++;
+                }
+
                 if (sx < -50 || sx > canvas.width + 50 || sy < -50 || sy > canvas.height + 50) return;
 
                 const radius = getPointRadius(paper);
@@ -1685,7 +1743,16 @@
                 const allIdx = allPapers.indexOf(paper);
                 const isSelected = selectedPapers.has(allIdx);
 
-                ctx.globalAlpha = paper.title ? (isSelected ? 1 : 0.7) : 0.3;
+                // Glow effect for selected points
+                if (isSelected) {
+                    ctx.globalAlpha = 0.3;
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, radius + 6, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.globalAlpha = paper.title ? (isSelected ? 1 : 0.75) : 0.25;
                 ctx.fillStyle = color;
                 ctx.beginPath();
                 ctx.arc(sx, sy, radius, 0, Math.PI * 2);
@@ -1702,9 +1769,173 @@
             });
             ctx.globalAlpha = 1;
 
-            ctx.fillStyle = '#666';
+            // Draw cluster labels at centroids
+            if (colorByMode === 'cluster') {
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                for (const cid of Object.keys(clusterCentroids)) {
+                    const c = clusterCentroids[cid];
+                    if (c.count < 3) continue;
+                    const cx = c.x / c.count;
+                    const cy = c.y / c.count;
+                    if (cx < 0 || cx > canvas.width || cy < 0 || cy > canvas.height) continue;
+
+                    // Background pill
+                    const label = c.label.length > 25 ? c.label.substring(0, 22) + '...' : c.label;
+                    ctx.font = 'bold 11px -apple-system, sans-serif';
+                    const tw = ctx.measureText(label).width;
+                    ctx.fillStyle = 'rgba(15, 15, 23, 0.75)';
+                    const px = 6, py = 3;
+                    ctx.beginPath();
+                    ctx.roundRect(cx - tw/2 - px, cy - 7 - py, tw + px*2, 14 + py*2, 4);
+                    ctx.fill();
+
+                    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+                    ctx.fillText(label, cx, cy);
+                }
+                ctx.textAlign = 'start';
+                ctx.textBaseline = 'alphabetic';
+            }
+
+            // Draw color legend
+            drawLegend();
+
+            // Footer info
+            ctx.fillStyle = 'rgba(255,255,255,0.35)';
             ctx.font = '11px -apple-system, sans-serif';
             ctx.fillText(`${currentProjection.toUpperCase()} · ${filteredPapers.length} papers`, 12, canvas.height - 12);
+
+            // Draw minimap
+            drawMinimap();
+        }
+
+        function drawLegend() {
+            const pad = 12;
+            let x = pad;
+            let y = pad;
+
+            if (colorByMode === 'channel') {
+                const channels = Array.from(selectedChannels).sort();
+                channels.forEach((ch, i) => {
+                    const color = CHANNEL_COLORS[ch] || '#64b5f6';
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x + 5, y + 5, 5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                    ctx.font = '10px -apple-system, sans-serif';
+                    ctx.fillText(channelDisplayName(ch), x + 14, y + 9);
+                    y += 18;
+                });
+            } else if (colorByMode === 'year' || colorByMode === 'citations') {
+                const label = colorByMode === 'year' ? 'Year' : 'Citations';
+                const minLabel = colorByMode === 'year' ? '2015' : '0';
+                const maxLabel = colorByMode === 'year' ? '2025' : '100+';
+                const gradWidth = 100;
+
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.font = '10px -apple-system, sans-serif';
+                ctx.fillText(label, x, y + 9);
+                y += 16;
+
+                // Gradient bar
+                const grad = ctx.createLinearGradient(x, 0, x + gradWidth, 0);
+                if (colorByMode === 'year') {
+                    grad.addColorStop(0, 'rgb(100, 181, 246)');
+                    grad.addColorStop(1, 'rgb(239, 83, 80)');
+                } else {
+                    grad.addColorStop(0, 'rgb(100, 181, 246)');
+                    grad.addColorStop(1, 'rgb(255, 202, 40)');
+                }
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.roundRect(x, y, gradWidth, 8, 4);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.font = '9px -apple-system, sans-serif';
+                ctx.fillText(minLabel, x, y + 20);
+                ctx.fillText(maxLabel, x + gradWidth - ctx.measureText(maxLabel).width, y + 20);
+            } else if (colorByMode === 'cluster') {
+                const CLUSTER_COLORS = ['#64b5f6','#bb86fc','#66bb6a','#ffa726','#ef5350','#26c6da','#ffca28','#ab47bc','#8d6e63','#78909c','#ec407a','#7e57c2'];
+                const clusters = {};
+                filteredPapers.forEach(p => {
+                    const cid = p.cluster_id || 0;
+                    if (!clusters[cid]) clusters[cid] = { label: p.cluster_label || `Cluster ${cid}`, count: 0 };
+                    clusters[cid].count++;
+                });
+                const sorted = Object.entries(clusters).sort((a, b) => b[1].count - a[1].count).slice(0, 8);
+                sorted.forEach(([cid, info]) => {
+                    const color = CLUSTER_COLORS[cid % CLUSTER_COLORS.length];
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x + 5, y + 5, 5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                    ctx.font = '10px -apple-system, sans-serif';
+                    const labelText = info.label.length > 20 ? info.label.substring(0, 18) + '...' : info.label;
+                    ctx.fillText(`${labelText} (${info.count})`, x + 14, y + 9);
+                    y += 18;
+                });
+            }
+        }
+
+        function drawMinimap() {
+            if (zoomLevel <= 1.1 && Math.abs(panX) < 0.01 && Math.abs(panY) < 0.01) return;
+
+            const mw = 120, mh = 90;
+            const mx = canvas.width - mw - 12;
+            const my = canvas.height - mh - 28;
+
+            // Background
+            ctx.fillStyle = 'rgba(15, 15, 23, 0.8)';
+            ctx.strokeStyle = 'rgba(100, 181, 246, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.roundRect(mx, my, mw, mh, 4);
+            ctx.fill();
+            ctx.stroke();
+
+            // Draw all points as tiny dots
+            const pad = 4;
+            filteredPapers.forEach(paper => {
+                const proj = paper.projections && paper.projections[currentProjection];
+                if (!proj) return;
+                const rangeX = projMaxX - projMinX || 1;
+                const rangeY = projMaxY - projMinY || 1;
+                const px = mx + pad + ((proj[0] - projMinX) / rangeX) * (mw - pad * 2);
+                const py = my + pad + (1 - (proj[1] - projMinY) / rangeY) * (mh - pad * 2);
+                ctx.fillStyle = getPointColor(paper);
+                ctx.globalAlpha = 0.5;
+                ctx.fillRect(px, py, 1.5, 1.5);
+            });
+            ctx.globalAlpha = 1;
+
+            // Draw viewport rectangle
+            const corners = [
+                screenToData(0, 0),
+                screenToData(canvas.width, 0),
+                screenToData(canvas.width, canvas.height),
+                screenToData(0, canvas.height)
+            ];
+            const rangeX = projMaxX - projMinX || 1;
+            const rangeY = projMaxY - projMinY || 1;
+
+            const vpLeft = mx + pad + ((Math.min(...corners.map(c => c[0])) - projMinX) / rangeX) * (mw - pad * 2);
+            const vpRight = mx + pad + ((Math.max(...corners.map(c => c[0])) - projMinX) / rangeX) * (mw - pad * 2);
+            const vpTop = my + pad + (1 - (Math.max(...corners.map(c => c[1])) - projMinY) / rangeY) * (mh - pad * 2);
+            const vpBottom = my + pad + (1 - (Math.min(...corners.map(c => c[1])) - projMinY) / rangeY) * (mh - pad * 2);
+
+            ctx.strokeStyle = 'rgba(100, 181, 246, 0.8)';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(
+                Math.max(mx + pad, vpLeft),
+                Math.max(my + pad, vpTop),
+                Math.min(mw - pad * 2, vpRight - vpLeft),
+                Math.min(mh - pad * 2, vpBottom - vpTop)
+            );
         }
 
         function handleZoom(e) {
@@ -1775,7 +2006,7 @@
                 panX -= dx / scale;
                 panY += dy / scale;
                 shiftPanStart = { x: e.clientX, y: e.clientY };
-                renderMap();
+                requestRenderMap();
                 return;
             }
 
@@ -1791,7 +2022,7 @@
                 panX -= dx / scale;
                 panY += dy / scale;
                 dragStart = { x: e.clientX, y: e.clientY };
-                renderMap();
+                requestRenderMap();
             }
 
             if (selectionMode === 'lasso' && lassoPoints.length > 0) {
