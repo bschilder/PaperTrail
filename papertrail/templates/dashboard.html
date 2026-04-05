@@ -579,9 +579,9 @@
         .channel-button {
             flex: 1;
             padding: 6px 10px;
-            border: 1px solid #3a3a4e;
-            background: #252538;
-            color: #e0e0e0;
+            border: 1px solid #3a3a50;
+            background: #1a1a2e;
+            color: #c0c0d0;
             border-radius: 6px;
             cursor: pointer;
             font-size: 12px;
@@ -590,6 +590,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            opacity: 1;
         }
 
         .channel-button::before {
@@ -598,17 +599,29 @@
             height: 8px;
             border-radius: 3px;
             flex-shrink: 0;
+            background: var(--channel-color, #64b5f6);
         }
 
         .channel-button:hover {
+            background: #1f1f35;
             border-color: #4a4a5e;
-            background: #2a2a3e;
         }
 
         .channel-button.active {
-            background: var(--channel-color, #64b5f6);
-            border-color: var(--channel-color, #64b5f6);
-            color: #fff;
+            background: #1a1a2e;
+            border-color: #4a4a5e;
+            color: #e0e0e0;
+            opacity: 1;
+        }
+
+        .channel-button:not(.active) {
+            opacity: 0.35;
+        }
+        .channel-button:not(.active)::before {
+            background: #555;
+        }
+        .channel-button:not(.active):hover {
+            opacity: 0.55;
         }
 
         .channel-name {
@@ -618,7 +631,7 @@
         }
 
         .channel-count {
-            background: rgba(0,0,0,0.25);
+            background: rgba(255,255,255,0.06);
             padding: 1px 6px;
             border-radius: 8px;
             font-size: 10px;
@@ -626,20 +639,11 @@
             min-width: 20px;
             text-align: center;
             flex-shrink: 0;
-        }
-
-        .channel-button:not(.active) .channel-count {
-            background: rgba(255,255,255,0.08);
+            color: inherit;
         }
 
         /* Channel colors */
-        .channel-button[data-channel="papers-dl"]::before { background: #64b5f6; }
-        .channel-button[data-channel="papers-genomics"]::before { background: #66bb6a; }
-        .channel-button[data-channel="papers-protein"]::before { background: #ffa726; }
-        .channel-button[data-channel="papers-phenomics"]::before { background: #ef5350; }
-        .channel-button[data-channel="papers-ai-agents"]::before { background: #bb86fc; }
-        .channel-button[data-channel="papers-health"]::before { background: #26c6da; }
-        .channel-button[data-channel="paper_digest_moon"]::before { background: #ffca28; }
+        /* Channel colors now use --channel-color CSS variable */
 
         .channel-slack-link {
             width: 22px;
@@ -3782,30 +3786,30 @@
         let idleTimer3D = 0;
 
         function computePCA3D(papers) {
-            // Simple PCA-3D in browser: center data, compute covariance, extract top 3 eigenvectors
-            // Using projection coordinates as input features (fast approximation)
-            const projs = ['umap', 'tsne', 'pca'];
-            const features = papers.map(p => {
-                const coords = [];
-                projs.forEach(pr => {
-                    const proj = p.projections && p.projections[pr];
-                    if (proj) { coords.push(proj[0], proj[1]); }
-                    else { coords.push(0, 0); }
-                });
-                return coords; // 6 features
+            // Use current 2D projection for x,y and compute z from orthogonal info
+            // Strategy: x,y from current projection, z from the DIFFERENCE between
+            // two projection methods (captures structure not in the 2D view)
+            const proj1 = currentProjection;
+            const proj2 = proj1 === 'umap' ? 'tsne' : (proj1 === 'tsne' ? 'pca' : 'umap');
+
+            return papers.map(p => {
+                const p1 = p.projections && p.projections[proj1];
+                const p2 = p.projections && p.projections[proj2];
+                if (!p1) return [0, 0, 0];
+
+                const x = p1[0];
+                const y = p1[1];
+                // Z from orthogonal projection difference + cluster spread
+                let z = 0;
+                if (p2) {
+                    // Normalize second projection's contribution
+                    z = (p2[0] * 0.4 + p2[1] * 0.6);
+                }
+                // Add slight cluster-based jitter for separation
+                z += ((p.cluster_id || 0) % 7 - 3) * 0.5;
+
+                return [x, y, z];
             });
-
-            const n = features.length;
-            const dim = features[0].length;
-            // Center
-            const means = Array(dim).fill(0);
-            features.forEach(f => f.forEach((v, i) => means[i] += v));
-            means.forEach((_, i) => means[i] /= n);
-            const centered = features.map(f => f.map((v, i) => v - means[i]));
-
-            // Simple SVD approximation: use first 3 components via power iteration
-            // For speed, just use the first 3 centered dimensions scaled
-            return centered.map(f => [f[0], f[1], f[2] || f[0] * 0.5 + f[1] * 0.3]);
         }
 
         function init3DView() {
@@ -4211,8 +4215,20 @@
             // KDE background (needs screen positions)
             if (kdeEnabled) { computeKDE(); drawKDEBackground(); }
 
-            // Compute cluster centroids for labels
+            // Compute cluster centroids from ALL papers (stable across filter changes)
             const clusterCentroids = {};
+            allPapers.forEach(paper => {
+                const proj = paper.projections && paper.projections[currentProjection];
+                if (!proj || !paper.cluster_label) return;
+                const [sx, sy] = dataToScreen(proj[0], proj[1]);
+                const cid = paper.cluster_id || 0;
+                if (!clusterCentroids[cid]) {
+                    clusterCentroids[cid] = { x: 0, y: 0, count: 0, label: paper.cluster_label };
+                }
+                clusterCentroids[cid].x += sx;
+                clusterCentroids[cid].y += sy;
+                clusterCentroids[cid].count++;
+            });
             const clusterCounts = {};
 
             filteredPapers.forEach((paper, idx) => {
@@ -4223,16 +4239,7 @@
                 paper._sx = sx;
                 paper._sy = sy;
 
-                // Track cluster centroids (always, for labels)
-                if (paper.cluster_label) {
-                    const cid = paper.cluster_id || 0;
-                    if (!clusterCentroids[cid]) {
-                        clusterCentroids[cid] = { x: 0, y: 0, count: 0, label: paper.cluster_label };
-                    }
-                    clusterCentroids[cid].x += sx;
-                    clusterCentroids[cid].y += sy;
-                    clusterCentroids[cid].count++;
-                }
+                // (cluster centroids computed from allPapers above for stability)
 
                 if (sx < -50 || sx > canvas.width + 50 || sy < -50 || sy > canvas.height + 50) return;
 
