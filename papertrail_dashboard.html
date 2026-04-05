@@ -1056,6 +1056,101 @@
             min-width: 40px;
         }
 
+        /* Interactive map legend */
+        .map-legend {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 30;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            max-height: 50%;
+            overflow-y: auto;
+            pointer-events: auto;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 4px 10px 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            background: rgba(15,15,23,0.5);
+            user-select: none;
+            position: relative;
+        }
+        .legend-item:hover {
+            background: rgba(15,15,23,0.8);
+        }
+        .legend-item.dimmed {
+            opacity: 0.35;
+        }
+        .legend-item.dimmed .legend-dot {
+            background: #555 !important;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .legend-label {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 140px;
+        }
+        .legend-count {
+            font-size: 10px;
+            color: #666;
+            flex-shrink: 0;
+        }
+        .legend-info-btn {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(100,181,246,0.2);
+            border: 1px solid rgba(100,181,246,0.3);
+            color: #64b5f6;
+            font-size: 10px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.15s;
+        }
+        .legend-item:hover .legend-info-btn { display: flex; }
+        .legend-info-btn:hover { background: rgba(100,181,246,0.4); }
+
+        .legend-gradient {
+            padding: 6px 10px;
+            background: rgba(15,15,23,0.5);
+            border-radius: 6px;
+        }
+        .legend-gradient-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 4px;
+        }
+        .legend-gradient-bar {
+            height: 8px;
+            border-radius: 4px;
+            width: 120px;
+        }
+        .legend-gradient-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #666;
+            margin-top: 3px;
+        }
+
         /* 3D View */
         .three-d-view {
             display: none;
@@ -2131,6 +2226,8 @@
                     <!-- Map View -->
                     <div class="map-view visible" id="mapView">
                         <canvas id="canvas"></canvas>
+                        <!-- Interactive HTML legend overlay -->
+                        <div class="map-legend" id="mapLegend"></div>
                         <canvas id="lassoCanvas"></canvas>
                         <!-- Time travel control -->
                         <div class="time-travel" id="timeTravelBar">
@@ -2395,6 +2492,7 @@
         let scaleTransform = 'linear'; // linear, log, sqrt
         let densityMap = new Map(); // paper -> density score (0-1)
         let renderedLabels = []; // {x, y, w, h, label} for click detection
+        let hiddenClusters = new Set(); // cluster labels hidden via legend toggle
         let currentProjection = 'umap';
 
         // Canvas state
@@ -2573,6 +2671,10 @@
         function filterPapers() {
             filteredPapers = allPapers.filter(paper => {
                 if (selectedChannels.size > 0 && (!paper.channels || !paper.channels.some(ch => selectedChannels.has(ch)))) {
+                    return false;
+                }
+                // Hidden clusters from legend toggle
+                if (hiddenClusters.size > 0 && hiddenClusters.has(paper.cluster_label)) {
                     return false;
                 }
                 // Time travel cutoff
@@ -3838,7 +3940,7 @@
             drawHierarchicalLabels(clusterCentroids);
 
             // Draw color legend
-            drawLegend();
+            updateHTMLLegend();
 
             // Subtle vignette for depth
             const vigGrad = ctx.createRadialGradient(
@@ -3859,7 +3961,89 @@
             drawMinimap();
         }
 
+        function updateHTMLLegend() {
+            const container = document.getElementById('mapLegend');
+            if (!container) return;
+
+            const CLUSTER_COLORS_ARR = ['#64b5f6','#bb86fc','#66bb6a','#ffa726','#ef5350','#26c6da','#ffca28','#ab47bc','#8d6e63','#78909c','#ec407a','#7e57c2'];
+
+            if (colorByMode === 'channel') {
+                const channels = Array.from(selectedChannels).sort();
+                container.innerHTML = channels.map(ch => {
+                    const color = CHANNEL_COLORS[ch] || '#64b5f6';
+                    const count = allPapers.filter(p => (p.channels || []).includes(ch)).length;
+                    return `<div class="legend-item" data-channel="${esc(ch)}">
+                        <div class="legend-dot" style="background:${color};"></div>
+                        <span class="legend-label">${channelDisplayName(ch)}</span>
+                        <span class="legend-count">${count}</span>
+                    </div>`;
+                }).join('');
+            } else if (colorByMode === 'cluster') {
+                const clusters = {};
+                allPapers.forEach(p => {
+                    const cid = p.cluster_id || 0;
+                    const label = p.cluster_label || `Cluster ${cid}`;
+                    if (!clusters[label]) clusters[label] = { cid, count: 0 };
+                    clusters[label].count++;
+                });
+                const sorted = Object.entries(clusters).sort((a, b) => b[1].count - a[1].count);
+                container.innerHTML = sorted.map(([label, info]) => {
+                    const color = CLUSTER_COLORS_ARR[info.cid % CLUSTER_COLORS_ARR.length];
+                    const dimmed = hiddenClusters.has(label) ? ' dimmed' : '';
+                    return `<div class="legend-item${dimmed}" data-cluster="${esc(label)}">
+                        <div class="legend-dot" style="background:${color};"></div>
+                        <span class="legend-label">${esc(label)}</span>
+                        <span class="legend-count">${info.count}</span>
+                        <button class="legend-info-btn" data-info="${esc(label)}" title="Topic details">i</button>
+                    </div>`;
+                }).join('');
+
+                // Click to toggle visibility
+                container.querySelectorAll('.legend-item[data-cluster]').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        if (e.target.closest('.legend-info-btn')) return; // don't toggle on info click
+                        const label = item.dataset.cluster;
+                        if (hiddenClusters.has(label)) {
+                            hiddenClusters.delete(label);
+                            item.classList.remove('dimmed');
+                        } else {
+                            hiddenClusters.add(label);
+                            item.classList.add('dimmed');
+                        }
+                        filterPapers();
+                    });
+                });
+
+                // Info button
+                container.querySelectorAll('.legend-info-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showTopicInfo(btn.dataset.info);
+                    });
+                });
+            } else if (colorByMode === 'year' || colorByMode === 'citations' || colorByMode === 'density') {
+                const configs = {
+                    year: { label: 'Year', min: '2015', max: '2025', colors: ['rgb(100,181,246)', 'rgb(239,83,80)'] },
+                    citations: { label: 'Citations', min: '0', max: '500+', colors: ['rgb(100,181,246)', 'rgb(255,202,40)'] },
+                    density: { label: 'Density', min: 'Sparse', max: 'Dense', colors: ['rgb(68,1,84)', 'rgb(59,82,139)', 'rgb(33,145,140)', 'rgb(94,201,98)', 'rgb(253,231,37)'] },
+                };
+                const cfg = configs[colorByMode] || configs.year;
+                const gradStops = cfg.colors.length === 2
+                    ? `${cfg.colors[0]}, ${cfg.colors[1]}`
+                    : cfg.colors.join(', ');
+                container.innerHTML = `<div class="legend-gradient">
+                    <div class="legend-gradient-label">${cfg.label}</div>
+                    <div class="legend-gradient-bar" style="background:linear-gradient(90deg, ${gradStops});"></div>
+                    <div class="legend-gradient-labels"><span>${cfg.min}</span><span>${cfg.max}</span></div>
+                </div>`;
+            } else {
+                container.innerHTML = '';
+            }
+        }
+
         function drawLegend() {
+            // No-op: legend is now an interactive HTML overlay
+            return;
             const pad = 12;
             let x = pad;
             let y = pad;
