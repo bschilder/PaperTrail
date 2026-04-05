@@ -3452,7 +3452,11 @@
 
         function showContributorProfile(name) {
             pushModalHistory();
-            const papers = allPapers.filter(p => p.shared_by === name);
+            // Case-insensitive match, resolve to actual name
+            const nameLower = (name || '').toLowerCase();
+            const actualPaper = allPapers.find(p => (p.shared_by || '').toLowerCase() === nameLower);
+            if (actualPaper) name = actualPaper.shared_by; // restore proper case
+            const papers = allPapers.filter(p => (p.shared_by || '').toLowerCase() === nameLower);
             const modal = document.getElementById('profileModal');
             const header = document.getElementById('profileHeader');
             const body = document.getElementById('profileBody');
@@ -6728,30 +6732,70 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
         async function runChatSearch(query) {
             if (!query) return;
 
-            // Smart shortcuts for LOCAL mode only (LLM mode handles these via tools)
-            if (!claudeApiKey) {
-                // "who is @name" -> open profile directly
-                const whoIsMatch = query.match(/^(?:who is|about|profile)\s+@?(.+)/i);
-                if (whoIsMatch) {
-                    const name = whoIsMatch[1].trim();
-                    const match = findBestPersonMatch(name.toLowerCase(), new Set(allPapers.map(p => p.shared_by).filter(Boolean).map(s => s.toLowerCase())));
-                    if (match) {
-                        showContributorProfile(match);
-                        return;
-                    }
-                }
+            // Smart entity queries — provide conversational answer with link to full profile
+            const whoIsMatch = query.match(/^(?:who is|about|profile)\s+@?(.+)/i);
+            if (whoIsMatch) {
+                const name = whoIsMatch[1].trim();
+                const matchName = findBestPersonMatch(name.toLowerCase(), new Set(allPapers.map(p => p.shared_by).filter(Boolean).map(s => s.toLowerCase())));
+                if (matchName) {
+                    const actualName = allPapers.find(p => (p.shared_by || '').toLowerCase() === matchName)?.shared_by || matchName;
+                    const papers = allPapers.filter(p => (p.shared_by || '').toLowerCase() === matchName);
+                    const channels = new Set();
+                    const topics = {};
+                    let totalCites = 0;
+                    papers.forEach(p => {
+                        (p.channels || []).forEach(ch => channels.add(ch));
+                        if (p.cluster_label) topics[p.cluster_label] = (topics[p.cluster_label] || 0) + 1;
+                        totalCites += p.cited_by_count || 0;
+                    });
+                    const topTopics = Object.entries(topics).sort((a,b) => b[1]-a[1]).slice(0,3).map(([t]) => t);
+                    const topPaper = [...papers].sort((a,b) => (b.cited_by_count||0)-(a.cited_by_count||0))[0];
 
-                // "what is [topic]" -> open topic info
-                const whatIsMatch = query.match(/^(?:what is|tell me about)\s+(?:the\s+)?(.+?)(?:\s+cluster|\s+topic)?$/i);
-                if (whatIsMatch) {
-                    const topic = whatIsMatch[1].trim().toLowerCase();
-                    const clusters = {};
-                    allPapers.forEach(p => { if (p.cluster_label) clusters[p.cluster_label.toLowerCase()] = p.cluster_label; });
-                    const match = Object.entries(clusters).find(([k]) => k.includes(topic));
-                    if (match) {
-                        showTopicInfo(match[1]);
-                        return;
-                    }
+                    const resultsPanel = document.getElementById('chatbotResults');
+                    resultsPanel.innerHTML = '';
+                    resultsPanel.classList.add('visible');
+
+                    const answer = `<strong>${esc(actualName)}</strong> has shared <strong>${papers.length} papers</strong> across ${channels.size} channels, with ${totalCites.toLocaleString()} total citations. Their top interests are <strong>${topTopics.map(t => esc(t)).join('</strong>, <strong>')}</strong>. Their most cited share is "${esc(topPaper?.title || 'N/A')}" (${topPaper?.cited_by_count || 0} citations).`;
+
+                    resultsPanel.innerHTML = `
+                        <div class="chatbot-results-header">
+                            <span>About ${esc(actualName)}<span class="ai-mode-badge local">local</span></span>
+                            <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
+                        </div>
+                        <div class="ai-response">${answer}</div>
+                        <div style="padding:8px 14px;">
+                            <button class="profile-action-btn primary" style="font-size:12px;" onclick="document.getElementById('chatbotResults').classList.remove('visible');showContributorProfile('${esc(matchName).replace(/'/g, "\\'")}')">View Full Profile</button>
+                        </div>`;
+                    return;
+                }
+            }
+
+            // Smart topic queries
+            const whatIsMatch = query.match(/^(?:what is|tell me about)\s+(?:the\s+)?(.+?)(?:\s+cluster|\s+topic)?$/i);
+            if (whatIsMatch) {
+                const topic = whatIsMatch[1].trim().toLowerCase();
+                const clusters = {};
+                allPapers.forEach(p => { if (p.cluster_label) clusters[p.cluster_label.toLowerCase()] = p.cluster_label; });
+                const match = Object.entries(clusters).find(([k]) => k.includes(topic));
+                if (match) {
+                    const label = match[1];
+                    const papers = allPapers.filter(p => p.cluster_label === label);
+                    const topPaper = [...papers].sort((a,b) => (b.cited_by_count||0)-(a.cited_by_count||0))[0];
+
+                    const resultsPanel = document.getElementById('chatbotResults');
+                    resultsPanel.innerHTML = '';
+                    resultsPanel.classList.add('visible');
+
+                    resultsPanel.innerHTML = `
+                        <div class="chatbot-results-header">
+                            <span>About ${esc(label)}<span class="ai-mode-badge local">local</span></span>
+                            <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
+                        </div>
+                        <div class="ai-response"><strong>${esc(label)}</strong> contains <strong>${papers.length} papers</strong>. The most cited is "${esc(topPaper?.title || 'N/A')}" (${topPaper?.cited_by_count || 0} citations).</div>
+                        <div style="padding:8px 14px;">
+                            <button class="profile-action-btn primary" style="font-size:12px;" onclick="document.getElementById('chatbotResults').classList.remove('visible');showTopicInfo('${esc(label).replace(/'/g, "\\'")}')">View Full Details</button>
+                        </div>`;
+                    return;
                 }
             }
 
