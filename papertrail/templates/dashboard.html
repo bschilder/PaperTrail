@@ -6696,9 +6696,8 @@
 
             // Close results when clicking outside
             document.addEventListener('click', (e) => {
-                if (!e.target.closest('.chatbot-bar') && !e.target.closest('.agent-panel') && !e.target.closest('.chatbot-results')) {
+                if (!e.target.closest('.chatbot-bar') && !e.target.closest('.agent-panel') && !e.target.closest('.chatbot-results') && !e.target.closest('.profile-card') && !e.target.closest('#settingsOverlay .profile-card')) {
                     resultsPanel.classList.remove('visible');
-                    document.getElementById('settingsOverlay')?.classList.remove('visible');
                 }
             });
 
