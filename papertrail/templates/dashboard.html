@@ -2272,6 +2272,9 @@
         <!-- Collapsible Semantic Search Panel -->
         <div class="agent-panel" id="semanticPanel" style="background:linear-gradient(135deg,#172530,#1a2e35);">
             <div style="display:flex;align-items:center;gap:10px;max-width:900px;margin:0 auto;">
+                <div style="font-size:11px;color:#888;max-width:300px;line-height:1.4;">
+                    Semantic search ranks papers by how closely their content relates to your query — not just keyword matching. Results are colored and sized by relevance on the map.
+                </div>
                 <input type="text" class="chatbot-bar-input" id="semanticPanelInput" placeholder="Type a semantic query and press Enter..." style="flex:1;">
                 <div style="display:flex;gap:6px;">
                     <button class="chatbot-example-btn" onclick="document.getElementById('semanticPanelInput').value='single cell RNA sequencing';triggerSemanticFromPanel();">scRNA-seq</button>
@@ -3720,7 +3723,7 @@
                     <div class="lb-section-title"><span class="lb-icon">&#128293;</span> Most Engaged</div>
                     <div class="lb-grid">
                         ${topEngaged.map((p, i) => `
-                            <div class="lb-card">
+                            <div class="lb-card" style="cursor:pointer;" onclick="event.stopPropagation(); selectedPapers.clear(); const idx = (paperIndexMap.get(allPapers.find(ap => ap.title === '${esc(p.title).replace(/'/g, "\\'")}')) ?? -1); if (idx >= 0) { selectedPapers.add(idx); document.getElementById('mapToggle').click(); showDetailPanel([allPapers[idx]]); renderMap(); }">
                                 <div class="lb-rank ${rankClass(i)}">${i + 1}</div>
                                 <div class="lb-card-body">
                                     <div class="lb-card-name">${esc(p.title) || 'Untitled'}</div>
@@ -3740,7 +3743,7 @@
                     <div class="lb-section-title"><span class="lb-icon">&#127941;</span> Most Cited Papers</div>
                     <div class="lb-grid">
                         ${topCited.map((p, i) => `
-                            <div class="lb-card">
+                            <div class="lb-card" style="cursor:pointer;" onclick="event.stopPropagation(); selectedPapers.clear(); const idx = (paperIndexMap.get(allPapers.find(ap => ap.title === '${esc(p.title).replace(/'/g, "\\'")}')) ?? -1); if (idx >= 0) { selectedPapers.add(idx); document.getElementById('mapToggle').click(); showDetailPanel([allPapers[idx]]); renderMap(); }">
                                 <div class="lb-rank ${rankClass(i)}">${i + 1}</div>
                                 <div class="lb-card-body">
                                     <div class="lb-card-name">${esc(p.title) || 'Untitled'}</div>
@@ -3760,7 +3763,7 @@
                     <div class="lb-section-title"><span class="lb-icon">&#128161;</span> Recently Shared</div>
                     <div class="lb-grid">
                         ${recentHits.map((p, i) => `
-                            <div class="lb-card">
+                            <div class="lb-card" style="cursor:pointer;" onclick="event.stopPropagation(); selectedPapers.clear(); const idx = (paperIndexMap.get(allPapers.find(ap => ap.title === '${esc(p.title).replace(/'/g, "\\'")}')) ?? -1); if (idx >= 0) { selectedPapers.add(idx); document.getElementById('mapToggle').click(); showDetailPanel([allPapers[idx]]); renderMap(); }">
                                 <div class="lb-rank">${i + 1}</div>
                                 <div class="lb-card-body">
                                     <div class="lb-card-name">${esc(p.title) || 'Untitled'}</div>
@@ -3773,6 +3776,12 @@
                             </div>
                         `).join('')}
                     </div>
+                </div>
+            `;
+
+            html += `
+                <div style="text-align:center;padding:16px;font-size:11px;color:#555;">
+                    Click any item to view details
                 </div>
             `;
 
