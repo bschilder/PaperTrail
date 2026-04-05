@@ -896,6 +896,96 @@
             flex-shrink: 0;
         }
 
+        /* Onboarding overlay */
+        .onboarding-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 600;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease;
+        }
+        .onboarding-overlay.visible { display: flex; }
+        .onboarding-card {
+            background: linear-gradient(135deg, #1e1e32 0%, #252540 100%);
+            border: 1px solid rgba(100,181,246,0.2);
+            border-radius: 16px;
+            padding: 36px 40px;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 80px rgba(100,181,246,0.05);
+        }
+        .onboarding-icon { margin-bottom: 16px; }
+        .onboarding-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+            letter-spacing: -0.3px;
+        }
+        .onboarding-text {
+            font-size: 14px;
+            color: #a0a0b0;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .onboarding-text strong { color: #e0e0e0; }
+        .onboarding-hints {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .onboarding-hint {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #888;
+            padding: 6px 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 6px;
+        }
+        .onboarding-hint kbd {
+            display: inline-block;
+            padding: 2px 6px;
+            background: #252538;
+            border: 1px solid #3a3a4e;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #64b5f6;
+            font-family: inherit;
+            min-width: 28px;
+            text-align: center;
+        }
+        .onboarding-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #4a9cf5 0%, #64b5f6 100%);
+            border: none;
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.2s;
+            letter-spacing: 0.2px;
+        }
+        .onboarding-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(100,181,246,0.3); }
+        .onboarding-dismiss {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 12px;
+            font-size: 11px;
+            color: #555;
+            cursor: pointer;
+        }
+
         /* Keyboard shortcuts overlay */
         .shortcuts-overlay {
             display: none;
@@ -1252,7 +1342,10 @@
                 <div class="sidebar-section">
                     <div class="sidebar-label">Activity</div>
                     <canvas id="sparklineCanvas" width="230" height="48" style="width:100%;height:48px;border-radius:6px;background:#252538;cursor:crosshair;"></canvas>
-                    <div id="sparklineInfo" style="font-size:10px;color:#666;margin-top:2px;"></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div id="sparklineInfo" style="font-size:10px;color:#666;margin-top:2px;"></div>
+                        <button id="sparklineClear" style="display:none;font-size:9px;color:#64b5f6;background:none;border:1px solid #3a3a4e;border-radius:4px;padding:1px 6px;cursor:pointer;margin-top:2px;">Clear</button>
+                    </div>
                 </div>
 
                 <div class="sidebar-section">
@@ -1378,6 +1471,37 @@
     <!-- Tooltip -->
     <div class="tooltip" id="tooltip"></div>
 
+    <!-- Onboarding overlay -->
+    <div class="onboarding-overlay" id="onboardingOverlay">
+        <div class="onboarding-card">
+            <div class="onboarding-icon">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="22" stroke="#64b5f6" stroke-width="2" fill="rgba(100,181,246,0.08)"/>
+                    <path d="M16 20 L24 14 L32 20 L32 32 L16 32 Z" stroke="#64b5f6" stroke-width="1.5" fill="rgba(100,181,246,0.15)"/>
+                    <path d="M20 32 L20 26 L28 26 L28 32" stroke="#64b5f6" stroke-width="1.5" fill="none"/>
+                    <circle cx="24" cy="21" r="2" fill="#64b5f6"/>
+                </svg>
+            </div>
+            <div class="onboarding-title" id="onboardingTitle">Welcome to PaperTrail</div>
+            <div class="onboarding-text" id="onboardingText">
+                This map shows <strong id="onboardingCount">0</strong> papers shared by your team across Slack.
+                Each dot is a paper. <strong>Similar papers cluster together</strong> — nearby dots discuss related topics.
+            </div>
+            <div class="onboarding-hints">
+                <div class="onboarding-hint"><kbd>Hover</kbd> Preview any paper</div>
+                <div class="onboarding-hint"><kbd>Click</kbd> Select & view details</div>
+                <div class="onboarding-hint"><kbd>/</kbd> Search with AI</div>
+                <div class="onboarding-hint"><kbd>?</kbd> All keyboard shortcuts</div>
+            </div>
+            <button class="onboarding-btn" onclick="document.getElementById('onboardingOverlay').classList.remove('visible')">
+                Explore Papers
+            </button>
+            <label class="onboarding-dismiss">
+                <input type="checkbox" id="onboardingDismiss"> Don't show again
+            </label>
+        </div>
+    </div>
+
     <!-- Keyboard shortcut help overlay -->
     <div class="shortcuts-overlay" id="shortcutsOverlay">
         <div class="shortcuts-card">
@@ -1443,6 +1567,9 @@
         let animationRAF = null;
         let previousPositions = new Map(); // paper index -> {x, y}
         let hoveredPaperIdx = -1; // index into filteredPapers
+
+        // O(1) paper index lookup (built once during loadData)
+        let paperIndexMap = new Map(); // paper object -> index in allPapers
         let currentProjection = 'umap';
 
         // Canvas state
@@ -1501,6 +1628,10 @@
             selectedChannels = new Set(channels);
             initChannelFilters(Array.from(channels));
 
+            // Build O(1) index lookup
+            paperIndexMap.clear();
+            allPapers.forEach((p, i) => paperIndexMap.set(p, i));
+
             // Set top-N slider max to total paper count
             const topNSlider = document.getElementById('selectTopN');
             if (topNSlider && allPapers.length > 0) {
@@ -1554,6 +1685,13 @@
             filteredPapers = allPapers.filter(paper => {
                 if (selectedChannels.size > 0 && (!paper.channels || !paper.channels.some(ch => selectedChannels.has(ch)))) {
                     return false;
+                }
+                // Time brush filter
+                if (timeFilterFrom || timeFilterTo) {
+                    if (!paper.first_shared) return false;
+                    const d = new Date(paper.first_shared);
+                    if (timeFilterFrom && d < timeFilterFrom) return false;
+                    if (timeFilterTo && d > timeFilterTo) return false;
                 }
                 for (const [field, value] of Object.entries(columnFilters)) {
                     if (!value) continue;
@@ -1636,7 +1774,7 @@
 
                 row.addEventListener('click', () => {
                     selectedPapers.clear();
-                    const allIdx = allPapers.indexOf(paper);
+                    const allIdx = (paperIndexMap.get(paper) ?? -1);
                     if (allIdx !== -1) selectedPapers.add(allIdx);
                     showDetailPanel([paper]);
                 });
@@ -1773,37 +1911,53 @@
         }
 
         function computeBounds() {
-            projMinX = Infinity; projMaxX = -Infinity;
-            projMinY = Infinity; projMaxY = -Infinity;
+            // Use 2nd-98th percentile to be outlier-resistant
+            const xs = [], ys = [];
             filteredPapers.forEach(paper => {
                 const proj = paper.projections && paper.projections[currentProjection];
                 if (!proj) return;
-                projMinX = Math.min(projMinX, proj[0]);
-                projMaxX = Math.max(projMaxX, proj[0]);
-                projMinY = Math.min(projMinY, proj[1]);
-                projMaxY = Math.max(projMaxY, proj[1]);
+                xs.push(proj[0]);
+                ys.push(proj[1]);
             });
-            if (projMinX === Infinity) { projMinX = 0; projMaxX = 1; projMinY = 0; projMaxY = 1; }
+
+            if (xs.length === 0) { projMinX = 0; projMaxX = 1; projMinY = 0; projMaxY = 1; return; }
+
+            xs.sort((a, b) => a - b);
+            ys.sort((a, b) => a - b);
+
+            const lo = Math.floor(xs.length * 0.02);
+            const hi = Math.ceil(xs.length * 0.98) - 1;
+
+            projMinX = xs[lo];
+            projMaxX = xs[hi];
+            projMinY = ys[lo];
+            projMaxY = ys[hi];
+
             const rangeX = projMaxX - projMinX || 1;
             const rangeY = projMaxY - projMinY || 1;
-            projMinX -= rangeX * 0.05;
-            projMaxX += rangeX * 0.05;
-            projMinY -= rangeY * 0.05;
-            projMaxY += rangeY * 0.05;
+            projMinX -= rangeX * 0.08;
+            projMaxX += rangeX * 0.08;
+            projMinY -= rangeY * 0.08;
+            projMaxY += rangeY * 0.08;
         }
 
-        function drawSparkline() {
-            const canvas = document.getElementById('sparklineCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = canvas.clientWidth * dpr;
-            canvas.height = canvas.clientHeight * dpr;
-            ctx.scale(dpr, dpr);
-            const w = canvas.clientWidth;
-            const h = canvas.clientHeight;
+        // Sparkline state for brush selection
+        let sparklineMonths = [];
+        let sparklineBrush = null; // { startIdx, endIdx } or null
+        let sparklineDragging = false;
+        let sparklineDragStart = -1;
 
-            ctx.clearRect(0, 0, w, h);
+        function drawSparkline() {
+            const slCanvas = document.getElementById('sparklineCanvas');
+            if (!slCanvas) return;
+            const slCtx = slCanvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            slCanvas.width = slCanvas.clientWidth * dpr;
+            slCanvas.height = slCanvas.clientHeight * dpr;
+            slCtx.scale(dpr, dpr);
+            const w = slCanvas.clientWidth;
+            const h = slCanvas.clientHeight;
+            slCtx.clearRect(0, 0, w, h);
 
             // Bucket papers by month
             const buckets = {};
@@ -1819,88 +1973,154 @@
             });
 
             if (Object.keys(buckets).length < 2) {
-                ctx.fillStyle = '#666';
-                ctx.font = '10px -apple-system, sans-serif';
-                ctx.fillText('Not enough date data', 8, h / 2 + 3);
+                slCtx.fillStyle = '#666';
+                slCtx.font = '10px -apple-system, sans-serif';
+                slCtx.fillText('Not enough date data', 8, h / 2 + 3);
                 return;
             }
 
-            // Build sorted array of all months in range
             const startDate = new Date(minDate);
             const endDate = new Date(maxDate);
-            const months = [];
+            sparklineMonths = [];
             const d = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
             while (d <= endDate) {
                 const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                months.push({ key, count: buckets[key] || 0 });
+                sparklineMonths.push({ key, count: buckets[key] || 0 });
                 d.setMonth(d.getMonth() + 1);
             }
 
+            const months = sparklineMonths;
             const maxCount = Math.max(...months.map(m => m.count));
             const pad = { top: 4, bottom: 12, left: 4, right: 4 };
             const plotW = w - pad.left - pad.right;
             const plotH = h - pad.top - pad.bottom;
 
-            // Draw area chart
-            ctx.beginPath();
+            function xForIdx(i) { return pad.left + (i / (months.length - 1)) * plotW; }
+            function yForIdx(i) { return pad.top + plotH - (months[i].count / maxCount) * plotH; }
+
+            // Draw brush selection highlight
+            if (sparklineBrush) {
+                const x1 = xForIdx(sparklineBrush.startIdx);
+                const x2 = xForIdx(sparklineBrush.endIdx);
+                slCtx.fillStyle = 'rgba(100, 181, 246, 0.15)';
+                slCtx.fillRect(Math.min(x1, x2), 0, Math.abs(x2 - x1), h);
+                slCtx.strokeStyle = 'rgba(100, 181, 246, 0.5)';
+                slCtx.lineWidth = 1;
+                slCtx.strokeRect(Math.min(x1, x2), 0, Math.abs(x2 - x1), h);
+            }
+
+            // Draw area
+            slCtx.beginPath();
             months.forEach((m, i) => {
-                const x = pad.left + (i / (months.length - 1)) * plotW;
-                const y = pad.top + plotH - (m.count / maxCount) * plotH;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
+                if (i === 0) slCtx.moveTo(xForIdx(i), yForIdx(i));
+                else slCtx.lineTo(xForIdx(i), yForIdx(i));
             });
-
-            // Close the path for fill
-            ctx.lineTo(pad.left + plotW, pad.top + plotH);
-            ctx.lineTo(pad.left, pad.top + plotH);
-            ctx.closePath();
-
-            const grad = ctx.createLinearGradient(0, pad.top, 0, h);
+            slCtx.lineTo(pad.left + plotW, pad.top + plotH);
+            slCtx.lineTo(pad.left, pad.top + plotH);
+            slCtx.closePath();
+            const grad = slCtx.createLinearGradient(0, pad.top, 0, h);
             grad.addColorStop(0, 'rgba(100, 181, 246, 0.35)');
             grad.addColorStop(1, 'rgba(100, 181, 246, 0.02)');
-            ctx.fillStyle = grad;
-            ctx.fill();
+            slCtx.fillStyle = grad;
+            slCtx.fill();
 
-            // Draw line on top
-            ctx.beginPath();
+            // Draw line
+            slCtx.beginPath();
             months.forEach((m, i) => {
-                const x = pad.left + (i / (months.length - 1)) * plotW;
-                const y = pad.top + plotH - (m.count / maxCount) * plotH;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
+                if (i === 0) slCtx.moveTo(xForIdx(i), yForIdx(i));
+                else slCtx.lineTo(xForIdx(i), yForIdx(i));
             });
-            ctx.strokeStyle = '#64b5f6';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
+            slCtx.strokeStyle = '#64b5f6';
+            slCtx.lineWidth = 1.5;
+            slCtx.stroke();
 
-            // X-axis labels (first and last year)
-            ctx.fillStyle = '#555';
-            ctx.font = '9px -apple-system, sans-serif';
+            // X labels
+            slCtx.fillStyle = '#555';
+            slCtx.font = '9px -apple-system, sans-serif';
             const firstYear = months[0].key.split('-')[0];
             const lastYear = months[months.length - 1].key.split('-')[0];
-            ctx.fillText(firstYear, pad.left, h - 1);
-            ctx.textAlign = 'right';
-            ctx.fillText(lastYear, w - pad.right, h - 1);
-            ctx.textAlign = 'start';
+            slCtx.fillText(firstYear, pad.left, h - 1);
+            slCtx.textAlign = 'right';
+            slCtx.fillText(lastYear, w - pad.right, h - 1);
+            slCtx.textAlign = 'start';
 
-            // Hover interaction
-            canvas.onmousemove = (e) => {
-                const rect = canvas.getBoundingClientRect();
+            // Interactions
+            function idxFromMouse(e) {
+                const rect = slCanvas.getBoundingClientRect();
                 const mx = e.clientX - rect.left;
-                const idx = Math.round(((mx - pad.left) / plotW) * (months.length - 1));
-                if (idx >= 0 && idx < months.length) {
-                    const m = months[idx];
-                    document.getElementById('sparklineInfo').textContent = `${m.key}: ${m.count} papers`;
+                return Math.max(0, Math.min(months.length - 1, Math.round(((mx - pad.left) / plotW) * (months.length - 1))));
+            }
+
+            slCanvas.onmousedown = (e) => {
+                sparklineDragging = true;
+                sparklineDragStart = idxFromMouse(e);
+            };
+
+            slCanvas.onmousemove = (e) => {
+                const idx = idxFromMouse(e);
+                if (sparklineDragging) {
+                    const lo = Math.min(sparklineDragStart, idx);
+                    const hi = Math.max(sparklineDragStart, idx);
+                    if (hi - lo >= 1) {
+                        sparklineBrush = { startIdx: lo, endIdx: hi };
+                        const fromKey = months[lo].key;
+                        const toKey = months[hi].key;
+                        const count = months.slice(lo, hi + 1).reduce((s, m) => s + m.count, 0);
+                        document.getElementById('sparklineInfo').textContent = `${fromKey} to ${toKey}: ${count} papers`;
+                        drawSparkline();
+                    }
+                } else if (idx >= 0 && idx < months.length) {
+                    document.getElementById('sparklineInfo').textContent = `${months[idx].key}: ${months[idx].count} papers (drag to filter)`;
                 }
             };
-            canvas.onmouseleave = () => {
-                const total = allPapers.length;
-                const range = `${firstYear} — ${lastYear}`;
-                document.getElementById('sparklineInfo').textContent = `${total} papers · ${range}`;
+
+            slCanvas.onmouseup = () => {
+                if (sparklineDragging && sparklineBrush) {
+                    applyTimeBrush();
+                }
+                sparklineDragging = false;
             };
 
-            // Set default info
-            document.getElementById('sparklineInfo').textContent = `${allPapers.length} papers · ${firstYear} — ${lastYear}`;
+            slCanvas.onmouseleave = () => {
+                sparklineDragging = false;
+                if (!sparklineBrush) {
+                    document.getElementById('sparklineInfo').textContent = `${allPapers.length} papers · ${firstYear} — ${lastYear}`;
+                }
+            };
+
+            // Clear button
+            const clearBtn = document.getElementById('sparklineClear');
+            clearBtn.onclick = () => {
+                sparklineBrush = null;
+                timeFilterFrom = null;
+                timeFilterTo = null;
+                clearBtn.style.display = 'none';
+                filterPapers();
+                drawSparkline();
+                document.getElementById('sparklineInfo').textContent = `${allPapers.length} papers · ${firstYear} — ${lastYear}`;
+            };
+
+            // Default info
+            if (!sparklineBrush) {
+                document.getElementById('sparklineInfo').textContent = `${allPapers.length} papers · ${firstYear} — ${lastYear}`;
+            }
+        }
+
+        // Time brush filter state
+        let timeFilterFrom = null;
+        let timeFilterTo = null;
+
+        function applyTimeBrush() {
+            if (!sparklineBrush || sparklineMonths.length === 0) return;
+            const fromKey = sparklineMonths[sparklineBrush.startIdx].key;
+            const toKey = sparklineMonths[sparklineBrush.endIdx].key;
+            // Parse YYYY-MM to Date
+            const [fy, fm] = fromKey.split('-').map(Number);
+            const [ty, tm] = toKey.split('-').map(Number);
+            timeFilterFrom = new Date(fy, fm - 1, 1);
+            timeFilterTo = new Date(ty, tm, 0); // last day of month
+            document.getElementById('sparklineClear').style.display = 'block';
+            filterPapers();
         }
 
         function dataToScreen(dx, dy) {
@@ -1975,8 +2195,8 @@
                 paper._sx = sx;
                 paper._sy = sy;
 
-                // Track cluster centroids
-                if (paper.cluster_label && colorByMode === 'cluster') {
+                // Track cluster centroids (always, for labels)
+                if (paper.cluster_label) {
                     const cid = paper.cluster_id || 0;
                     if (!clusterCentroids[cid]) {
                         clusterCentroids[cid] = { x: 0, y: 0, count: 0, label: paper.cluster_label };
@@ -1990,7 +2210,7 @@
 
                 const radius = getPointRadius(paper);
                 const color = getPointColor(paper);
-                const allIdx = allPapers.indexOf(paper);
+                const allIdx = (paperIndexMap.get(paper) ?? -1);
                 const isSelected = selectedPapers.has(allIdx);
 
                 const isHovered = (idx === hoveredPaperIdx);
@@ -2033,8 +2253,8 @@
             });
             ctx.globalAlpha = 1;
 
-            // Draw cluster labels at centroids
-            if (colorByMode === 'cluster') {
+            // Draw cluster labels at centroids (always visible)
+            {
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 for (const cid of Object.keys(clusterCentroids)) {
@@ -2044,17 +2264,18 @@
                     const cy = c.y / c.count;
                     if (cx < 0 || cx > canvas.width || cy < 0 || cy > canvas.height) continue;
 
-                    // Background pill
+                    // Background pill — subtler when not in cluster mode
+                    const isClusterMode = colorByMode === 'cluster';
                     const label = c.label.length > 25 ? c.label.substring(0, 22) + '...' : c.label;
-                    ctx.font = 'bold 11px -apple-system, sans-serif';
+                    ctx.font = (isClusterMode ? 'bold ' : '') + '11px -apple-system, sans-serif';
                     const tw = ctx.measureText(label).width;
-                    ctx.fillStyle = 'rgba(15, 15, 23, 0.75)';
+                    ctx.fillStyle = isClusterMode ? 'rgba(15, 15, 23, 0.75)' : 'rgba(15, 15, 23, 0.5)';
                     const px = 6, py = 3;
                     ctx.beginPath();
                     ctx.roundRect(cx - tw/2 - px, cy - 7 - py, tw + px*2, 14 + py*2, 4);
                     ctx.fill();
 
-                    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+                    ctx.fillStyle = isClusterMode ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.45)';
                     ctx.fillText(label, cx, cy);
                 }
                 ctx.textAlign = 'start';
@@ -2067,7 +2288,7 @@
             // Footer info
             ctx.fillStyle = 'rgba(255,255,255,0.35)';
             ctx.font = '11px -apple-system, sans-serif';
-            ctx.fillText(`${currentProjection.toUpperCase()} · ${filteredPapers.length} papers`, 12, canvas.height - 12);
+            ctx.fillText(`${currentProjection.toUpperCase()} · ${filteredPapers.length} papers · Nearby papers discuss similar topics`, 12, canvas.height - 12);
 
             // Draw minimap
             drawMinimap();
@@ -2283,7 +2504,7 @@
 
                 const radius = getPointRadius(paper);
                 const color = getPointColor(paper);
-                const allIdx = allPapers.indexOf(paper);
+                const allIdx = (paperIndexMap.get(paper) ?? -1);
                 const isSelected = selectedPapers.has(allIdx);
 
                 ctx.globalAlpha = paper.title ? (isSelected ? 1 : 0.75) * t : 0.25 * t;
@@ -2439,7 +2660,7 @@
                     });
                     if (hitIdx >= 0) {
                         const paper = filteredPapers[hitIdx];
-                        const allIdx = allPapers.indexOf(paper);
+                        const allIdx = (paperIndexMap.get(paper) ?? -1);
                         selectedPapers.clear();
                         if (allIdx !== -1) selectedPapers.add(allIdx);
                         showDetailPanel([paper]);
@@ -2500,7 +2721,7 @@
                 if (!proj) return;
                 const [sx, sy] = dataToScreen(proj[0], proj[1]);
                 if (pointInPolygon([sx, sy], lassoPoints)) {
-                    const allIdx = allPapers.indexOf(paper);
+                    const allIdx = (paperIndexMap.get(paper) ?? -1);
                     if (allIdx !== -1) selectedPapers.add(allIdx);
                 }
             });
@@ -2524,7 +2745,7 @@
                 if (!proj) return;
                 const [sx, sy] = dataToScreen(proj[0], proj[1]);
                 if (sx >= minX && sx <= maxX && sy >= minY && sy <= maxY) {
-                    const allIdx = allPapers.indexOf(paper);
+                    const allIdx = (paperIndexMap.get(paper) ?? -1);
                     if (allIdx !== -1) selectedPapers.add(allIdx);
                 }
             });
@@ -2648,7 +2869,7 @@
             const checkboxes = [];
 
             papers.forEach((paper, i) => {
-                const allIdx = allPapers.indexOf(paper);
+                const allIdx = (paperIndexMap.get(paper) ?? -1);
                 const card = document.createElement('div');
                 card.className = 'paper-card';
 
@@ -2781,7 +3002,7 @@
             selectedPapers.clear();
             const selectedPapersList = [];
             sorted.forEach(([idx, paper]) => {
-                const allIdx = allPapers.indexOf(paper);
+                const allIdx = (paperIndexMap.get(paper) ?? -1);
                 if (allIdx !== -1) selectedPapers.add(allIdx);
                 selectedPapersList.push(paper);
             });
@@ -3598,7 +3819,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             panel.querySelectorAll('.chatbot-result-item').forEach((item, i) => {
                 item.addEventListener('click', () => {
                     const paper = shown[i];
-                    const allIdx = allPapers.indexOf(paper);
+                    const allIdx = (paperIndexMap.get(paper) ?? -1);
                     selectedPapers.clear();
                     if (allIdx !== -1) selectedPapers.add(allIdx);
                     showDetailPanel([paper]);
@@ -3612,7 +3833,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 selectAllBtn.addEventListener('click', () => {
                     selectedPapers.clear();
                     papers.forEach(paper => {
-                        const allIdx = allPapers.indexOf(paper);
+                        const allIdx = (paperIndexMap.get(paper) ?? -1);
                         if (allIdx !== -1) selectedPapers.add(allIdx);
                     });
                     showDetailPanel(papers.slice(0, 50));
@@ -3632,7 +3853,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     <div class="chatbot-result-title">${paper.title || 'Untitled'}</div>
                     <div class="chatbot-result-meta">${paper.year || ''} &middot; ${personDisplay(paper.shared_by)} &middot; ${channels}</div>`;
                 div.addEventListener('click', () => {
-                    const allIdx = allPapers.indexOf(paper);
+                    const allIdx = (paperIndexMap.get(paper) ?? -1);
                     selectedPapers.clear();
                     if (allIdx !== -1) selectedPapers.add(allIdx);
                     showDetailPanel([paper]);
@@ -4085,6 +4306,17 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             initChatbot();
             initTableResize();
             setSelectionMode('pan');
+
+            // Show onboarding if not dismissed
+            if (!localStorage.getItem('papertrail_onboarding_dismissed') && allPapers.length > 0) {
+                document.getElementById('onboardingCount').textContent = allPapers.length;
+                document.getElementById('onboardingOverlay').classList.add('visible');
+                document.getElementById('onboardingOverlay').querySelector('.onboarding-btn').addEventListener('click', () => {
+                    if (document.getElementById('onboardingDismiss').checked) {
+                        localStorage.setItem('papertrail_onboarding_dismissed', '1');
+                    }
+                });
+            }
 
             // ===== EVENT LISTENERS =====
             document.getElementById('mapToggle').addEventListener('click', () => {
