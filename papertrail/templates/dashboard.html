@@ -835,6 +835,7 @@
 
         .table-view.visible {
             display: flex;
+            animation: viewFadeIn 0.3s ease-out;
         }
 
         .table-wrapper {
@@ -917,6 +918,24 @@
         .data-table tr:hover td {
             background: #1f1f30;
         }
+        .data-table tbody tr {
+            animation: rowSlideIn 0.3s ease-out both;
+        }
+        @keyframes rowSlideIn {
+            from { opacity: 0; transform: translateX(-8px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        /* Stagger: first 20 rows get individual delays, rest appear together */
+        .data-table tbody tr:nth-child(1) { animation-delay: 0.02s; }
+        .data-table tbody tr:nth-child(2) { animation-delay: 0.04s; }
+        .data-table tbody tr:nth-child(3) { animation-delay: 0.06s; }
+        .data-table tbody tr:nth-child(4) { animation-delay: 0.08s; }
+        .data-table tbody tr:nth-child(5) { animation-delay: 0.10s; }
+        .data-table tbody tr:nth-child(6) { animation-delay: 0.12s; }
+        .data-table tbody tr:nth-child(7) { animation-delay: 0.14s; }
+        .data-table tbody tr:nth-child(8) { animation-delay: 0.16s; }
+        .data-table tbody tr:nth-child(9) { animation-delay: 0.18s; }
+        .data-table tbody tr:nth-child(10) { animation-delay: 0.20s; }
 
         .paper-title {
             color: #64b5f6;
@@ -1006,6 +1025,7 @@
 
         .map-view.visible {
             display: block;
+            animation: viewFadeIn 0.3s ease-out;
         }
 
         #canvas {
@@ -1024,7 +1044,7 @@
             padding: 24px;
             background: #0f0f17;
         }
-        .leaderboard-view.visible { display: block; }
+        .leaderboard-view.visible { display: block; animation: viewFadeIn 0.3s ease-out; }
         .lb-container {
             max-width: 900px;
             margin: 0 auto;
@@ -1058,6 +1078,19 @@
             transition: all 0.15s;
         }
         .lb-card:hover { background: #1f1f35; border-color: #3a3a4e; }
+        .lb-card {
+            animation: cardBrickIn 0.4s ease-out both;
+        }
+        @keyframes cardBrickIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .lb-card:nth-child(1) { animation-delay: 0.05s; }
+        .lb-card:nth-child(2) { animation-delay: 0.1s; }
+        .lb-card:nth-child(3) { animation-delay: 0.15s; }
+        .lb-card:nth-child(4) { animation-delay: 0.2s; }
+        .lb-card:nth-child(5) { animation-delay: 0.25s; }
+        .lb-card:nth-child(6) { animation-delay: 0.3s; }
         .lb-rank {
             font-size: 18px;
             font-weight: 700;
@@ -1224,7 +1257,11 @@
             overflow: hidden;
             background: #050510;
         }
-        .three-d-view.visible { display: block; }
+        .three-d-view.visible { display: block; animation: viewFadeIn 0.3s ease-out; }
+        @keyframes viewFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         .three-d-controls {
             position: absolute;
             bottom: 12px;
@@ -2226,6 +2263,14 @@
                         <button id="apiKeyClear" style="flex:1;padding:6px;background:#3a3a4e;border:1px solid #4a4a5e;color:#e0e0e0;border-radius:6px;cursor:pointer;font-size:12px;">Clear</button>
                     </div>
                     <div id="apiKeyStatus" style="font-size:11px;color:#666;margin-top:6px;"></div>
+                    <div style="border-top:1px solid #2a2a3e;margin-top:10px;padding-top:10px;">
+                        <div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:6px;">Display</div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:11px;color:#888;">Text Size</span>
+                            <input type="range" id="textScaleSlider" min="80" max="130" value="100" style="flex:1;">
+                            <span id="textScaleDisplay" style="font-size:11px;color:#64b5f6;min-width:30px;">100%</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="statsDisplay" style="display:none;">Loading...</div>
@@ -2478,6 +2523,7 @@
                     <!-- 3D View -->
                     <div class="three-d-view" id="threeDView">
                         <div id="threeDContainer" style="width:100%;height:100%;"></div>
+                        <div class="map-legend" id="threeDLegend" style="z-index:10;"></div>
                         <div class="three-d-controls">
                             <span style="font-size:11px;color:#888;">Drag to orbit · Shift+drag to pan · Scroll to zoom · Click for details · Double-click to fly to cluster</span>
                         </div>
@@ -4484,6 +4530,30 @@
             });
 
             updateCamera();
+            // Populate 3D legend
+            const threeDLeg = document.getElementById('threeDLegend');
+            if (threeDLeg) {
+                const clusters3D = {};
+                papers3DRef.forEach(p => {
+                    const cid = p.cluster_id || 0;
+                    const label = p.cluster_label || '';
+                    if (!label || clusters3D[label]) return;
+                    clusters3D[label] = { cid, count: 0 };
+                });
+                papers3DRef.forEach(p => {
+                    if (p.cluster_label && clusters3D[p.cluster_label]) clusters3D[p.cluster_label].count++;
+                });
+                const sorted3D = Object.entries(clusters3D).sort((a, b) => b[1].count - a[1].count);
+                threeDLeg.innerHTML = sorted3D.map(([label, info]) => {
+                    const color = ['#64b5f6','#bb86fc','#66bb6a','#ffa726','#ef5350','#26c6da','#ffca28','#ab47bc','#8d6e63','#78909c','#ec407a','#7e57c2'][info.cid % 12];
+                    return `<div class="legend-item" style="pointer-events:auto;cursor:pointer;" onclick="showTopicInfo('${esc(label).replace(/'/g, "\\'")}')">
+                        <div class="legend-dot" style="background:${color};"></div>
+                        <span class="legend-label">${esc(label)}</span>
+                        <span class="legend-count">${info.count}</span>
+                    </div>`;
+                }).join('');
+            }
+
             threeDInitialized = true;
             animate3D();
         }
@@ -7290,6 +7360,21 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 document.getElementById('pointSizeDisplay').textContent = basePointSize;
                 renderMap();
             });
+
+            // Text scaling
+            document.getElementById('textScaleSlider').addEventListener('input', (e) => {
+                const scale = parseInt(e.target.value) / 100;
+                document.documentElement.style.setProperty('--text-scale', scale);
+                document.getElementById('textScaleDisplay').textContent = e.target.value + '%';
+                localStorage.setItem('papertrail_text_scale', e.target.value);
+            });
+            // Restore saved text scale
+            const savedScale = localStorage.getItem('papertrail_text_scale');
+            if (savedScale) {
+                document.getElementById('textScaleSlider').value = savedScale;
+                document.documentElement.style.setProperty('--text-scale', parseInt(savedScale) / 100);
+                document.getElementById('textScaleDisplay').textContent = savedScale + '%';
+            }
 
             // KDE controls
             document.getElementById('kdeToggle').addEventListener('change', (e) => {
