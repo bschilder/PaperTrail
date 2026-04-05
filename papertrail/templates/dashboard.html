@@ -919,23 +919,12 @@
             background: #1f1f30;
         }
         .data-table tbody tr {
-            animation: rowSlideIn 0.3s ease-out both;
+            animation: rowSlideIn 0.25s ease-out both;
         }
         @keyframes rowSlideIn {
             from { opacity: 0; transform: translateX(-8px); }
             to { opacity: 1; transform: translateX(0); }
         }
-        /* Stagger: first 20 rows get individual delays, rest appear together */
-        .data-table tbody tr:nth-child(1) { animation-delay: 0.02s; }
-        .data-table tbody tr:nth-child(2) { animation-delay: 0.04s; }
-        .data-table tbody tr:nth-child(3) { animation-delay: 0.06s; }
-        .data-table tbody tr:nth-child(4) { animation-delay: 0.08s; }
-        .data-table tbody tr:nth-child(5) { animation-delay: 0.10s; }
-        .data-table tbody tr:nth-child(6) { animation-delay: 0.12s; }
-        .data-table tbody tr:nth-child(7) { animation-delay: 0.14s; }
-        .data-table tbody tr:nth-child(8) { animation-delay: 0.16s; }
-        .data-table tbody tr:nth-child(9) { animation-delay: 0.18s; }
-        .data-table tbody tr:nth-child(10) { animation-delay: 0.20s; }
 
         .paper-title {
             color: #64b5f6;
@@ -3543,7 +3532,7 @@
 
             // Channel badges
             const channelBadges = Array.from(channels).map(ch =>
-                `<span class="card-tag channel-tag">${channelDisplayName(ch)}</span>`
+                `<span class="card-tag channel-tag" style="cursor:pointer;" onclick="document.getElementById('profileModal').classList.remove('visible');showChannelInfo('${esc(ch).replace(/'/g, "\\'")}')">${channelDisplayName(ch)}</span>`
             ).join(' ');
 
             header.innerHTML = `
@@ -3776,6 +3765,12 @@
                     });
                 });
             }
+
+            // Stagger row animations for full cascade (#45)
+            const allRows = tbody.querySelectorAll('tr');
+            allRows.forEach((row, i) => {
+                row.style.animationDelay = Math.min(i * 0.015, 0.5) + 's';
+            });
         }
 
         // ===== TABLE COLUMN RESIZING =====
