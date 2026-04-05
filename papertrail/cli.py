@@ -106,7 +106,7 @@ def embed(
     from tqdm import tqdm
 
     from papertrail.embeddings import VectorStore, embed_texts
-    from papertrail.projections import cluster_papers, compute_projections
+    from papertrail.projections import cluster_papers, compute_projections, compute_projections_3d
 
     with open(input_file) as f:
         papers = json.load(f)
@@ -122,8 +122,10 @@ def embed(
     # Embed
     embeddings = embed_texts(texts, backend=backend, model=model)
 
-    # Project
+    # Project (2D + 3D)
     projections = compute_projections(embeddings)
+    click.echo("Computing 3D projections...")
+    projections_3d = compute_projections_3d(embeddings)
 
     # Cluster
     cluster_ids, cluster_labels = cluster_papers(
@@ -135,6 +137,9 @@ def embed(
         p["projections"] = {
             k: [float(v[i, 0]), float(v[i, 1])] for k, v in projections.items()
         }
+        # Add 3D projections
+        for k, v in projections_3d.items():
+            p["projections"][k] = [float(v[i, 0]), float(v[i, 1]), float(v[i, 2])]
         p["cluster_id"] = int(cluster_ids[i])
         p["cluster_label"] = cluster_labels[int(cluster_ids[i])]
 
