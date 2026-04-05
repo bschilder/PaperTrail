@@ -885,6 +885,34 @@
         .data-table td:not(:last-child) {
             max-width: 0;
         }
+        .data-table td:last-child {
+            overflow: visible;
+            text-overflow: clip;
+        }
+        /* Instant styled tooltip for table cells */
+        .data-table td[data-tip] {
+            position: relative;
+        }
+        .data-table td[data-tip]:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            left: 0;
+            top: calc(100% + 4px);
+            background: linear-gradient(135deg, #1e1e32, #252540);
+            border: 1px solid rgba(100,181,246,0.2);
+            color: #e0e0e0;
+            font-size: 12px;
+            line-height: 1.4;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 350px;
+            white-space: normal;
+            word-break: break-word;
+            z-index: 100;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            pointer-events: none;
+            animation: tooltipFadeIn 0.1s ease-out;
+        }
 
         .data-table tr:hover td {
             background: #1f1f30;
@@ -2310,7 +2338,7 @@
                             <table class="data-table" id="dataTable">
                                 <thead>
                                     <tr>
-                                        <th data-field="title" title="Paper title (click to sort, drag edge to resize)" style="width:30%;">
+                                        <th data-field="title" title="Paper title &#10;Click header to sort &#10;Drag edge to resize column" style="width:30%;">
                                             <div class="th-content">
                                                 <span>Title <span class="sort-indicator"></span></span>
                                                 <input type="text" class="column-filter" placeholder="Filter..." data-field="title">
@@ -2366,13 +2394,14 @@
                                             </div>
                                             <div class="th-resizer"></div>
                                         </th>
-                                        <th data-field="engagement" title="Engagement: shares + reactions + replies" style="width:45px;">
+                                        <th data-field="engagement" title="Engagement: total shares + emoji reactions + thread replies" style="width:80px;">
                                             <div class="th-content">
-                                                <span>Eng <span class="sort-indicator"></span></span>
+                                                <span>Engagement <span class="sort-indicator"></span></span>
+                                                <input type="text" class="column-filter" placeholder="e.g. >2" data-field="engagement">
                                             </div>
                                             <div class="th-resizer"></div>
                                         </th>
-                                        <th data-field="cluster_label" title="Topic cluster" style="width:12%;">
+                                        <th data-field="cluster_label" title="Topic cluster: auto-detected research area from embedding similarity" style="width:12%;">
                                             <div class="th-content">
                                                 <span>Cluster <span class="sort-indicator"></span></span>
                                                 <input type="text" class="column-filter" placeholder="Filter..." data-field="cluster_label">
@@ -2749,9 +2778,21 @@
                 }
                 for (const [field, value] of Object.entries(columnFilters)) {
                     if (!value) continue;
-                    const fieldValue = String(paper[field] || '').toLowerCase();
-                    if (!fieldValue.includes(value.toLowerCase())) {
-                        return false;
+                    // Numeric filter: support >, <, >=, <=, = operators
+                    const numMatch = value.match(/^([><=!]+)\s*(\d+\.?\d*)$/);
+                    if (numMatch) {
+                        const op = numMatch[1];
+                        const num = parseFloat(numMatch[2]);
+                        const paperNum = parseFloat(paper[field]) || 0;
+                        if (op === '>' && !(paperNum > num)) return false;
+                        if (op === '>=' && !(paperNum >= num)) return false;
+                        if (op === '<' && !(paperNum < num)) return false;
+                        if (op === '<=' && !(paperNum <= num)) return false;
+                        if (op === '=' && !(paperNum === num)) return false;
+                        if (op === '!=' && !(paperNum !== num)) return false;
+                    } else {
+                        const fieldValue = String(paper[field] || '').toLowerCase();
+                        if (!fieldValue.includes(value.toLowerCase())) return false;
                     }
                 }
                 return true;
@@ -3249,16 +3290,16 @@
                 }
 
                 row.innerHTML = `
-                    <td title="${esc(paper.title)}"><a href="${esc(paper.url) || '#'}" target="_blank" class="paper-title">${esc(paper.title) || 'Untitled'}</a></td>
+                    <td data-tip="${esc(paper.title)}"><a href="${esc(paper.url) || '#'}" target="_blank" class="paper-title">${esc(paper.title) || 'Untitled'}</a></td>
                     <td>${paper.year || ''}</td>
-                    <td title="${(paper.journal || '').replace(/"/g, '&quot;')}">${paper.journal || ''}</td>
-                    <td title="${authors.replace(/"/g, '&quot;')}">${authors}</td>
+                    <td data-tip="${esc(paper.journal)}">${paper.journal || ''}</td>
+                    <td data-tip="${esc(authors)}">${authors}</td>
                     <td>${channelBadges}</td>
                     <td><span style="cursor:pointer;color:#bb86fc;" onclick="event.stopPropagation();showContributorProfile('${esc(paper.shared_by || '').replace(/'/g, "\\'")}')">${personDisplay(paper.shared_by)}</span></td>
                     <td>${dateShared}</td>
                     <td>${citations}</td>
                     <td>${paper.engagement || 0}</td>
-                    <td title="${esc(paper.cluster_label)}"><span style="cursor:pointer;color:#66bb6a;" onclick="event.stopPropagation();showTopicActions('${esc(paper.cluster_label || '').replace(/'/g, "\\'")}', event)">${esc(paper.cluster_label || '')}</span></td>
+                    <td>${paper.cluster_label ? `<span class="card-tag cluster-tag" style="cursor:pointer;font-size:10px;" onclick="event.stopPropagation();showTopicActions('${esc(paper.cluster_label).replace(/'/g, "\\'")}', event)">${esc(paper.cluster_label)}</span>` : ''}</td>
                     <td style="white-space:nowrap;">${linksHtml}</td>
                 `;
 
@@ -3301,6 +3342,29 @@
 
                     document.addEventListener('mousemove', onMouseMove);
                     document.addEventListener('mouseup', onMouseUp);
+                });
+
+                // Double-click resizer to auto-fit column width (like Excel)
+                resizer.addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                    const colIdx = Array.from(th.parentElement.children).indexOf(th);
+                    const rows = document.querySelectorAll('#tableBody tr');
+                    let maxWidth = th.querySelector('.th-content span')?.scrollWidth || 60;
+
+                    rows.forEach(row => {
+                        const cell = row.children[colIdx];
+                        if (cell) {
+                            // Temporarily remove overflow to measure
+                            const prev = cell.style.cssText;
+                            cell.style.overflow = 'visible';
+                            cell.style.whiteSpace = 'nowrap';
+                            cell.style.maxWidth = 'none';
+                            maxWidth = Math.max(maxWidth, cell.scrollWidth);
+                            cell.style.cssText = prev;
+                        }
+                    });
+
+                    th.style.width = Math.min(maxWidth + 20, 500) + 'px';
                 });
             });
         }
