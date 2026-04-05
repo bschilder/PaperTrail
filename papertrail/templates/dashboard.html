@@ -862,6 +862,8 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+        .data-table td:not(:last-child) {
             max-width: 0;
         }
 
@@ -1392,10 +1394,11 @@
             pointer-events: none;
             box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
-        .heatmap-cell.l1 { background: rgba(100,181,246,0.2); }
-        .heatmap-cell.l2 { background: rgba(100,181,246,0.4); }
-        .heatmap-cell.l3 { background: rgba(100,181,246,0.65); }
-        .heatmap-cell.l4 { background: #64b5f6; }
+        /* Plasma color scale */
+        .heatmap-cell.l1 { background: #6a00a8; }
+        .heatmap-cell.l2 { background: #b12a90; }
+        .heatmap-cell.l3 { background: #e16462; }
+        .heatmap-cell.l4 { background: #fca636; }
         .heatmap-months {
             display: flex;
             gap: 2px;
@@ -2178,6 +2181,19 @@
                                             </div>
                                             <div class="th-resizer"></div>
                                         </th>
+                                        <th data-field="engagement" title="Engagement: shares + reactions + replies" style="width:45px;">
+                                            <div class="th-content">
+                                                <span>Eng <span class="sort-indicator"></span></span>
+                                            </div>
+                                            <div class="th-resizer"></div>
+                                        </th>
+                                        <th data-field="cluster_label" title="Topic cluster" style="width:12%;">
+                                            <div class="th-content">
+                                                <span>Cluster <span class="sort-indicator"></span></span>
+                                                <input type="text" class="column-filter" placeholder="Filter..." data-field="cluster_label">
+                                            </div>
+                                            <div class="th-resizer"></div>
+                                        </th>
                                         <th data-field="actions" title="Links to paper, Slack thread, OpenAlex" style="width:70px;">Links</th>
                                     </tr>
                                 </thead>
@@ -2946,7 +2962,7 @@
                 const authors = Array.isArray(paper.authors) ? paper.authors.join(', ') : (paper.authors || '');
                 const channels = Array.isArray(paper.channels) ? paper.channels : [];
                 const channelBadges = channels.map(ch =>
-                    `<span class="channel-badge">${channelDisplayName(ch)}</span>`
+                    `<a href="${slackChannelUrl(ch)}" target="_blank" class="channel-badge" style="cursor:pointer;text-decoration:none;color:${CHANNEL_COLORS[ch] || '#a0a0a0'};border-color:${CHANNEL_COLORS[ch] || '#3a3a4e'};" title="Open ${channelDisplayName(ch)} in Slack">${channelDisplayName(ch)}</a>`
                 ).join(' ');
 
                 const dateShared = paper.first_shared ? new Date(paper.first_shared).toLocaleDateString() : '';
@@ -2972,9 +2988,11 @@
                     <td title="${(paper.journal || '').replace(/"/g, '&quot;')}">${paper.journal || ''}</td>
                     <td title="${authors.replace(/"/g, '&quot;')}">${authors}</td>
                     <td>${channelBadges}</td>
-                    <td>${personDisplay(paper.shared_by)}</td>
+                    <td><span style="cursor:pointer;color:#bb86fc;" onclick="event.stopPropagation();showContributorProfile('${esc(paper.shared_by || '').replace(/'/g, "\\'")}')">${personDisplay(paper.shared_by)}</span></td>
                     <td>${dateShared}</td>
                     <td>${citations}</td>
+                    <td>${paper.engagement || 0}</td>
+                    <td title="${esc(paper.cluster_label)}">${esc(paper.cluster_label || '')}</td>
                     <td style="white-space:nowrap;">${linksHtml}</td>
                 `;
 
