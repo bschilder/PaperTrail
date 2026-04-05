@@ -215,6 +215,11 @@ The dashboard draws from several best-in-class data visualization tools:
 - **Semantic Scholar** — Paper metadata, abstract previews, citation counts,
   author information display patterns.
 
+- **Datashader** ([docs](https://datashader.org/getting_started/Pipeline.html))
+  — Scalable rendering pipeline. eq_hist (equalized histogram) density
+  coloring for overplotted regions. Point size scaling. Inspired the
+  density color mode in the dashboard.
+
 ### Embedding Model Sources
 
 Models are drawn from multiple providers (see `embeddings.py:MODEL_REGISTRY`):
