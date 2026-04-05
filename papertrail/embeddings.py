@@ -54,6 +54,16 @@ MODEL_REGISTRY: dict[str, dict[str, Any]] = {
         "quality": "good", "cost": "low",
         "description": "Legacy model, still widely used",
     },
+    "o3-embedding": {
+        "backend": "openai", "dims": 3072, "speed": "medium",
+        "quality": "highest", "cost": "medium",
+        "description": "Latest OpenAI reasoning-based embeddings, superior semantic understanding",
+    },
+    "o3-embedding-small": {
+        "backend": "openai", "dims": 1536, "speed": "fast",
+        "quality": "high", "cost": "low",
+        "description": "Compact version of o3-embedding, fast and accurate",
+    },
     # --- HuggingFace (remote, free tier available) ---
     "BAAI/bge-small-en-v1.5": {
         "backend": "huggingface", "dims": 384, "speed": "fast",
@@ -84,6 +94,21 @@ MODEL_REGISTRY: dict[str, dict[str, Any]] = {
         "backend": "huggingface", "dims": 768, "speed": "medium",
         "quality": "high", "cost": "free",
         "description": "Strong on scientific/technical text, 8K context",
+    },
+    "Alibaba-NLP/gte-Qwen2-1.5B-instruct": {
+        "backend": "huggingface", "dims": 1536, "speed": "slow",
+        "quality": "highest", "cost": "free",
+        "description": "Qwen2-based 1.5B param model, state-of-the-art on MTEB, 32K context",
+    },
+    "Alibaba-NLP/gte-Qwen2-7B-instruct": {
+        "backend": "huggingface", "dims": 3584, "speed": "slow",
+        "quality": "highest", "cost": "free",
+        "description": "Qwen2-based 7B param model, top MTEB scores, best for complex scientific text",
+    },
+    "Alibaba-NLP/gte-large-en-v1.5": {
+        "backend": "huggingface", "dims": 1024, "speed": "medium",
+        "quality": "high", "cost": "free",
+        "description": "GTE large model, strong multilingual and English performance",
     },
     # --- Local (offline, ONNX) ---
     # These use the same model names as HF but run locally via fastembed
