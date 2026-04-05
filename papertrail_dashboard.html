@@ -2271,14 +2271,14 @@
 
         <!-- Collapsible Semantic Search Panel -->
         <div class="agent-panel" id="semanticPanel" style="background:linear-gradient(135deg,#172530,#1a2e35);">
-            <div style="display:flex;align-items:center;gap:10px;max-width:900px;margin:0 auto;">
-                <div style="font-size:11px;color:#888;max-width:300px;line-height:1.4;">
-                    Semantic search ranks papers by how closely their content relates to your query — not just keyword matching. Results are colored and sized by relevance on the map.
+            <div style="display:flex;align-items:center;gap:12px;max-width:900px;margin:0 auto;">
+                <div style="font-size:13px;color:#a0a0b0;max-width:320px;line-height:1.5;">
+                    <strong style="color:#66bb6a;">Semantic Search</strong> ranks papers by content relevance, not just keywords. Results are colored and sized by relevance.
                 </div>
-                <input type="text" class="chatbot-bar-input" id="semanticPanelInput" placeholder="Type a semantic query and press Enter..." style="flex:1;">
+                <input type="text" class="chatbot-bar-input" id="semanticPanelInput" placeholder="Try: single cell RNA sequencing, attention mechanism, protein folding..." style="flex:1;font-size:14px;padding:9px 14px;">
                 <div style="display:flex;gap:6px;">
-                    <button class="chatbot-example-btn" onclick="document.getElementById('semanticPanelInput').value='single cell RNA sequencing';triggerSemanticFromPanel();">scRNA-seq</button>
-                    <button class="chatbot-example-btn" onclick="document.getElementById('semanticPanelInput').value='protein structure prediction';triggerSemanticFromPanel();">protein structure</button>
+                    <button class="chatbot-example-btn" style="font-size:12px;padding:6px 12px;" onclick="document.getElementById('semanticPanelInput').value='single cell RNA sequencing';triggerSemanticFromPanel();">scRNA-seq</button>
+                    <button class="chatbot-example-btn" style="font-size:12px;padding:6px 12px;" onclick="document.getElementById('semanticPanelInput').value='protein structure prediction';triggerSemanticFromPanel();">protein structure</button>
                     <button class="chatbot-example-btn" onclick="document.getElementById('semanticPanelInput').value='attention mechanism transformer';triggerSemanticFromPanel();">attention</button>
                 </div>
             </div>
@@ -8351,9 +8351,26 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
                 // Don't trigger shortcuts when typing in inputs
-                // Allow CMD/Ctrl shortcuts through even when in inputs
+                // Allow CMD/Ctrl and ESC through even when in inputs
                 const inInput = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT';
-                if (inInput && !(e.metaKey || e.ctrlKey)) return;
+                if (inInput && !(e.metaKey || e.ctrlKey) && e.key !== 'Escape') return;
+                // ESC in agent/search input: collapse panel and blur
+                if (inInput && e.key === 'Escape') {
+                    e.target.blur();
+                    const agentPanel = document.getElementById('agentPanel');
+                    const semanticPanel = document.getElementById('semanticPanel');
+                    if (agentPanel?.classList.contains('visible') && (e.target.id === 'chatbotInput')) {
+                        agentPanel.classList.remove('visible');
+                        document.getElementById('agentMascotBtn').classList.remove('active');
+                        document.getElementById('agentMascotBtn').classList.remove('settled');
+                        return;
+                    }
+                    if (semanticPanel?.classList.contains('visible') && (e.target.id === 'semanticPanelInput')) {
+                        semanticPanel.classList.remove('visible');
+                        document.getElementById('semanticMascotBtn').classList.remove('active');
+                        return;
+                    }
+                }
 
                 switch(e.key) {
                     case 'Escape': {
