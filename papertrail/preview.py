@@ -25,6 +25,7 @@ def build_preview(
     papers: list[dict[str, Any]],
     output_path: str = "papertrail.html",
     title: str = "PaperTrail",
+    slack_workspace_url: str | None = None,
 ) -> None:
     """
     Build the interactive HTML dashboard.
@@ -80,6 +81,10 @@ def build_preview(
 
     html = template.replace("{{TITLE}}", title)
     html = html.replace("{{DATA_B64}}", data_b64)
+    if slack_workspace_url:
+        html = html.replace("{{SLACK_WORKSPACE_URL}}", slack_workspace_url)
+    else:
+        html = html.replace("{{SLACK_WORKSPACE_URL}}", "")
 
     Path(output_path).write_text(html, encoding="utf-8")
     logger.info("Dashboard written to %s (%d KB)", output_path, len(html) // 1024)
