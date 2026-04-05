@@ -7376,13 +7376,26 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 const result = executeAnalyzeTrends({ granularity: 'quarterly' });
                 const recent = result.periods.slice(-4);
                 const allWords = {};
-                recent.forEach(p => (p.top_words || []).forEach(w => allWords[w] = (allWords[w] || 0) + 1));
+                const stopW = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by','from','is','are','was','were','be','been','have','has','do','does','not','can','will','this','that','its','our','their','using','based','via','new','non']);
+                recent.forEach(p => (p.top_words || []).forEach(w => {
+                    if (w.length > 2 && !stopW.has(w)) allWords[w] = (allWords[w] || 0) + 1;
+                }));
+                // Deduplicate stems (remove "models" if "model" exists)
+                const wordList = Object.keys(allWords);
+                wordList.forEach(w => {
+                    if (w.endsWith('s') && allWords[w.slice(0,-1)]) {
+                        allWords[w.slice(0,-1)] += allWords[w];
+                        delete allWords[w];
+                    }
+                });
                 const topWords = Object.entries(allWords).sort((a,b) => b[1]-a[1]).slice(0, 8).map(([w]) => w);
+                const firstRecent = recent[0];
+                const lastRecent = recent[recent.length - 1];
                 return {
                     title: 'Trending Topics',
                     html: `<p>Recent quarters show focus on: <strong>${topWords.join(', ')}</strong></p>
-                        <p style="margin-top:6px;">${recent.map(p => `${p.period}: ${p.total_papers} papers`).join(' → ')}</p>
-                        <p style="margin-top:6px;color:#888;">Total trend: ${result.periods[0]?.total_papers || 0} → ${result.periods[result.periods.length-1]?.total_papers || 0} papers/quarter</p>`
+                        <p style="margin-top:6px;">${recent.map(p => `${p.period}: ${p.total_papers} papers`).join(' &rarr; ')}</p>
+                        <p style="margin-top:6px;color:#888;">Recent trend: ${firstRecent?.total_papers || 0} &rarr; ${lastRecent?.total_papers || 0} papers/quarter (${firstRecent?.period} to ${lastRecent?.period})</p>`
                 };
             }
 
