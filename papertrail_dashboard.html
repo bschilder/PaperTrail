@@ -1087,20 +1087,20 @@
             min-width: 28px;
             text-align: center;
         }
-        .lb-rank.gold { color: #ffd700; animation: goldShine 2s ease infinite; }
-        .lb-rank.silver { color: #c0c0c0; animation: silverShine 3s ease infinite; }
-        .lb-rank.bronze { color: #cd7f32; animation: bronzeShine 4s ease infinite; }
+        .lb-rank.gold { color: #ffd700; animation: goldShine 2s ease infinite; font-size: 22px; }
+        .lb-rank.silver { color: #c0c0c0; animation: silverShine 2.5s ease infinite; font-size: 20px; }
+        .lb-rank.bronze { color: #cd7f32; animation: bronzeShine 3s ease infinite; }
         @keyframes goldShine {
-            0%, 100% { text-shadow: 0 0 4px rgba(255,215,0,0.3); }
-            50% { text-shadow: 0 0 12px rgba(255,215,0,0.6); }
+            0%, 100% { text-shadow: 0 0 8px rgba(255,215,0,0.4), 0 0 20px rgba(255,215,0,0.2); }
+            50% { text-shadow: 0 0 16px rgba(255,215,0,0.8), 0 0 30px rgba(255,215,0,0.4); }
         }
         @keyframes silverShine {
-            0%, 100% { text-shadow: 0 0 3px rgba(192,192,192,0.2); }
-            50% { text-shadow: 0 0 8px rgba(192,192,192,0.4); }
+            0%, 100% { text-shadow: 0 0 6px rgba(192,192,192,0.3), 0 0 15px rgba(192,192,192,0.15); }
+            50% { text-shadow: 0 0 12px rgba(192,192,192,0.6), 0 0 25px rgba(192,192,192,0.3); }
         }
         @keyframes bronzeShine {
-            0%, 100% { text-shadow: 0 0 2px rgba(205,127,50,0.15); }
-            50% { text-shadow: 0 0 6px rgba(205,127,50,0.3); }
+            0%, 100% { text-shadow: 0 0 4px rgba(205,127,50,0.25); }
+            50% { text-shadow: 0 0 10px rgba(205,127,50,0.5), 0 0 20px rgba(205,127,50,0.2); }
         }
         .lb-card-body { flex: 1; min-width: 0; }
         .lb-card-name {
@@ -3453,6 +3453,13 @@
             const actualPaper = allPapers.find(p => (p.shared_by || '').toLowerCase() === nameLower);
             if (actualPaper) name = actualPaper.shared_by; // restore proper case
             const papers = allPapers.filter(p => (p.shared_by || '').toLowerCase() === nameLower);
+
+            // Check if this is the top contributor
+            const allCounts = {};
+            allPapers.forEach(p => { if (p.shared_by) allCounts[p.shared_by] = (allCounts[p.shared_by] || 0) + 1; });
+            const maxCount = Math.max(...Object.values(allCounts));
+            const isTopContributor = papers.length === maxCount;
+
             const modal = document.getElementById('profileModal');
             const header = document.getElementById('profileHeader');
             const body = document.getElementById('profileBody');
@@ -3536,7 +3543,7 @@
             ).join(' ');
 
             header.innerHTML = `
-                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#bb86fc;margin-bottom:4px;">&#x1F451; Contributor</div>
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#bb86fc;margin-bottom:4px;">${isTopContributor ? '&#x1F451;' : '&#x1F464;'} Contributor</div>
                 <div class="profile-name">${esc(name)}</div>
                 <div class="profile-subtitle">${channelBadges}</div>
                 <div class="profile-stats">
@@ -3553,7 +3560,7 @@
                         <div class="profile-stat-label">Total Cites</div>
                     </div>
                     <div class="profile-stat">
-                        <div class="profile-stat-value">${topClusters[0] ? topClusters[0][1] : 0}</div>
+                        <div class="profile-stat-value" style="font-size:14px;">${topClusters[0] ? esc(topClusters[0][0].split(' ').slice(0,2).join(' ')) : 'N/A'}</div>
                         <div class="profile-stat-label">Top Topic</div>
                     </div>
                 </div>
