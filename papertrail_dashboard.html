@@ -896,6 +896,58 @@
             flex-shrink: 0;
         }
 
+        /* Keyboard shortcuts overlay */
+        .shortcuts-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 500;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.15s ease;
+        }
+        .shortcuts-overlay.visible { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .shortcuts-card {
+            background: #1e1e32;
+            border: 1px solid #3a3a4e;
+            border-radius: 12px;
+            padding: 24px;
+            min-width: 340px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+        }
+        .shortcuts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #2a2a3e;
+        }
+        .shortcuts-grid { display: flex; flex-direction: column; gap: 8px; }
+        .shortcut-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: #a0a0b0;
+        }
+        .shortcut-row kbd {
+            display: inline-block;
+            min-width: 32px;
+            padding: 3px 8px;
+            background: #252538;
+            border: 1px solid #3a3a4e;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 11px;
+            color: #e0e0e0;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
         /* ===== SELECTED PAPERS (in sidebar) ===== */
         #panelContent {
             display: flex;
@@ -1128,9 +1180,9 @@
                     <div class="chatbot-results" id="chatbotResults"></div>
                 </div>
                 <div class="chatbot-examples">
-                    <button class="chatbot-example-btn" data-query="papers shared by Peter Koo in genomics last summer">@Peter · summer</button>
-                    <button class="chatbot-example-btn" data-query="What are the most influential diffusion model papers?">diffusion</button>
-                    <button class="chatbot-example-btn" data-query="Compare the topics in papers-dl vs papers-genomics">dl vs genomics</button>
+                    <button class="chatbot-example-btn" data-query="Compare the focus areas of papers-dl vs papers-genomics">dl vs genomics</button>
+                    <button class="chatbot-example-btn" data-query="What topics are trending in the last 6 months?">trending</button>
+                    <button class="chatbot-example-btn" data-query="Who are the most active contributors and what do they focus on?">contributors</button>
                 </div>
                 <button class="chatbot-settings-btn" id="chatbotSettingsBtn" title="Configure AI (API key)">⚙</button>
                 <!-- Settings popup -->
@@ -1325,6 +1377,28 @@
 
     <!-- Tooltip -->
     <div class="tooltip" id="tooltip"></div>
+
+    <!-- Keyboard shortcut help overlay -->
+    <div class="shortcuts-overlay" id="shortcutsOverlay">
+        <div class="shortcuts-card">
+            <div class="shortcuts-header">
+                <span style="font-size:14px;font-weight:600;color:#fff;">Keyboard Shortcuts</span>
+                <button onclick="document.getElementById('shortcutsOverlay').classList.remove('visible')" style="background:none;border:none;color:#888;cursor:pointer;font-size:18px;">&times;</button>
+            </div>
+            <div class="shortcuts-grid">
+                <div class="shortcut-row"><kbd>?</kbd><span>Show this help</span></div>
+                <div class="shortcut-row"><kbd>1</kbd><span>UMAP projection</span></div>
+                <div class="shortcut-row"><kbd>2</kbd><span>t-SNE projection</span></div>
+                <div class="shortcut-row"><kbd>3</kbd><span>PCA projection</span></div>
+                <div class="shortcut-row"><kbd>T</kbd><span>Toggle Map / Table</span></div>
+                <div class="shortcut-row"><kbd>/</kbd><span>Focus search bar</span></div>
+                <div class="shortcut-row"><kbd>Esc</kbd><span>Clear selection / close panels</span></div>
+                <div class="shortcut-row"><kbd>Shift+Drag</kbd><span>Pan (any mode)</span></div>
+                <div class="shortcut-row"><kbd>Scroll</kbd><span>Zoom in/out</span></div>
+                <div class="shortcut-row"><kbd>Double-click</kbd><span>Reset zoom</span></div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // ===== CONSTANTS =====
@@ -2965,19 +3039,29 @@ DATASET SUMMARY:
 - Date range: ${summary.date_range.from} to ${summary.date_range.to}
 - Fields per paper: ${summary.fields_per_paper.join(', ')}
 
-You have a tool called "search_papers" to query the dataset. Use it to answer user questions.
+You have powerful tools to analyze this dataset:
 
-When the user asks a question:
-1. Figure out what filters to apply (person, channels, date range, keywords, sort, limit)
-2. Call the search_papers tool with those filters
-3. After getting results, provide a brief, helpful natural language answer
+TOOLS AVAILABLE:
+1. **search_papers** — Find papers by person, channel, date, keywords, cluster, with sorting
+2. **analyze_trends** — Track how topics evolve over time (monthly/quarterly/yearly)
+3. **compare_channels** — Compare channels by focus areas, contributors, citations
+4. **summarize_cluster** — Deep-dive into a topic cluster: top papers, key authors, trends
+5. **contributor_analysis** — Analyze a team member's sharing patterns and interests
+
+GUIDELINES:
+- Choose the BEST tool for the question. Don't default to search_papers for everything.
+- For "what topics..." or "what's trending..." → use analyze_trends
+- For "compare..." or "how does X differ from Y..." → use compare_channels
+- For "what is [cluster] about..." → use summarize_cluster
+- For "what does [person] share..." → use contributor_analysis
+- For finding specific papers → use search_papers
+- You can call multiple tools if needed.
 
 For date filters, today is ${new Date().toISOString().slice(0,10)}.
+For channels, use exact names: ${summary.channels.join(', ')}.
+For people, use exact names: ${summary.people.join(', ')}.
 
-For channels, use the exact channel names from the dataset (e.g. "papers-dl", "papers-genomics", "paper_digest_moon").
-For people, use the exact names from the dataset.
-
-Be concise and conversational. 2-3 sentences max for the answer.`;
+Be insightful and analytical. Don't just list papers — provide genuine analysis, comparisons, and actionable insights. 3-5 sentences.`;
         }
 
         const SEARCH_TOOL = {
@@ -3031,6 +3115,204 @@ Be concise and conversational. 2-3 sentences max for the answer.`;
                 }
             }
         };
+
+        const ANALYZE_TRENDS_TOOL = {
+            name: "analyze_trends",
+            description: "Analyze how paper topics and sharing patterns change over time. Returns monthly counts, top keywords per period, and trend direction.",
+            input_schema: {
+                type: "object",
+                properties: {
+                    keywords: {
+                        type: "array", items: { type: "string" },
+                        description: "Keywords to track over time"
+                    },
+                    channels: {
+                        type: "array", items: { type: "string" },
+                        description: "Limit to specific channels"
+                    },
+                    granularity: {
+                        type: "string", enum: ["monthly", "quarterly", "yearly"],
+                        description: "Time bucket granularity"
+                    }
+                }
+            }
+        };
+
+        const COMPARE_CHANNELS_TOOL = {
+            name: "compare_channels",
+            description: "Compare channels by topic focus, activity, contributors, and paper overlap. Use for understanding team research focus areas.",
+            input_schema: {
+                type: "object",
+                properties: {
+                    channels: {
+                        type: "array", items: { type: "string" },
+                        description: "Channels to compare (2+). Use exact channel names."
+                    }
+                },
+                required: ["channels"]
+            }
+        };
+
+        const SUMMARIZE_CLUSTER_TOOL = {
+            name: "summarize_cluster",
+            description: "Get detailed info about a topic cluster: top papers, key authors, representative titles, and what distinguishes this cluster.",
+            input_schema: {
+                type: "object",
+                properties: {
+                    cluster_label: {
+                        type: "string",
+                        description: "Cluster label to analyze. Use labels from the dataset."
+                    }
+                },
+                required: ["cluster_label"]
+            }
+        };
+
+        const CONTRIBUTOR_ANALYSIS_TOOL = {
+            name: "contributor_analysis",
+            description: "Analyze a team member's sharing patterns: what topics they focus on, how active they are, which channels they post to, and notable papers they shared.",
+            input_schema: {
+                type: "object",
+                properties: {
+                    person: { type: "string", description: "Person name to analyze" }
+                },
+                required: ["person"]
+            }
+        };
+
+        const ALL_TOOLS = [SEARCH_TOOL, ANALYZE_TRENDS_TOOL, COMPARE_CHANNELS_TOOL, SUMMARIZE_CLUSTER_TOOL, CONTRIBUTOR_ANALYSIS_TOOL];
+
+        function executeTool(name, params) {
+            if (name === 'search_papers') return executeSearchTool(params);
+            if (name === 'analyze_trends') return executeAnalyzeTrends(params);
+            if (name === 'compare_channels') return executeCompareChannels(params);
+            if (name === 'summarize_cluster') return executeSummarizeCluster(params);
+            if (name === 'contributor_analysis') return executeContributorAnalysis(params);
+            return { error: 'Unknown tool: ' + name };
+        }
+
+        function executeAnalyzeTrends(params) {
+            const granularity = params.granularity || 'monthly';
+            const keywords = (params.keywords || []).map(k => k.toLowerCase());
+            const channelFilter = (params.channels || []).map(c => c.toLowerCase());
+
+            let papers = [...filteredPapers];
+            if (channelFilter.length > 0) {
+                papers = papers.filter(p => (p.channels || []).some(c => channelFilter.includes(c.toLowerCase())));
+            }
+
+            const buckets = {};
+            papers.forEach(p => {
+                if (!p.first_shared) return;
+                const d = new Date(p.first_shared);
+                let key;
+                if (granularity === 'yearly') key = String(d.getFullYear());
+                else if (granularity === 'quarterly') key = `${d.getFullYear()}-Q${Math.floor(d.getMonth() / 3) + 1}`;
+                else key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+
+                if (!buckets[key]) buckets[key] = { total: 0, matching: 0, top_keywords: {} };
+                buckets[key].total++;
+
+                const text = ((p.title || '') + ' ' + (p.abstract || '')).toLowerCase();
+                if (keywords.length === 0 || keywords.some(k => text.includes(k))) {
+                    buckets[key].matching++;
+                }
+
+                // Track word frequency for trend words
+                (p.title || '').toLowerCase().split(/\s+/).forEach(w => {
+                    if (w.length > 3) buckets[key].top_keywords[w] = (buckets[key].top_keywords[w] || 0) + 1;
+                });
+            });
+
+            const sorted = Object.entries(buckets).sort((a, b) => a[0].localeCompare(b[0]));
+            return {
+                periods: sorted.map(([period, data]) => ({
+                    period,
+                    total_papers: data.total,
+                    matching_papers: data.matching,
+                    top_words: Object.entries(data.top_keywords).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([w, c]) => w)
+                })),
+                keywords_tracked: keywords,
+                total_papers: papers.length
+            };
+        }
+
+        function executeCompareChannels(params) {
+            const channels = params.channels || [];
+            const result = {};
+            channels.forEach(ch => {
+                const chLower = ch.toLowerCase();
+                const papers = allPapers.filter(p => (p.channels || []).some(c => c.toLowerCase().includes(chLower)));
+                const people = {};
+                const clusters = {};
+                let totalCites = 0;
+                papers.forEach(p => {
+                    if (p.shared_by) people[p.shared_by] = (people[p.shared_by] || 0) + 1;
+                    if (p.cluster_label) clusters[p.cluster_label] = (clusters[p.cluster_label] || 0) + 1;
+                    totalCites += p.cited_by_count || 0;
+                });
+                result[ch] = {
+                    paper_count: papers.length,
+                    avg_citations: papers.length > 0 ? Math.round(totalCites / papers.length) : 0,
+                    top_contributors: Object.entries(people).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([n, c]) => `${n} (${c})`),
+                    top_topics: Object.entries(clusters).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([l, c]) => `${l} (${c})`),
+                    date_range: {
+                        earliest: papers.filter(p => p.first_shared).sort((a, b) => a.first_shared.localeCompare(b.first_shared))[0]?.first_shared?.slice(0, 10) || 'N/A',
+                        latest: papers.filter(p => p.first_shared).sort((a, b) => b.first_shared.localeCompare(a.first_shared))[0]?.first_shared?.slice(0, 10) || 'N/A',
+                    }
+                };
+            });
+            return result;
+        }
+
+        function executeSummarizeCluster(params) {
+            const label = (params.cluster_label || '').toLowerCase();
+            const papers = filteredPapers.filter(p => (p.cluster_label || '').toLowerCase().includes(label));
+            const byYear = {};
+            const people = {};
+            papers.forEach(p => {
+                const y = p.year || 'Unknown';
+                byYear[y] = (byYear[y] || 0) + 1;
+                if (p.shared_by) people[p.shared_by] = (people[p.shared_by] || 0) + 1;
+            });
+            const topPapers = [...papers].sort((a, b) => (b.cited_by_count || 0) - (a.cited_by_count || 0)).slice(0, 5);
+            return {
+                cluster_label: params.cluster_label,
+                paper_count: papers.length,
+                top_papers: topPapers.map(p => ({ title: p.title, year: p.year, citations: p.cited_by_count || 0 })),
+                papers_by_year: byYear,
+                top_contributors: Object.entries(people).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([n, c]) => `${n} (${c})`),
+                channels: [...new Set(papers.flatMap(p => p.channels || []))],
+                _full_papers: topPapers
+            };
+        }
+
+        function executeContributorAnalysis(params) {
+            const person = (params.person || '').toLowerCase();
+            const papers = allPapers.filter(p => (p.shared_by || '').toLowerCase().includes(person));
+            const channels = {};
+            const clusters = {};
+            const byMonth = {};
+            papers.forEach(p => {
+                (p.channels || []).forEach(ch => channels[ch] = (channels[ch] || 0) + 1);
+                if (p.cluster_label) clusters[p.cluster_label] = (clusters[p.cluster_label] || 0) + 1;
+                if (p.first_shared) {
+                    const d = new Date(p.first_shared);
+                    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                    byMonth[key] = (byMonth[key] || 0) + 1;
+                }
+            });
+            const topPapers = [...papers].sort((a, b) => (b.cited_by_count || 0) - (a.cited_by_count || 0)).slice(0, 5);
+            return {
+                person: params.person,
+                total_papers_shared: papers.length,
+                channels: Object.entries(channels).sort((a, b) => b[1] - a[1]).map(([ch, c]) => `${ch} (${c})`),
+                top_topics: Object.entries(clusters).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([l, c]) => `${l} (${c})`),
+                activity_by_month: Object.entries(byMonth).sort((a, b) => a[0].localeCompare(b[0])).map(([m, c]) => `${m}: ${c}`),
+                most_cited_shares: topPapers.map(p => ({ title: p.title, citations: p.cited_by_count || 0 })),
+                _full_papers: topPapers
+            };
+        }
 
         function executeSearchTool(params) {
             let results = [...filteredPapers];
@@ -3141,7 +3423,7 @@ Be concise and conversational. 2-3 sentences max for the answer.`;
                     model: claudeModel,
                     max_tokens: 1024,
                     system: buildSystemPrompt(),
-                    tools: [SEARCH_TOOL],
+                    tools: ALL_TOOLS,
                     messages
                 })
             });
@@ -3171,7 +3453,7 @@ Be concise and conversational. 2-3 sentences max for the answer.`;
             }
 
             // Execute the tool
-            const toolResult = executeSearchTool(toolUseBlock.input);
+            const toolResult = executeTool(toolUseBlock.name, toolUseBlock.input);
             const fullPapers = toolResult._full_papers;
             delete toolResult._full_papers;
 
@@ -3198,7 +3480,7 @@ Be concise and conversational. 2-3 sentences max for the answer.`;
                     model: claudeModel,
                     max_tokens: 512,
                     system: buildSystemPrompt(),
-                    tools: [SEARCH_TOOL],
+                    tools: ALL_TOOLS,
                     messages
                 })
             });
@@ -3929,6 +4211,9 @@ Be concise and conversational. 2-3 sentences max for the answer.`;
                         } else {
                             document.getElementById('mapToggle').click();
                         }
+                        break;
+                    case '?':
+                        document.getElementById('shortcutsOverlay').classList.toggle('visible');
                         break;
                 }
             });
