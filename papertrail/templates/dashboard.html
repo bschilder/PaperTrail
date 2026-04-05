@@ -3319,8 +3319,12 @@
         function showTopicActions(label, event) {
             currentTopicLabel = label;
             const popup = document.getElementById('topicActionPopup');
-            popup.style.left = event.clientX + 'px';
-            popup.style.top = (event.clientY + 8) + 'px';
+            // Position above the click point so cursor doesn't cover it
+            const popupHeight = 80; // approximate
+            let top = event.clientY - popupHeight - 8;
+            if (top < 60) top = event.clientY + 16; // flip below if too close to top
+            popup.style.left = (event.clientX - 40) + 'px';
+            popup.style.top = top + 'px';
             popup.classList.add('visible');
 
             // Close on outside click
@@ -5514,6 +5518,8 @@
                         mx >= lb.x && mx <= lb.x + lb.w && my >= lb.y && my <= lb.y + lb.h
                     );
                     if (clickedLabel) {
+                        // Hide tooltip so it doesn't cover the action popup
+                        document.getElementById('tooltip').classList.remove('visible');
                         showTopicActions(clickedLabel.label, e);
                         return;
                     }
