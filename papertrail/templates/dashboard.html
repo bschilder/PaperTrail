@@ -4326,6 +4326,8 @@
         let raycaster3D = null;
         let mouse3D = new (typeof THREE !== 'undefined' ? THREE.Vector2 : Object)();
         let hovered3DIdx = -1;
+        let coords3DRef = [];
+        let scale3D = 1;
         let velTheta = 0, velPhi = 0;
         let flyTarget3D = null;
         let flyTargetRadius = 50;
@@ -4472,14 +4474,35 @@
                 idleTimer3D = 0;
             });
 
-            // Click to select paper
+            // Click to select paper (sphere selection — selects nearby papers within radius)
             renderer3D.domElement.addEventListener('click', (e) => {
                 if (hovered3DIdx >= 0 && papers3DRef[hovered3DIdx]) {
-                    const paper = papers3DRef[hovered3DIdx];
-                    const allIdx = (paperIndexMap.get(paper) ?? -1);
+                    const clickedPaper = papers3DRef[hovered3DIdx];
+                    const clickedCoord = coords3DRef[hovered3DIdx];
+                    const cx = clickedCoord[0] * scale3D, cy = clickedCoord[1] * scale3D, cz = clickedCoord[2] * scale3D;
+
+                    // Select all papers within sphere radius
+                    const selectRadius = 4; // units in 3D space
+                    const selectRadiusSq = selectRadius * selectRadius;
                     selectedPapers.clear();
-                    if (allIdx !== -1) selectedPapers.add(allIdx);
-                    showDetailPanel([paper]);
+                    const selected = [];
+
+                    papers3DRef.forEach((paper, i) => {
+                        const c = coords3DRef[i];
+                        const px = c[0] * scale3D, py = c[1] * scale3D, pz = c[2] * scale3D;
+                        const distSq = (px-cx)*(px-cx) + (py-cy)*(py-cy) + (pz-cz)*(pz-cz);
+                        if (distSq < selectRadiusSq) {
+                            const allIdx = (paperIndexMap.get(paper) ?? -1);
+                            if (allIdx !== -1) {
+                                selectedPapers.add(allIdx);
+                                selected.push(paper);
+                            }
+                        }
+                    });
+
+                    if (selected.length > 0) {
+                        showDetailPanel(selected.slice(0, 50));
+                    }
                 }
             });
 
@@ -4503,6 +4526,8 @@
             let maxDist = 0;
             coords3D.forEach(c => { const d = Math.sqrt(c[0]*c[0] + c[1]*c[1] + c[2]*c[2]); if (d > maxDist) maxDist = d; });
             const scale = 25 / (maxDist || 1);
+            coords3DRef = coords3D;
+            scale3D = scale;
 
             const sphereGeo = new THREE.SphereGeometry(1, 10, 8);
             const CLUSTER_COLORS_3D = [0x64b5f6, 0xbb86fc, 0x66bb6a, 0xffa726, 0xef5350, 0x26c6da, 0xffca28, 0xab47bc, 0x8d6e63, 0x78909c, 0xec407a, 0x7e57c2];
