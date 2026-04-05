@@ -1064,6 +1064,180 @@
             flex-shrink: 0;
         }
 
+        /* Profile modal */
+        .profile-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 550;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(6px);
+            animation: fadeIn 0.15s ease;
+        }
+        .profile-modal.visible { display: flex; }
+        .profile-card {
+            background: linear-gradient(135deg, #1e1e32 0%, #252540 100%);
+            border: 1px solid rgba(100,181,246,0.15);
+            border-radius: 14px;
+            width: 520px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .profile-close {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1;
+        }
+        .profile-close:hover { color: #fff; }
+        .profile-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid #2a2a3e;
+        }
+        .profile-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .profile-subtitle {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+        .profile-stats {
+            display: flex;
+            gap: 16px;
+        }
+        .profile-stat {
+            text-align: center;
+        }
+        .profile-stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #64b5f6;
+        }
+        .profile-stat-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .profile-body { padding: 16px 24px 24px; }
+        .profile-section {
+            margin-bottom: 16px;
+        }
+        .profile-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #666;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        /* GitHub-style contribution heatmap */
+        .heatmap-grid {
+            display: flex;
+            gap: 2px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+        .heatmap-col {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .heatmap-cell {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            background: #1a1a2e;
+        }
+        .heatmap-cell.l1 { background: rgba(100,181,246,0.2); }
+        .heatmap-cell.l2 { background: rgba(100,181,246,0.4); }
+        .heatmap-cell.l3 { background: rgba(100,181,246,0.65); }
+        .heatmap-cell.l4 { background: #64b5f6; }
+        .heatmap-months {
+            display: flex;
+            gap: 2px;
+            font-size: 9px;
+            color: #555;
+            margin-top: 4px;
+        }
+        .profile-paper-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .profile-paper-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            background: #1a1a2e;
+            border: 1px solid #2a2a3e;
+            border-radius: 8px;
+            font-size: 12px;
+            transition: background 0.15s;
+        }
+        .profile-paper-item:hover { background: #1f1f35; }
+        .profile-paper-title {
+            flex: 1;
+            color: #e0e0e0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .profile-paper-links {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .profile-paper-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background 0.15s;
+            font-size: 12px;
+        }
+        .profile-paper-links a:hover { background: #3a3a4e; }
+        .profile-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .profile-action-btn {
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid #3a3a4e;
+            background: #252538;
+            color: #e0e0e0;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+        .profile-action-btn:hover { background: #3a3a4e; border-color: #4a4a5e; }
+        .profile-action-btn.primary { background: #64b5f6; border-color: #64b5f6; color: #fff; }
+
         /* Insights bar */
         .insights-bar {
             background: linear-gradient(90deg, rgba(100,181,246,0.08) 0%, rgba(187,134,252,0.06) 100%);
@@ -1081,6 +1255,18 @@
         }
         .insights-text strong { color: #e0e0e0; }
         .insights-text .insight-highlight { color: #64b5f6; font-weight: 600; }
+        .insight-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+            white-space: nowrap;
+        }
+        .insight-chip:hover { background: rgba(100,181,246,0.12); }
+        .insight-sep { color: #3a3a4e; margin: 0 2px; }
         .insights-close {
             background: none;
             border: none;
@@ -1725,6 +1911,15 @@
     <!-- Tooltip -->
     <div class="tooltip" id="tooltip"></div>
 
+    <!-- Contributor profile modal -->
+    <div class="profile-modal" id="profileModal">
+        <div class="profile-card">
+            <button class="profile-close" onclick="document.getElementById('profileModal').classList.remove('visible')">&times;</button>
+            <div class="profile-header" id="profileHeader"></div>
+            <div class="profile-body" id="profileBody"></div>
+        </div>
+    </div>
+
     <!-- Onboarding overlay -->
     <div class="onboarding-overlay" id="onboardingOverlay">
         <div class="onboarding-card">
@@ -2003,6 +2198,121 @@
         }
 
         // ===== TABLE VIEW =====
+        function showContributorProfile(name) {
+            const papers = allPapers.filter(p => p.shared_by === name);
+            const modal = document.getElementById('profileModal');
+            const header = document.getElementById('profileHeader');
+            const body = document.getElementById('profileBody');
+
+            // Stats
+            const channels = new Set();
+            const clusters = {};
+            let totalCites = 0;
+            papers.forEach(p => {
+                (p.channels || []).forEach(ch => channels.add(ch));
+                if (p.cluster_label) clusters[p.cluster_label] = (clusters[p.cluster_label] || 0) + 1;
+                totalCites += p.cited_by_count || 0;
+            });
+            const topClusters = Object.entries(clusters).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+            // Build GitHub-style heatmap (last 12 months, 7 days per week)
+            const now = new Date();
+            const weeks = 52;
+            const heatmapData = {};
+            papers.forEach(p => {
+                if (!p.first_shared) return;
+                const d = new Date(p.first_shared);
+                const key = d.toISOString().slice(0, 10);
+                heatmapData[key] = (heatmapData[key] || 0) + 1;
+            });
+
+            let heatmapHTML = '<div class="heatmap-grid">';
+            const startDate = new Date(now);
+            startDate.setDate(startDate.getDate() - (weeks * 7));
+            // Align to Sunday
+            startDate.setDate(startDate.getDate() - startDate.getDay());
+
+            for (let w = 0; w < weeks; w++) {
+                heatmapHTML += '<div class="heatmap-col">';
+                for (let d = 0; d < 7; d++) {
+                    const date = new Date(startDate);
+                    date.setDate(date.getDate() + w * 7 + d);
+                    const key = date.toISOString().slice(0, 10);
+                    const count = heatmapData[key] || 0;
+                    const level = count === 0 ? '' : count === 1 ? 'l1' : count <= 3 ? 'l2' : count <= 5 ? 'l3' : 'l4';
+                    heatmapHTML += `<div class="heatmap-cell ${level}" title="${key}: ${count} papers"></div>`;
+                }
+                heatmapHTML += '</div>';
+            }
+            heatmapHTML += '</div>';
+
+            // Channel badges
+            const channelBadges = Array.from(channels).map(ch =>
+                `<span class="card-tag channel-tag">${channelDisplayName(ch)}</span>`
+            ).join(' ');
+
+            header.innerHTML = `
+                <div class="profile-name">${esc(name)}</div>
+                <div class="profile-subtitle">${channelBadges}</div>
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">${papers.length}</div>
+                        <div class="profile-stat-label">Papers</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">${channels.size}</div>
+                        <div class="profile-stat-label">Channels</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">${totalCites.toLocaleString()}</div>
+                        <div class="profile-stat-label">Total Cites</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">${topClusters[0] ? topClusters[0][1] : 0}</div>
+                        <div class="profile-stat-label">Top Topic</div>
+                    </div>
+                </div>
+            `;
+
+            // Top papers with links
+            const topPapers = [...papers].sort((a, b) => (b.cited_by_count || 0) - (a.cited_by_count || 0)).slice(0, 8);
+            const paperListHTML = topPapers.map(p => {
+                const paperLink = p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper">📄</a>` : '';
+                const slackLink = p.slack_url ? `<a href="${esc(p.slack_url)}" target="_blank" title="View in Slack">${SLACK_ICON_SVG}</a>` : '';
+                return `<div class="profile-paper-item">
+                    <span style="color:#ffca28;font-size:11px;min-width:35px;">${p.cited_by_count || 0}x</span>
+                    <span class="profile-paper-title">${esc(p.title) || 'Untitled'}</span>
+                    <div class="profile-paper-links">${paperLink}${slackLink}</div>
+                </div>`;
+            }).join('');
+
+            // Topic breakdown
+            const topicHTML = topClusters.map(([label, count]) =>
+                `<span class="card-tag cluster-tag" style="margin-bottom:4px;">${esc(label)} (${count})</span>`
+            ).join(' ');
+
+            body.innerHTML = `
+                <div class="profile-section">
+                    <div class="profile-section-title">Sharing Activity (past year)</div>
+                    ${heatmapHTML}
+                </div>
+                <div class="profile-section">
+                    <div class="profile-section-title">Top Topics</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;">${topicHTML}</div>
+                </div>
+                <div class="profile-section">
+                    <div class="profile-section-title">Top Papers</div>
+                    <div class="profile-paper-list">${paperListHTML}</div>
+                </div>
+                <div class="profile-actions">
+                    <a href="https://koolab.slack.com/team/" target="_blank" class="profile-action-btn primary">${SLACK_ICON_SVG} Message in Slack</a>
+                    <button class="profile-action-btn" onclick="document.getElementById('profileModal').classList.remove('visible'); document.getElementById('chatbotInput').value='papers by ${esc(name)}'; runChatSearch('papers by ${esc(name)}');">Search their papers</button>
+                </div>
+            `;
+
+            modal.classList.add('visible');
+        }
+
         function renderLeaderboard() {
             const container = document.getElementById('leaderboardContent');
 
@@ -2031,7 +2341,7 @@
                     <div class="lb-section-title"><span class="lb-icon">&#127942;</span> Top Contributors</div>
                     <div class="lb-grid">
                         ${sortedPeople.slice(0, 12).map(([name, data], i) => `
-                            <div class="lb-card">
+                            <div class="lb-card" style="cursor:pointer;" onclick="showContributorProfile('${esc(name).replace(/'/g, "\\'")}')">
                                 <div class="lb-rank ${rankClass(i)}">${i + 1}</div>
                                 <div class="lb-card-body">
                                     <div class="lb-card-name">${esc(name)}</div>
@@ -2052,7 +2362,11 @@
                                 <div class="lb-rank ${rankClass(i)}">${i + 1}</div>
                                 <div class="lb-card-body">
                                     <div class="lb-card-name">${esc(p.title) || 'Untitled'}</div>
-                                    <div class="lb-card-meta">${p.year || '?'} · ${esc(p.journal || 'Preprint')} · shared by ${esc(p.shared_by || '?')}</div>
+                                    <div class="lb-card-meta">${p.year || '?'} · ${esc(p.journal || 'Preprint')} · <span style="cursor:pointer;color:#bb86fc;" onclick="event.stopPropagation();showContributorProfile('${esc(p.shared_by || '').replace(/'/g, "\\'")}')">${esc(p.shared_by || '?')}</span></div>
+                                </div>
+                                <div class="profile-paper-links" style="flex-shrink:0;">
+                                    ${p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()">📄</a>` : ''}
+                                    ${p.slack_url ? `<a href="${esc(p.slack_url)}" target="_blank" title="View in Slack" onclick="event.stopPropagation()">${SLACK_ICON_SVG}</a>` : ''}
                                 </div>
                                 <div class="lb-stat" style="color:#ffca28;">${p.cited_by_count || 0}</div>
                             </div>
@@ -2068,7 +2382,11 @@
                                 <div class="lb-rank">${i + 1}</div>
                                 <div class="lb-card-body">
                                     <div class="lb-card-name">${esc(p.title) || 'Untitled'}</div>
-                                    <div class="lb-card-meta">${p.first_shared ? new Date(p.first_shared).toLocaleDateString() : '?'} · ${esc(p.shared_by || '?')} · ${(p.channels || []).map(ch => channelDisplayName(ch)).join(', ')}</div>
+                                    <div class="lb-card-meta">${p.first_shared ? new Date(p.first_shared).toLocaleDateString() : '?'} · <span style="cursor:pointer;color:#bb86fc;" onclick="event.stopPropagation();showContributorProfile('${esc(p.shared_by || '').replace(/'/g, "\\'")}')">${esc(p.shared_by || '?')}</span> · ${(p.channels || []).map(ch => channelDisplayName(ch)).join(', ')}</div>
+                                </div>
+                                <div class="profile-paper-links" style="flex-shrink:0;">
+                                    ${p.url ? `<a href="${esc(p.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()">📄</a>` : ''}
+                                    ${p.slack_url ? `<a href="${esc(p.slack_url)}" target="_blank" title="View in Slack" onclick="event.stopPropagation()">${SLACK_ICON_SVG}</a>` : ''}
                                 </div>
                             </div>
                         `).join('')}
@@ -2504,10 +2822,11 @@
             // Most cited paper
             const topCited = [...allPapers].sort((a, b) => (b.cited_by_count || 0) - (a.cited_by_count || 0))[0];
 
-            let html = `<span class="insight-highlight">${sortedClusters.length} topic clusters</span> across ${allPapers.length} papers`;
-            if (topCluster) html += ` · Largest: <strong>${esc(topCluster[0])}</strong> (${topCluster[1]})`;
-            if (topPerson) html += ` · Most active: <strong>${esc(topPerson[0])}</strong> (${topPerson[1]} papers)`;
-            if (topCited && topCited.cited_by_count > 50) html += ` · Most cited: <strong>${esc((topCited.title || '').substring(0, 40))}...</strong> (${topCited.cited_by_count})`;
+            let html = `<span class="insight-chip" onclick="document.getElementById('colorBySelect').value='cluster';colorByMode='cluster';renderMap();" title="View clusters">&#x1F30D; <span class="insight-highlight">${sortedClusters.length} clusters</span></span>`;
+            html += `<span class="insight-sep">·</span><span class="insight-chip">${allPapers.length} papers</span>`;
+            if (topCluster) html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="document.getElementById('chatbotInput').value='${esc(topCluster[0])}';runChatSearch('${esc(topCluster[0])}');" title="Search this topic">&#x1F4CA; <strong>${esc(topCluster[0])}</strong> (${topCluster[1]})</span>`;
+            if (topPerson) html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="showContributorProfile('${esc(topPerson[0]).replace(/'/g, "\\'")}')" title="View profile">&#x1F451; <strong>${esc(topPerson[0])}</strong> (${topPerson[1]})</span>`;
+            if (topCited && topCited.cited_by_count > 50) html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="window.open('${esc(topCited.url || '')}','_blank')" title="Open paper">&#x1F525; <strong>${esc((topCited.title || '').substring(0, 35))}...</strong> (${topCited.cited_by_count})</span>`;
 
             text.innerHTML = html;
             bar.style.display = 'flex';
