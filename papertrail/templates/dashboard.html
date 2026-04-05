@@ -7936,18 +7936,13 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
 
             // ===== URL HASH STATE =====
             function saveHashState() {
-                const state = {
-                    p: currentProjection,
-                    c: colorByMode,
-                    s: scaleByMode,
-                    z: Math.round(zoomLevel * 100) / 100,
-                };
-                // Only include non-default values to keep URL clean
-                if (state.p === 'umap') delete state.p;
-                if (state.c === 'channel') delete state.c;
-                if (state.s === 'uniform') delete state.s;
-                if (state.z === 1) delete state.z;
-                const hash = Object.entries(state).map(([k, v]) => `${k}=${v}`).join('&');
+                const state = {};
+                // Only include non-default, defined values
+                if (currentProjection && currentProjection !== 'umap') state.p = currentProjection;
+                if (colorByMode && colorByMode !== 'channel') state.c = colorByMode;
+                if (scaleByMode && scaleByMode !== 'uniform') state.s = scaleByMode;
+                if (zoomLevel && Math.round(zoomLevel * 100) / 100 !== 1) state.z = Math.round(zoomLevel * 100) / 100;
+                const hash = Object.entries(state).filter(([k, v]) => v !== undefined && v !== null).map(([k, v]) => `${k}=${v}`).join('&');
                 if (hash) {
                     history.replaceState(null, '', '#' + hash);
                 } else {
