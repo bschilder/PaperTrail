@@ -2565,9 +2565,9 @@
                         <div class="map-legend" id="threeDLegend" style="z-index:10;"></div>
                         <!-- 3D Toolbar -->
                         <div class="map-toolbar" style="z-index:10;">
-                            <button class="toolbar-button active" id="threeD_orbitBtn" data-tooltip="Orbit (drag)">&#x1F310;</button>
-                            <button class="toolbar-button" id="threeD_selectBtn" data-tooltip="Sphere Select (click near a point)">&#x25CE;</button>
-                            <button class="toolbar-button" id="threeD_flyBtn" data-tooltip="Fly to Cluster (double-click)">&#x2708;</button>
+                            <button class="toolbar-button active" id="threeD_orbitBtn" data-tooltip="Orbit / Pan (drag)">&#x1F310;</button>
+                            <button class="toolbar-button" id="threeD_selectBtn" data-tooltip="Sphere Select (hold+scroll to resize)">&#x25CE;</button>
+                            <button class="toolbar-button" id="threeD_flyBtn" data-tooltip="Lasso Select (draw on screen)">&#x2712;</button>
                             <button class="toolbar-button" id="threeD_resetBtn" data-tooltip="Reset Camera">&#x21BA;</button>
                         </div>
                         <div class="three-d-controls">
@@ -4334,6 +4334,10 @@
         let mouse3D = new (typeof THREE !== 'undefined' ? THREE.Vector2 : Object)();
         let hovered3DIdx = -1;
         let coords3DRef = [];
+        let mode3D = 'orbit'; // 'orbit', 'sphere', 'lasso'
+        let sphereSelect3D = null; // { center: Vector3, radius: number, mesh: Mesh }
+        let lasso3DPoints = []; // screen-space lasso points
+        let lasso3DCanvas = null;
         let scale3D = 1;
         let velTheta = 0, velPhi = 0;
         let flyTarget3D = null;
@@ -4481,34 +4485,146 @@
                 idleTimer3D = 0;
             });
 
-            // Click to select paper (sphere selection — selects nearby papers within radius)
-            renderer3D.domElement.addEventListener('click', (e) => {
-                if (hovered3DIdx >= 0 && papers3DRef[hovered3DIdx]) {
-                    const clickedPaper = papers3DRef[hovered3DIdx];
-                    const clickedCoord = coords3DRef[hovered3DIdx];
-                    const cx = clickedCoord[0] * scale3D, cy = clickedCoord[1] * scale3D, cz = clickedCoord[2] * scale3D;
+            // 3D Selection: sphere select + lasso
+            let sphereMesh3D = null;
+            let sphereCenter3D = null;
+            let sphereRadius3Dval = 3;
+            let isSelecting3D = false;
+            let lasso3DCtx = null;
 
-                    // Select all papers within sphere radius
-                    const selectRadius = 4; // units in 3D space
-                    const selectRadiusSq = selectRadius * selectRadius;
+            // Create lasso overlay canvas for 3D
+            lasso3DCanvas = document.createElement('canvas');
+            lasso3DCanvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;';
+            document.getElementById('threeDContainer').appendChild(lasso3DCanvas);
+
+            renderer3D.domElement.addEventListener('mousedown', (e) => {
+                if (mode3D === 'sphere' && hovered3DIdx >= 0) {
+                    // Start sphere selection at hovered point
+                    const c = coords3DRef[hovered3DIdx];
+                    sphereCenter3D = new THREE.Vector3(c[0] * scale3D, c[1] * scale3D, c[2] * scale3D);
+                    sphereRadius3Dval = 3;
+                    isSelecting3D = true;
+
+                    // Create visible sphere
+                    if (sphereMesh3D) scene3D.remove(sphereMesh3D);
+                    const geom = new THREE.SphereGeometry(1, 24, 16);
+                    const mat = new THREE.MeshBasicMaterial({ color: 0x64b5f6, transparent: true, opacity: 0.15, wireframe: false });
+                    sphereMesh3D = new THREE.Mesh(geom, mat);
+                    sphereMesh3D.position.copy(sphereCenter3D);
+                    sphereMesh3D.scale.set(sphereRadius3Dval, sphereRadius3Dval, sphereRadius3Dval);
+                    scene3D.add(sphereMesh3D);
+
+                    // Also add wireframe
+                    const wire = new THREE.LineSegments(
+                        new THREE.WireframeGeometry(geom),
+                        new THREE.LineBasicMaterial({ color: 0x64b5f6, transparent: true, opacity: 0.3 })
+                    );
+                    sphereMesh3D.add(wire);
+
+                    e.preventDefault();
+                    e.stopPropagation();
+                } else if (mode3D === 'lasso') {
+                    isSelecting3D = true;
+                    lasso3DPoints = [];
+                    const rect = renderer3D.domElement.getBoundingClientRect();
+                    lasso3DPoints.push([e.clientX - rect.left, e.clientY - rect.top]);
+                    lasso3DCanvas.width = rect.width;
+                    lasso3DCanvas.height = rect.height;
+                    lasso3DCtx = lasso3DCanvas.getContext('2d');
+                }
+            });
+
+            // Scroll to resize sphere while selecting
+            renderer3D.domElement.addEventListener('wheel', (e) => {
+                if (isSelecting3D && mode3D === 'sphere' && sphereMesh3D) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    sphereRadius3Dval = Math.max(1, Math.min(20, sphereRadius3Dval * (1 - e.deltaY * 0.002)));
+                    sphereMesh3D.scale.set(sphereRadius3Dval, sphereRadius3Dval, sphereRadius3Dval);
+                    return;
+                }
+                // Normal zoom
+                e.preventDefault();
+                radius3D = Math.max(5, Math.min(200, radius3D * (1 + e.deltaY * 0.001)));
+                updateCamera();
+                idleTimer3D = 0;
+            });
+
+            renderer3D.domElement.addEventListener('mousemove', (e) => {
+                if (isSelecting3D && mode3D === 'lasso' && lasso3DCtx) {
+                    const rect = renderer3D.domElement.getBoundingClientRect();
+                    lasso3DPoints.push([e.clientX - rect.left, e.clientY - rect.top]);
+                    // Draw lasso
+                    lasso3DCtx.clearRect(0, 0, lasso3DCanvas.width, lasso3DCanvas.height);
+                    lasso3DCtx.fillStyle = 'rgba(100,181,246,0.08)';
+                    lasso3DCtx.strokeStyle = 'rgba(100,181,246,0.7)';
+                    lasso3DCtx.lineWidth = 2;
+                    lasso3DCtx.setLineDash([6, 4]);
+                    lasso3DCtx.beginPath();
+                    lasso3DPoints.forEach((pt, i) => {
+                        if (i === 0) lasso3DCtx.moveTo(pt[0], pt[1]);
+                        else lasso3DCtx.lineTo(pt[0], pt[1]);
+                    });
+                    lasso3DCtx.closePath();
+                    lasso3DCtx.fill();
+                    lasso3DCtx.stroke();
+                    lasso3DCtx.setLineDash([]);
+                }
+            });
+
+            renderer3D.domElement.addEventListener('mouseup', (e) => {
+                if (!isSelecting3D) return;
+                isSelecting3D = false;
+
+                if (mode3D === 'sphere' && sphereCenter3D) {
+                    // Select all papers within sphere
+                    const rSq = sphereRadius3Dval * sphereRadius3Dval;
                     selectedPapers.clear();
                     const selected = [];
-
                     papers3DRef.forEach((paper, i) => {
                         const c = coords3DRef[i];
-                        const px = c[0] * scale3D, py = c[1] * scale3D, pz = c[2] * scale3D;
-                        const distSq = (px-cx)*(px-cx) + (py-cy)*(py-cy) + (pz-cz)*(pz-cz);
-                        if (distSq < selectRadiusSq) {
+                        const p = new THREE.Vector3(c[0]*scale3D, c[1]*scale3D, c[2]*scale3D);
+                        if (p.distanceToSquared(sphereCenter3D) < rSq) {
                             const allIdx = (paperIndexMap.get(paper) ?? -1);
-                            if (allIdx !== -1) {
-                                selectedPapers.add(allIdx);
-                                selected.push(paper);
-                            }
+                            if (allIdx !== -1) { selectedPapers.add(allIdx); selected.push(paper); }
                         }
                     });
+                    if (selected.length > 0) showDetailPanel(selected.slice(0, 50));
+                    // Remove sphere visual after brief delay
+                    setTimeout(() => { if (sphereMesh3D) { scene3D.remove(sphereMesh3D); sphereMesh3D = null; } }, 1000);
+                    sphereCenter3D = null;
+                }
 
-                    if (selected.length > 0) {
-                        showDetailPanel(selected.slice(0, 50));
+                if (mode3D === 'lasso' && lasso3DPoints.length > 3) {
+                    // Screen-space lasso: project all 3D points to screen and check containment
+                    selectedPapers.clear();
+                    const selected = [];
+                    const rect = renderer3D.domElement.getBoundingClientRect();
+                    papers3DRef.forEach((paper, i) => {
+                        const c = coords3DRef[i];
+                        const pos = new THREE.Vector3(c[0]*scale3D, c[1]*scale3D, c[2]*scale3D);
+                        pos.project(camera3D);
+                        const sx = (pos.x + 1) / 2 * rect.width;
+                        const sy = (-pos.y + 1) / 2 * rect.height;
+                        if (pointInPolygon([sx, sy], lasso3DPoints)) {
+                            const allIdx = (paperIndexMap.get(paper) ?? -1);
+                            if (allIdx !== -1) { selectedPapers.add(allIdx); selected.push(paper); }
+                        }
+                    });
+                    if (selected.length > 0) showDetailPanel(selected.slice(0, 50));
+                    // Clear lasso
+                    if (lasso3DCtx) lasso3DCtx.clearRect(0, 0, lasso3DCanvas.width, lasso3DCanvas.height);
+                    lasso3DPoints = [];
+                }
+
+                if (mode3D === 'orbit' && hovered3DIdx >= 0) {
+                    // Simple click in orbit mode: select single paper
+                    const paper = papers3DRef[hovered3DIdx];
+                    if (paper) {
+                        const allIdx = (paperIndexMap.get(paper) ?? -1);
+                        selectedPapers.clear();
+                        if (allIdx !== -1) selectedPapers.add(allIdx);
+                        showDetailPanel([paper]);
                     }
                 }
             });
@@ -7760,18 +7876,19 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             });
 
             // 3D toolbar buttons
-            document.getElementById('threeD_orbitBtn')?.addEventListener('click', () => {
+            function set3DMode(newMode) {
+                mode3D = newMode;
                 document.querySelectorAll('#threeDView .toolbar-button').forEach(b => b.classList.remove('active'));
-                document.getElementById('threeD_orbitBtn').classList.add('active');
-            });
-            document.getElementById('threeD_selectBtn')?.addEventListener('click', () => {
-                document.querySelectorAll('#threeDView .toolbar-button').forEach(b => b.classList.remove('active'));
-                document.getElementById('threeD_selectBtn').classList.add('active');
-            });
-            document.getElementById('threeD_flyBtn')?.addEventListener('click', () => {
-                document.querySelectorAll('#threeDView .toolbar-button').forEach(b => b.classList.remove('active'));
-                document.getElementById('threeD_flyBtn').classList.add('active');
-            });
+                const btnMap = { orbit: 'threeD_orbitBtn', sphere: 'threeD_selectBtn', lasso: 'threeD_flyBtn' };
+                document.getElementById(btnMap[newMode] || 'threeD_orbitBtn')?.classList.add('active');
+                // Update cursor
+                if (renderer3D) {
+                    renderer3D.domElement.style.cursor = newMode === 'orbit' ? 'grab' : 'crosshair';
+                }
+            }
+            document.getElementById('threeD_orbitBtn')?.addEventListener('click', () => set3DMode('orbit'));
+            document.getElementById('threeD_selectBtn')?.addEventListener('click', () => set3DMode('sphere'));
+            document.getElementById('threeD_flyBtn')?.addEventListener('click', () => set3DMode('lasso'));
             document.getElementById('threeD_resetBtn')?.addEventListener('click', () => {
                 theta3D = 0; phi3D = Math.PI / 4; radius3D = 50;
                 panOffset3D = { x: 0, y: 0, z: 0 };
