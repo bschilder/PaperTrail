@@ -2184,6 +2184,44 @@
             width: 14px;
             height: 14px;
         }
+        /* Mobile responsive */
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 200px;
+                padding: 10px;
+                gap: 10px;
+            }
+            .header {
+                padding: 6px 12px;
+                gap: 8px;
+            }
+            .header-title { font-size: 16px; }
+            .view-toggle button { padding: 4px 12px; font-size: 12px; }
+            .insights-bar { padding: 4px 12px; font-size: 11px; }
+            .insight-chip { padding: 1px 6px; font-size: 11px; }
+            .agent-mascot { padding: 5px 10px; }
+            .mascot-svg { width: 24px; height: 24px; }
+            .mascot-label { font-size: 12px; }
+        }
+
+        @media (max-width: 640px) {
+            .main-container { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                max-height: 40vh;
+                overflow-y: auto;
+                border-right: none;
+                border-bottom: 1px solid #2a2a3e;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .sidebar-section { min-width: 120px; }
+            .header { flex-wrap: wrap; }
+            .insights-bar { display: none; }
+            .chatbot-examples { display: none; }
+            .map-legend { max-height: 30%; font-size: 11px; }
+            .detail-panel-right.visible { width: 100%; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200; }
+        }
     </style>
 </head>
 <body>
