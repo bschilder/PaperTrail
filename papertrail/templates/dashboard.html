@@ -4475,11 +4475,26 @@
                 lassoCtx.setLineDash([]);
             }
 
-            // Set cursor for label hover
-            const overLabel = renderedLabels.some(lb =>
+            // Set cursor for label hover and show label tooltip
+            const hoveredLabel = renderedLabels.find(lb =>
                 mouseX >= lb.x && mouseX <= lb.x + lb.w && mouseY >= lb.y && mouseY <= lb.y + lb.h
             );
-            canvas.style.cursor = overLabel ? 'pointer' : (hoveredPaperIdx >= 0 ? 'pointer' : 'default');
+            canvas.style.cursor = (hoveredLabel || hoveredPaperIdx >= 0) ? 'pointer' : 'default';
+
+            // Show label action hint
+            if (hoveredLabel && !isDragging) {
+                const tooltip = document.getElementById('tooltip');
+                const clusterPapers = filteredPapers.filter(p => p.cluster_label === hoveredLabel.label);
+                tooltip.innerHTML = `
+                    <div class="tooltip-title">${esc(hoveredLabel.label)}</div>
+                    <div class="tooltip-content">${clusterPapers.length} papers</div>
+                    <div style="font-size:10px;color:#64b5f6;margin-top:4px;">Click for options</div>
+                `;
+                tooltip.classList.add('visible');
+                tooltip.style.left = (e.clientX + 16) + 'px';
+                tooltip.style.top = (e.clientY + 16) + 'px';
+                return; // skip paper tooltip
+            }
 
             // Show tooltip
             showTooltip(mouseX, mouseY, e.clientX, e.clientY);
