@@ -2520,14 +2520,14 @@
                                             </div>
                                             <div class="th-resizer"></div>
                                         </th>
-                                        <th data-field="channels" title="Slack channels where paper was shared" style="width:10%;">
+                                        <th data-field="channels" title="Slack channels where paper was shared" style="width:12%;">
                                             <div class="th-content">
                                                 <span>Channels <span class="sort-indicator"></span></span>
                                                 <input type="text" class="column-filter" placeholder="Filter..." data-field="channels">
                                             </div>
                                             <div class="th-resizer"></div>
                                         </th>
-                                        <th data-field="shared_by" title="Team member who shared the paper" style="width:10%;">
+                                        <th data-field="shared_by" title="Team member who shared the paper" style="width:11%;">
                                             <div class="th-content">
                                                 <span>Shared By <span class="sort-indicator"></span></span>
                                                 <input type="text" class="column-filter" placeholder="Filter..." data-field="shared_by">
@@ -3837,7 +3837,7 @@
                     linksHtml += `<a href="${slackUrl}" target="_blank" class="table-action-icon" title="Open in Slack">${SLACK_ICON_SVG}</a>`;
                 }
                 if (paper.openalex_url) {
-                    linksHtml += `<a href="${paper.openalex_url}" target="_blank" class="table-action-icon" title="View on OpenAlex"><img src="https://openalex.org/img/tricon.a08e3fec.png" alt="OA" style="width:16px;height:16px;"></a>`;
+                    linksHtml += `<a href="${paper.openalex_url}" target="_blank" class="table-action-icon" title="View on OpenAlex"><img src="https://openalex.org/img/tricon.a08e3fec.png" alt="OA" style="width:16px;height:16px;filter:brightness(2) invert(0.1);"></a>`;
                 }
 
                 row.innerHTML = `
