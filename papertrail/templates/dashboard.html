@@ -1,0 +1,3327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaperTrail Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0f0f17;
+            color: #e0e0e0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: #1a1a2e;
+            border-bottom: 1px solid #2a2a3e;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 4px;
+            background: #2a2a3e;
+            padding: 4px;
+            border-radius: 16px;
+            border: 1px solid #3a3a4e;
+        }
+
+        .view-toggle button {
+            padding: 6px 18px;
+            border: none;
+            background: transparent;
+            color: #a0a0a0;
+            cursor: pointer;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .view-toggle button.active {
+            background: #64b5f6;
+            color: #fff;
+        }
+
+        .view-toggle button:hover:not(.active) {
+            color: #e0e0e0;
+        }
+
+        /* ===== CHATBOT BAR (top nav) ===== */
+        .chatbot-bar {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .chatbot-avatar {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+            image-rendering: pixelated;
+        }
+
+        .chatbot-bar-input-wrap {
+            flex: 1;
+            position: relative;
+        }
+
+        .chatbot-bar-input {
+            width: 100%;
+            padding: 7px 12px;
+            background: #252538;
+            border: 1px solid #3a3a4e;
+            color: #e0e0e0;
+            border-radius: 18px;
+            font-size: 13px;
+        }
+
+        .chatbot-bar-input:focus {
+            outline: none;
+            border-color: #64b5f6;
+            background: #2a2a3e;
+        }
+
+        .chatbot-bar-input::placeholder {
+            color: #666;
+        }
+
+        .chatbot-examples {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .chatbot-example-btn {
+            padding: 5px 10px;
+            background: #252538;
+            border: 1px solid #3a3a4e;
+            color: #a0a0a0;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 11px;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .chatbot-example-btn:hover {
+            background: #3a3a4e;
+            color: #e0e0e0;
+        }
+
+        .chatbot-settings-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: transparent;
+            border: 1px solid #3a3a4e;
+            color: #888;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .chatbot-settings-btn:hover {
+            background: #3a3a4e;
+            color: #e0e0e0;
+        }
+
+        .chatbot-settings-btn.has-key {
+            color: #66bb6a;
+            border-color: #66bb6a;
+        }
+
+        .chatbot-settings-popup {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 320px;
+            background: #1a1a2e;
+            border: 1px solid #3a3a4e;
+            border-radius: 10px;
+            padding: 14px;
+            z-index: 300;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        }
+
+        .chatbot-settings-popup.visible {
+            display: block;
+        }
+
+        /* AI thinking indicator */
+        .ai-thinking {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            font-size: 12px;
+            color: #64b5f6;
+        }
+
+        .ai-thinking-dots span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #64b5f6;
+            border-radius: 50%;
+            animation: aiPulse 1.4s infinite ease-in-out both;
+        }
+
+        .ai-thinking-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .ai-thinking-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes aiPulse {
+            0%, 80%, 100% { transform: scale(0.4); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* AI response area */
+        .ai-response {
+            padding: 12px 14px;
+            font-size: 12px;
+            color: #e0e0e0;
+            line-height: 1.5;
+            border-bottom: 1px solid #2a2a3e;
+        }
+
+        .ai-response strong {
+            color: #64b5f6;
+        }
+
+        .ai-mode-badge {
+            display: inline-block;
+            font-size: 9px;
+            padding: 1px 5px;
+            border-radius: 3px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .ai-mode-badge.llm {
+            background: rgba(102,187,106,0.2);
+            color: #66bb6a;
+            border: 1px solid rgba(102,187,106,0.3);
+        }
+
+        .ai-mode-badge.local {
+            background: rgba(255,167,38,0.2);
+            color: #ffa726;
+            border: 1px solid rgba(255,167,38,0.3);
+        }
+
+        /* Chatbot Results Dropdown */
+        .chatbot-results {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: #1a1a2e;
+            border: 1px solid #3a3a4e;
+            border-radius: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 250;
+            display: none;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+        }
+
+        .chatbot-results.visible {
+            display: block;
+        }
+
+        .chatbot-results-header {
+            padding: 10px 14px;
+            font-size: 12px;
+            color: #888;
+            border-bottom: 1px solid #2a2a3e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-results-close {
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .chatbot-results-close:hover {
+            color: #e0e0e0;
+        }
+
+        .chatbot-result-item {
+            padding: 10px 14px;
+            border-bottom: 1px solid #1f1f30;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .chatbot-result-item:hover {
+            background: #252538;
+        }
+
+        .chatbot-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .chatbot-result-title {
+            font-size: 13px;
+            color: #fff;
+            font-weight: 500;
+            margin-bottom: 3px;
+            line-height: 1.3;
+        }
+
+        .chatbot-result-meta {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: #252538;
+            border: 1px solid #3a3a4e;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 260;
+            display: none;
+        }
+
+        .autocomplete-dropdown.visible {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #e0e0e0;
+            transition: background 0.15s;
+        }
+
+        .autocomplete-item:hover, .autocomplete-item.ac-active {
+            background: #3a3a4e;
+        }
+
+        .export-buttons {
+            display: none;
+            gap: 8px;
+        }
+
+        .export-buttons.visible {
+            display: flex;
+        }
+
+        .export-buttons button {
+            padding: 6px 12px;
+            background: #2a2a3e;
+            border: 1px solid #3a3a4e;
+            color: #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .export-buttons button:hover {
+            background: #3a3a4e;
+            border-color: #4a4a5e;
+        }
+
+        #statsDisplay {
+            color: #888;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 260px;
+            background: #1a1a2e;
+            border-right: 1px solid #2a2a3e;
+            overflow-y: auto;
+            flex-shrink: 0;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .sidebar-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sidebar-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #888;
+            letter-spacing: 0.5px;
+        }
+
+        .channel-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .channel-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .channel-button {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #3a3a4e;
+            background: #252538;
+            color: #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .channel-button::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .channel-button:hover {
+            border-color: #4a4a5e;
+            background: #2a2a3e;
+        }
+
+        .channel-button.active {
+            background: var(--channel-color, #64b5f6);
+            border-color: var(--channel-color, #64b5f6);
+            color: #fff;
+        }
+
+        /* Channel colors */
+        .channel-button[data-channel="papers-dl"]::before { background: #64b5f6; }
+        .channel-button[data-channel="papers-genomics"]::before { background: #66bb6a; }
+        .channel-button[data-channel="papers-protein"]::before { background: #ffa726; }
+        .channel-button[data-channel="papers-phenomics"]::before { background: #ef5350; }
+        .channel-button[data-channel="papers-ai-agents"]::before { background: #bb86fc; }
+        .channel-button[data-channel="papers-health"]::before { background: #26c6da; }
+        .channel-button[data-channel="paper_digest_moon"]::before { background: #ffca28; }
+
+        .channel-slack-link {
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #252538;
+            border: 1px solid #3a3a4e;
+            border-radius: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .channel-slack-link:hover {
+            background: #3a3a4e;
+        }
+
+        .channel-slack-link img {
+            width: 14px;
+            height: 14px;
+        }
+
+        .color-by-select, .scale-by-select {
+            padding: 6px 8px;
+            background: #252538;
+            border: 1px solid #3a3a4e;
+            color: #e0e0e0;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .color-by-select:focus, .scale-by-select:focus {
+            outline: none;
+            border-color: #64b5f6;
+        }
+
+        .semantic-controls {
+            display: flex;
+            gap: 6px;
+        }
+
+        .semantic-controls button {
+            flex: 1;
+            padding: 6px;
+            background: #64b5f6;
+            border: none;
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .semantic-controls button:hover {
+            background: #42a5f5;
+        }
+
+        .semantic-input {
+            padding: 6px 8px;
+            background: #252538;
+            border: 1px solid #3a3a4e;
+            color: #e0e0e0;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .semantic-input:focus {
+            outline: none;
+            border-color: #64b5f6;
+        }
+
+        .select-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .threshold-display {
+            font-size: 13px;
+            font-weight: 600;
+            color: #64b5f6;
+            min-width: 30px;
+            text-align: right;
+        }
+
+        .semantic-active {
+            padding: 4px 8px;
+            background: rgba(100, 181, 246, 0.2);
+            border: 1px solid #64b5f6;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #64b5f6;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        /* ===== CENTER PANEL ===== */
+        .center-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .view-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-view {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .table-view.visible {
+            display: flex;
+        }
+
+        .table-wrapper {
+            flex: 1;
+            overflow: auto;
+            border-top: 1px solid #2a2a3e;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .data-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #1a1a2e;
+        }
+
+        .data-table th {
+            padding: 10px 8px;
+            text-align: left;
+            font-size: 12px;
+            color: #a0a0a0;
+            font-weight: 600;
+            border-bottom: 1px solid #2a2a3e;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .data-table th:hover {
+            color: #e0e0e0;
+        }
+
+        .data-table td {
+            padding: 8px;
+            font-size: 12px;
+            border-bottom: 1px solid #1f1f2f;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 0;
+        }
+
+        .data-table tr:hover td {
+            background: #1f1f30;
+        }
+
+        .paper-title {
+            color: #64b5f6;
+            text-decoration: none;
+        }
+
+        .paper-title:hover {
+            text-decoration: underline;
+        }
+
+        .channel-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            font-size: 10px;
+            border-radius: 4px;
+            background: #252538;
+            color: #a0a0a0;
+            border: 1px solid #3a3a4e;
+        }
+
+        .column-filter {
+            padding: 4px 6px;
+            background: #252538;
+            border: 1px solid #3a3a4e;
+            color: #e0e0e0;
+            border-radius: 4px;
+            font-size: 11px;
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        .column-filter:focus {
+            outline: none;
+            border-color: #64b5f6;
+        }
+
+        .th-content {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        /* Column resize handle */
+        .th-resizer {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            cursor: col-resize;
+            background: transparent;
+            z-index: 11;
+        }
+
+        .th-resizer:hover, .th-resizer.resizing {
+            background: #64b5f6;
+        }
+
+        /* Table action icons */
+        .table-action-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            transition: background 0.15s;
+            text-decoration: none;
+        }
+
+        .table-action-icon:hover {
+            background: #3a3a4e;
+        }
+
+        .table-action-icon img {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ===== MAP VIEW ===== */
+        .map-view {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden;
+        }
+
+        .map-view.visible {
+            display: block;
+        }
+
+        #canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: default;
+        }
+
+        .map-toolbar {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 40;
+        }
+
+        .toolbar-button {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #252538;
+            border: 1px solid #3a3a4e;
+            color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .toolbar-button:hover {
+            background: #3a3a4e;
+            border-color: #4a4a5e;
+        }
+
+        .toolbar-button.active {
+            background: #64b5f6;
+            border-color: #64b5f6;
+            color: #fff;
+        }
+
+        .tooltip {
+            position: fixed;
+            background: #252538;
+            border: 1px solid #3a3a4e;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 12px;
+            z-index: 60;
+            display: none;
+            max-width: 300px;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .tooltip.visible {
+            display: block;
+        }
+
+        .tooltip-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
+        .tooltip-content {
+            color: #a0a0a0;
+            font-size: 11px;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
+        .tooltip-link {
+            color: #64b5f6;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        /* ===== SELECTED PAPERS (in sidebar) ===== */
+        #panelContent {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .paper-card {
+            background: #252538;
+            border: 1px solid #3a3a4e;
+            border-radius: 6px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .paper-card:hover {
+            background: #2a2a3e;
+            border-color: #4a4a5e;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .card-checkbox-area {
+            flex-shrink: 0;
+            padding-top: 2px;
+        }
+
+        .card-checkbox-area input[type="checkbox"] {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+
+        .card-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
+        .card-meta {
+            font-size: 11px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+        }
+
+        .card-tags {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+        }
+
+        .card-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 7px;
+            font-size: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        .card-tag:hover {
+            opacity: 0.8;
+        }
+
+        .card-tag.channel-tag {
+            background: rgba(100, 181, 246, 0.2);
+            color: #64b5f6;
+            border: 1px solid rgba(100, 181, 246, 0.3);
+        }
+
+        .card-tag.person-tag {
+            background: rgba(187, 134, 252, 0.2);
+            color: #bb86fc;
+            border: 1px solid rgba(187, 134, 252, 0.3);
+        }
+
+        .card-tag.cluster-tag {
+            background: rgba(102, 187, 106, 0.2);
+            color: #66bb6a;
+            border: 1px solid rgba(102, 187, 106, 0.3);
+        }
+
+        .card-details {
+            display: none;
+            font-size: 11px;
+            color: #a0a0a0;
+            padding-top: 6px;
+            border-top: 1px solid #3a3a4e;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .card-details.visible {
+            display: block;
+        }
+
+        .detail-row {
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #888;
+            font-size: 10px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            color: #a0a0a0;
+            word-break: break-word;
+        }
+
+        .detail-value a {
+            color: #64b5f6;
+            text-decoration: none;
+        }
+
+        .detail-value a:hover {
+            text-decoration: underline;
+        }
+
+        .select-all-checkbox {
+            padding: 6px 10px;
+            border-bottom: 1px solid #3a3a4e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .download-selected {
+            padding: 8px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .download-selected button {
+            flex: 1;
+            padding: 6px;
+            background: #64b5f6;
+            border: none;
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .download-selected button:hover {
+            background: #42a5f5;
+        }
+
+        /* ===== LASSO OVERLAY ===== */
+        #lassoCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: crosshair;
+            display: none;
+        }
+
+        #lassoCanvas.active {
+            display: block;
+        }
+
+        /* ===== SLACK ICON (inline SVG data URI) ===== */
+        .slack-icon {
+            width: 14px;
+            height: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="header-title">PaperTrail</div>
+                <div class="view-toggle">
+                    <button id="mapToggle" class="active">Map</button>
+                    <button id="tableToggle">Table</button>
+                </div>
+            </div>
+
+            <!-- Chatbot bar in center of header -->
+            <div class="chatbot-bar">
+                <svg class="chatbot-avatar" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Pixel art space invader -->
+                    <rect x="3" y="1" width="2" height="2" fill="#64b5f6"/>
+                    <rect x="11" y="1" width="2" height="2" fill="#64b5f6"/>
+                    <rect x="5" y="3" width="6" height="2" fill="#64b5f6"/>
+                    <rect x="3" y="5" width="10" height="2" fill="#64b5f6"/>
+                    <rect x="1" y="7" width="2" height="2" fill="#64b5f6"/>
+                    <rect x="3" y="7" width="10" height="2" fill="#64b5f6"/>
+                    <rect x="13" y="7" width="2" height="2" fill="#64b5f6"/>
+                    <rect x="1" y="9" width="2" height="2" fill="#64b5f6"/>
+                    <rect x="5" y="9" width="2" height="2" fill="#64b5f6"/>
+                    <rect x="9" y="9" width="2" height="2" fill="#64b5f6"/>
+                    <rect x="13" y="9" width="2" height="2" fill="#64b5f6"/>
+                    <rect x="3" y="11" width="2" height="2" fill="#64b5f6"/>
+                    <rect x="5" y="13" width="2" height="2" fill="#64b5f6"/>
+                    <rect x="9" y="13" width="2" height="2" fill="#64b5f6"/>
+                    <rect x="11" y="11" width="2" height="2" fill="#64b5f6"/>
+                    <!-- Eyes -->
+                    <rect x="5" y="7" width="2" height="2" fill="#0f0f17"/>
+                    <rect x="9" y="7" width="2" height="2" fill="#0f0f17"/>
+                </svg>
+                <div class="chatbot-bar-input-wrap">
+                    <input type="text" class="chatbot-bar-input" id="chatbotInput" placeholder="Ask about papers... try @person, #channel, or keywords">
+                    <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+                    <div class="chatbot-results" id="chatbotResults"></div>
+                </div>
+                <div class="chatbot-examples">
+                    <button class="chatbot-example-btn" data-query="papers shared by Peter Koo in genomics last summer">@Peter · summer</button>
+                    <button class="chatbot-example-btn" data-query="What are the most influential diffusion model papers?">diffusion</button>
+                    <button class="chatbot-example-btn" data-query="Compare the topics in papers-dl vs papers-genomics">dl vs genomics</button>
+                </div>
+                <button class="chatbot-settings-btn" id="chatbotSettingsBtn" title="Configure AI (API key)">⚙</button>
+                <!-- Settings popup -->
+                <div class="chatbot-settings-popup" id="chatbotSettingsPopup">
+                    <div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:8px;">AI Agent Settings</div>
+                    <div style="font-size:11px;color:#888;margin-bottom:8px;">Enter your Anthropic API key to enable the AI agent. Without a key, a local keyword parser is used instead.</div>
+                    <input type="password" class="chatbot-bar-input" id="apiKeyInput" placeholder="sk-ant-..." style="font-size:12px;margin-bottom:8px;">
+                    <div style="font-size:11px;color:#888;margin-bottom:4px;">Model</div>
+                    <select id="modelSelect" class="color-by-select" style="width:100%;margin-bottom:8px;font-size:12px;">
+                        <option value="claude-sonnet-4-20250514">Sonnet 4 — fast + smart (default)</option>
+                        <option value="claude-opus-4-20250514">Opus 4 — most capable</option>
+                        <option value="claude-haiku-3-5-20241022">Haiku 3.5 — fastest + cheapest</option>
+                    </select>
+                    <div style="display:flex;gap:6px;">
+                        <button id="apiKeySave" style="flex:1;padding:6px;background:#64b5f6;border:none;color:#fff;border-radius:6px;cursor:pointer;font-size:12px;">Save</button>
+                        <button id="apiKeyClear" style="flex:1;padding:6px;background:#3a3a4e;border:1px solid #4a4a5e;color:#e0e0e0;border-radius:6px;cursor:pointer;font-size:12px;">Clear</button>
+                    </div>
+                    <div id="apiKeyStatus" style="font-size:11px;color:#666;margin-top:6px;"></div>
+                </div>
+            </div>
+
+            <div id="statsDisplay">Loading...</div>
+            <div class="export-buttons" id="exportButtons">
+                <button id="exportCsv">CSV</button>
+                <button id="exportXlsx">XLSX</button>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-label">Channels</div>
+                    <div class="channel-filters" id="channelFilters"></div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-label">Projection</div>
+                    <select class="color-by-select" id="projectionSelect">
+                        <option value="umap">UMAP</option>
+                        <option value="tsne">t-SNE</option>
+                        <option value="pca">PCA</option>
+                    </select>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-label">Color By</div>
+                    <select class="color-by-select" id="colorBySelect">
+                        <option value="channel">Channel</option>
+                        <option value="cluster">Cluster</option>
+                        <option value="year">Year</option>
+                        <option value="citations">Citations</option>
+                    </select>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-label">Scale By</div>
+                    <select class="scale-by-select" id="scaleBySelect">
+                        <option value="uniform">Uniform</option>
+                        <option value="citations">Citations</option>
+                        <option value="year">Year</option>
+                        <option value="relevance">Relevance</option>
+                    </select>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-label">Semantic Search</div>
+                    <input type="text" class="semantic-input" id="semanticQuery" placeholder="Type a query...">
+                    <div class="semantic-controls">
+                        <button id="semanticSearch">Search</button>
+                        <button id="semanticClear" style="display: none;">Clear</button>
+                    </div>
+                    <div class="semantic-active" id="semanticActive" style="display: none;">Semantic mode active</div>
+                </div>
+
+                <div class="sidebar-section" id="topNSection" style="display: none;">
+                    <div class="sidebar-label">Select Top Results</div>
+                    <div class="select-controls">
+                        <input type="range" id="selectTopN" min="1" max="100" value="20" style="flex: 1;">
+                        <span class="threshold-display" id="topNDisplay">20</span>
+                    </div>
+                </div>
+
+                <!-- Selected Papers (inline in sidebar) -->
+                <div class="sidebar-section" id="detailPanel" style="display:none;">
+                    <div class="sidebar-label" style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>Selected Papers</span>
+                        <button id="panelClose" style="background:none;border:none;color:#888;cursor:pointer;font-size:14px;padding:0 4px;" title="Clear selection">&times;</button>
+                    </div>
+                    <div id="panelContent"></div>
+                </div>
+            </div>
+
+            <!-- Center Panel -->
+            <div class="center-panel">
+                <div class="view-content">
+                    <!-- Map View -->
+                    <div class="map-view visible" id="mapView">
+                        <canvas id="canvas"></canvas>
+                        <canvas id="lassoCanvas"></canvas>
+                        <div class="map-toolbar">
+                            <button class="toolbar-button" id="panBtn" title="Pan (or hold Shift)">✋</button>
+                            <button class="toolbar-button" id="lassoBtn" title="Lasso Select">∿</button>
+                            <button class="toolbar-button" id="rectBtn" title="Rectangle Select">◻</button>
+                            <button class="toolbar-button" id="resetBtn" title="Reset Zoom">↺</button>
+                        </div>
+                    </div>
+
+                    <!-- Table View -->
+                    <div class="table-view" id="tableView">
+                        <div class="table-wrapper">
+                            <table class="data-table" id="dataTable">
+                                <thead>
+                                    <tr>
+                                        <th data-field="title" title="Paper title (click to sort, drag edge to resize)" style="width:30%;">
+                                            <div class="th-content">
+                                                <span>Title <span class="sort-indicator"></span></span>
+                                                <input type="text" class="column-filter" placeholder="Filter..." data-field="title">
+                                            </div>
+                                            <div class="th-resizer"></div>
+                                        </th>
+                                        <th data-field="year" title="Publication year" style="width:60px;">
+                                            <div class="th-content">
+                                                <span>Year <span class="sort-indicator"></span></span>
+                                                <input type="text" class="column-filter" placeholder="Filter..." data-field="year">
+                                            </div>
+                                            <div class="th-resizer"></div>
+                                        </th>
+                                        <th data-field="journal" title="Journal or preprint server" style="width:12%;">
+                                            <div class="th-content">
+                                                <span>Journal <span class="sort-indicator"></span></span>
+                                                <input type="text" class="column-filter" placeholder="Filter..." data-field="journal">
+                                            </div>
+                                            <div class="th-resizer"></div>
+                                        </th>
+                                        <th data-field="authors" title="Author list (drag edge to widen)" style="width:15%;">
+                                            <div class="th-content">
+                                                <span>Authors <span class="sort-indicator"></span></span>
+                                                <input type="text" class="column-filter" placeholder="Filter..." data-field="authors">
+                                            </div>
+                                            <div class="th-resizer"></div>
+                                        </th>
+                                        <th data-field="channels" title="Slack channels where paper was shared" style="width:10%;">
+                                            <div class="th-content">
+                                                <span>Channels <span class="sort-indicator"></span></span>
+                                                <input type="text" class="column-filter" placeholder="Filter..." data-field="channels">
+                                            </div>
+                                            <div class="th-resizer"></div>
+                                        </th>
+                                        <th data-field="shared_by" title="Team member who shared the paper" style="width:10%;">
+                                            <div class="th-content">
+                                                <span>Shared By <span class="sort-indicator"></span></span>
+                                                <input type="text" class="column-filter" placeholder="Filter..." data-field="shared_by">
+                                            </div>
+                                            <div class="th-resizer"></div>
+                                        </th>
+                                        <th data-field="first_shared" title="Date first shared in Slack" style="width:80px;">
+                                            <div class="th-content">
+                                                <span>Date <span class="sort-indicator"></span></span>
+                                                <input type="text" class="column-filter" placeholder="Filter..." data-field="first_shared">
+                                            </div>
+                                            <div class="th-resizer"></div>
+                                        </th>
+                                        <th data-field="cited_by_count" title="Citation count from OpenAlex" style="width:55px;">
+                                            <div class="th-content">
+                                                <span>Cites <span class="sort-indicator"></span></span>
+                                                <input type="text" class="column-filter" placeholder="Filter..." data-field="cited_by_count">
+                                            </div>
+                                            <div class="th-resizer"></div>
+                                        </th>
+                                        <th data-field="actions" title="Links to paper, Slack thread, OpenAlex" style="width:70px;">Links</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right panel removed — selection now in sidebar -->
+        </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // ===== CONSTANTS =====
+        const CHANNEL_COLORS = {
+            'papers-dl': '#64b5f6',
+            'papers-genomics': '#66bb6a',
+            'papers-protein': '#ffa726',
+            'papers-phenomics': '#ef5350',
+            'papers-ai-agents': '#bb86fc',
+            'papers-health': '#26c6da',
+            'paper_digest_moon': '#ffca28'
+        };
+
+        const CHANNEL_IDS = {
+            'papers-dl': 'C0123Q7PGGP',
+            'papers-genomics': 'C015BQ2BDF0',
+            'papers-protein': 'C011SDT3KKQ',
+            'papers-phenomics': 'C084KFWEVC2',
+            'papers-ai-agents': 'C08C020L554',
+            'papers-health': 'C09U8FW4YJV',
+            'paper_digest_moon': 'C0AEX373E5Q'
+        };
+
+        const SLACK_ICON_SVG = `<svg viewBox="0 0 24 24" class="slack-icon" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zm-1.268 0a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z" fill="#888"/></svg>`;
+
+        // ===== GLOBAL STATE =====
+        let allPapers = [];
+        let filteredPapers = [];
+        let selectedPapers = new Set();
+        let selectedChannels = new Set();
+        let sortField = null;
+        let sortAscending = true;
+        let columnFilters = {};
+        let currentView = 'map';
+        let semanticQuery = null;
+        let semanticScores = new Map();
+        let colorByMode = 'channel';
+        let scaleByMode = 'uniform';
+        let currentProjection = 'umap';
+
+        // Canvas state
+        let canvas, ctx;
+        let zoomLevel = 1;
+        let panX = 0;
+        let panY = 0;
+        let projMinX = 0, projMaxX = 1, projMinY = 0, projMaxY = 1;
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        let mouseDownPos = { x: 0, y: 0 }; // for click detection (not updated during drag)
+        let selectionMode = 'pan';
+        let lassoPoints = [];
+        let lassoCanvas, lassoCtx;
+        let rectStart = null;
+        let isShiftPanning = false;
+        let shiftPanStart = null;
+
+        // ===== HELPERS =====
+        function channelDisplayName(ch) {
+            return '#' + ch;
+        }
+
+        function slackChannelUrl(ch) {
+            const cid = CHANNEL_IDS[ch];
+            return cid ? `https://koolab.slack.com/archives/${cid}` : '#';
+        }
+
+        function personDisplay(name) {
+            if (!name) return 'Unknown';
+            return '@' + name;
+        }
+
+        // ===== DATA LOADING =====
+        function loadData() {
+            try {
+                const dataB64 = "{{DATA_B64}}";
+                if (dataB64 === "{" + "{DATA_B64}}") {
+                    allPapers = [];
+                } else {
+                    const jsonStr = atob(dataB64);
+                    allPapers = JSON.parse(jsonStr);
+                }
+            } catch (error) {
+                console.error("Error loading data:", error);
+                allPapers = [];
+            }
+
+            const channels = new Set();
+            allPapers.forEach(paper => {
+                if (paper.channels && Array.isArray(paper.channels)) {
+                    paper.channels.forEach(ch => channels.add(ch));
+                }
+            });
+
+            selectedChannels = new Set(channels);
+            initChannelFilters(Array.from(channels));
+
+            // Set top-N slider max to total paper count
+            const topNSlider = document.getElementById('selectTopN');
+            if (topNSlider && allPapers.length > 0) {
+                topNSlider.max = allPapers.length;
+            }
+
+            filterPapers();
+        }
+
+        // ===== UI INITIALIZATION =====
+        function initChannelFilters(channels) {
+            const container = document.getElementById('channelFilters');
+            container.innerHTML = '';
+            channels.sort().forEach(channel => {
+                const row = document.createElement('div');
+                row.className = 'channel-row';
+
+                const btn = document.createElement('button');
+                btn.className = 'channel-button active';
+                btn.dataset.channel = channel;
+                btn.textContent = channelDisplayName(channel);
+                btn.style.setProperty('--channel-color', CHANNEL_COLORS[channel] || '#64b5f6');
+                btn.addEventListener('click', () => {
+                    if (selectedChannels.has(channel)) {
+                        selectedChannels.delete(channel);
+                        btn.classList.remove('active');
+                    } else {
+                        selectedChannels.add(channel);
+                        btn.classList.add('active');
+                    }
+                    filterPapers();
+                });
+
+                const link = document.createElement('a');
+                link.className = 'channel-slack-link';
+                link.href = slackChannelUrl(channel);
+                link.target = '_blank';
+                link.title = 'Open in Slack';
+                link.innerHTML = SLACK_ICON_SVG;
+
+                row.appendChild(btn);
+                row.appendChild(link);
+                container.appendChild(row);
+            });
+        }
+
+        function filterPapers() {
+            filteredPapers = allPapers.filter(paper => {
+                if (selectedChannels.size > 0 && (!paper.channels || !paper.channels.some(ch => selectedChannels.has(ch)))) {
+                    return false;
+                }
+                for (const [field, value] of Object.entries(columnFilters)) {
+                    if (!value) continue;
+                    const fieldValue = String(paper[field] || '').toLowerCase();
+                    if (!fieldValue.includes(value.toLowerCase())) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            if (sortField) {
+                filteredPapers.sort((a, b) => {
+                    let aVal = a[sortField];
+                    let bVal = b[sortField];
+                    if (aVal === undefined || aVal === null) aVal = '';
+                    if (bVal === undefined || bVal === null) bVal = '';
+                    if (typeof aVal === 'string') {
+                        aVal = aVal.toLowerCase();
+                        bVal = bVal.toLowerCase();
+                    }
+                    const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+                    return sortAscending ? cmp : -cmp;
+                });
+            }
+
+            computeBounds();
+
+            if (currentView === 'table') {
+                renderTable();
+            } else {
+                renderMap();
+            }
+
+            const statsEl = document.getElementById('statsDisplay');
+            if (statsEl) statsEl.textContent = filteredPapers.length + ' / ' + allPapers.length + ' papers';
+        }
+
+        // ===== TABLE VIEW =====
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            filteredPapers.forEach((paper, idx) => {
+                const row = document.createElement('tr');
+                const authors = Array.isArray(paper.authors) ? paper.authors.join(', ') : (paper.authors || '');
+                const channels = Array.isArray(paper.channels) ? paper.channels : [];
+                const channelBadges = channels.map(ch =>
+                    `<span class="channel-badge">${channelDisplayName(ch)}</span>`
+                ).join(' ');
+
+                const dateShared = paper.first_shared ? new Date(paper.first_shared).toLocaleDateString() : '';
+                const citations = paper.cited_by_count || 0;
+
+                // Build links cell: paper link, slack icon, openalex logo
+                let linksHtml = '';
+                if (paper.url) {
+                    linksHtml += `<a href="${paper.url}" target="_blank" class="table-action-icon" title="Open paper">📄</a>`;
+                }
+                // Slack link from first share
+                const slackUrl = paper.slack_url || (paper.shares && paper.shares[0] && paper.shares[0].slack_url);
+                if (slackUrl) {
+                    linksHtml += `<a href="${slackUrl}" target="_blank" class="table-action-icon" title="Open in Slack">${SLACK_ICON_SVG}</a>`;
+                }
+                if (paper.openalex_url) {
+                    linksHtml += `<a href="${paper.openalex_url}" target="_blank" class="table-action-icon" title="View on OpenAlex"><img src="https://openalex.org/img/tricon.a08e3fec.png" alt="OA" style="width:16px;height:16px;"></a>`;
+                }
+
+                row.innerHTML = `
+                    <td title="${(paper.title || '').replace(/"/g, '&quot;')}"><a href="${paper.url || '#'}" target="_blank" class="paper-title">${paper.title || 'Untitled'}</a></td>
+                    <td>${paper.year || ''}</td>
+                    <td title="${(paper.journal || '').replace(/"/g, '&quot;')}">${paper.journal || ''}</td>
+                    <td title="${authors.replace(/"/g, '&quot;')}">${authors}</td>
+                    <td>${channelBadges}</td>
+                    <td>${personDisplay(paper.shared_by)}</td>
+                    <td>${dateShared}</td>
+                    <td>${citations}</td>
+                    <td style="white-space:nowrap;">${linksHtml}</td>
+                `;
+
+                row.addEventListener('click', () => {
+                    selectedPapers.clear();
+                    const allIdx = allPapers.indexOf(paper);
+                    if (allIdx !== -1) selectedPapers.add(allIdx);
+                    showDetailPanel([paper]);
+                });
+
+                tbody.appendChild(row);
+            });
+        }
+
+        // ===== TABLE COLUMN RESIZING =====
+        function initTableResize() {
+            const resizers = document.querySelectorAll('.th-resizer');
+            resizers.forEach(resizer => {
+                const th = resizer.parentElement;
+                let startX, startWidth;
+
+                resizer.addEventListener('mousedown', (e) => {
+                    e.stopPropagation();
+                    startX = e.clientX;
+                    startWidth = th.offsetWidth;
+                    resizer.classList.add('resizing');
+
+                    function onMouseMove(e) {
+                        const newWidth = startWidth + (e.clientX - startX);
+                        if (newWidth > 40) {
+                            th.style.width = newWidth + 'px';
+                        }
+                    }
+
+                    function onMouseUp() {
+                        resizer.classList.remove('resizing');
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                    }
+
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                });
+            });
+        }
+
+        // ===== MAP VIEW =====
+        function initCanvas() {
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+            lassoCanvas = document.getElementById('lassoCanvas');
+            lassoCtx = lassoCanvas.getContext('2d');
+
+            function resizeCanvas() {
+                const mapView = document.getElementById('mapView');
+                canvas.width = mapView.clientWidth;
+                canvas.height = mapView.clientHeight;
+                lassoCanvas.width = mapView.clientWidth;
+                lassoCanvas.height = mapView.clientHeight;
+                renderMap();
+            }
+
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            // Event listeners on both canvases so lasso overlay doesn't block
+            [canvas, lassoCanvas].forEach(el => {
+                el.addEventListener('wheel', handleZoom);
+                el.addEventListener('mousedown', handleCanvasMouseDown);
+                el.addEventListener('mousemove', handleCanvasMouseMove);
+                el.addEventListener('mouseup', handleCanvasMouseUp);
+                el.addEventListener('dblclick', resetZoom);
+            });
+
+            // Toolbar
+            document.getElementById('panBtn').addEventListener('click', () => setSelectionMode('pan'));
+            document.getElementById('lassoBtn').addEventListener('click', () => setSelectionMode('lasso'));
+            document.getElementById('rectBtn').addEventListener('click', () => setSelectionMode('rect'));
+            document.getElementById('resetBtn').addEventListener('click', resetZoom);
+        }
+
+        function setSelectionMode(mode) {
+            selectionMode = mode;
+            const buttons = document.querySelectorAll('.toolbar-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            if (mode === 'pan') document.getElementById('panBtn').classList.add('active');
+            else if (mode === 'lasso') document.getElementById('lassoBtn').classList.add('active');
+            else if (mode === 'rect') document.getElementById('rectBtn').classList.add('active');
+
+            lassoCanvas.classList.toggle('active', mode !== 'pan');
+            lassoPoints = [];
+        }
+
+        function getPointRadius(paper) {
+            if (scaleByMode === 'uniform') return 4;
+            if (scaleByMode === 'citations') return Math.max(3, Math.min(10, (paper.cited_by_count || 0) / 5));
+            if (scaleByMode === 'year') return Math.max(3, Math.min(10, ((paper.year || 2020) - 2015) / 2 + 3));
+            if (scaleByMode === 'relevance' && semanticQuery) {
+                const score = semanticScores.get(paper.title) || 0;
+                return Math.max(3, Math.min(10, score * 10));
+            }
+            return 4;
+        }
+
+        function getPointColor(paper) {
+            if (semanticQuery) {
+                const score = semanticScores.get(paper.title) || 0;
+                return interpolateColor([50, 50, 120], [255, 80, 80], score);
+            }
+
+            if (colorByMode === 'channel' && paper.channels && paper.channels.length > 0) {
+                return CHANNEL_COLORS[paper.channels[0]] || '#64b5f6';
+            }
+
+            if (colorByMode === 'cluster') {
+                const CLUSTER_COLORS = ['#64b5f6','#bb86fc','#66bb6a','#ffa726','#ef5350','#26c6da','#ffca28','#ab47bc','#8d6e63','#78909c','#ec407a','#7e57c2'];
+                return CLUSTER_COLORS[(paper.cluster_id || 0) % CLUSTER_COLORS.length];
+            }
+
+            if (colorByMode === 'year') {
+                const year = paper.year || 2020;
+                const normalized = Math.min(1, (year - 2015) / 10);
+                return interpolateColor([100, 181, 246], [239, 83, 80], normalized);
+            }
+
+            if (colorByMode === 'citations') {
+                const citations = paper.cited_by_count || 0;
+                const normalized = Math.min(1, citations / 100);
+                return interpolateColor([100, 181, 246], [255, 202, 40], normalized);
+            }
+
+            return '#64b5f6';
+        }
+
+        function interpolateColor(rgb1, rgb2, t) {
+            const r = Math.round(rgb1[0] + (rgb2[0] - rgb1[0]) * t);
+            const g = Math.round(rgb1[1] + (rgb2[1] - rgb1[1]) * t);
+            const b = Math.round(rgb1[2] + (rgb2[2] - rgb1[2]) * t);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        function computeBounds() {
+            projMinX = Infinity; projMaxX = -Infinity;
+            projMinY = Infinity; projMaxY = -Infinity;
+            filteredPapers.forEach(paper => {
+                const proj = paper.projections && paper.projections[currentProjection];
+                if (!proj) return;
+                projMinX = Math.min(projMinX, proj[0]);
+                projMaxX = Math.max(projMaxX, proj[0]);
+                projMinY = Math.min(projMinY, proj[1]);
+                projMaxY = Math.max(projMaxY, proj[1]);
+            });
+            if (projMinX === Infinity) { projMinX = 0; projMaxX = 1; projMinY = 0; projMaxY = 1; }
+            const rangeX = projMaxX - projMinX || 1;
+            const rangeY = projMaxY - projMinY || 1;
+            projMinX -= rangeX * 0.05;
+            projMaxX += rangeX * 0.05;
+            projMinY -= rangeY * 0.05;
+            projMaxY += rangeY * 0.05;
+        }
+
+        function dataToScreen(dx, dy) {
+            const pad = 40;
+            const w = canvas.width - 2 * pad;
+            const h = canvas.height - 2 * pad;
+            const rangeX = projMaxX - projMinX || 1;
+            const rangeY = projMaxY - projMinY || 1;
+            const scale = Math.min(w / rangeX, h / rangeY) * zoomLevel;
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const midX = (projMinX + projMaxX) / 2;
+            const midY = (projMinY + projMaxY) / 2;
+            return [
+                cx + (dx - midX - panX) * scale,
+                cy - (dy - midY - panY) * scale
+            ];
+        }
+
+        function screenToData(sx, sy) {
+            const pad = 40;
+            const w = canvas.width - 2 * pad;
+            const h = canvas.height - 2 * pad;
+            const rangeX = projMaxX - projMinX || 1;
+            const rangeY = projMaxY - projMinY || 1;
+            const scale = Math.min(w / rangeX, h / rangeY) * zoomLevel;
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const midX = (projMinX + projMaxX) / 2;
+            const midY = (projMinY + projMaxY) / 2;
+            return [
+                (sx - cx) / scale + midX + panX,
+                -((sy - cy) / scale) + midY + panY
+            ];
+        }
+
+        function renderMap() {
+            if (!ctx) return;
+
+            ctx.fillStyle = '#0f0f17';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            filteredPapers.forEach((paper, idx) => {
+                const proj = paper.projections && paper.projections[currentProjection];
+                if (!proj) { paper._sx = -999; paper._sy = -999; return; }
+
+                const [sx, sy] = dataToScreen(proj[0], proj[1]);
+                paper._sx = sx;
+                paper._sy = sy;
+
+                if (sx < -50 || sx > canvas.width + 50 || sy < -50 || sy > canvas.height + 50) return;
+
+                const radius = getPointRadius(paper);
+                const color = getPointColor(paper);
+                const allIdx = allPapers.indexOf(paper);
+                const isSelected = selectedPapers.has(allIdx);
+
+                ctx.globalAlpha = paper.title ? (isSelected ? 1 : 0.7) : 0.3;
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(sx, sy, radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (isSelected) {
+                    ctx.globalAlpha = 1;
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, radius + 3, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            });
+            ctx.globalAlpha = 1;
+
+            ctx.fillStyle = '#666';
+            ctx.font = '11px -apple-system, sans-serif';
+            ctx.fillText(`${currentProjection.toUpperCase()} · ${filteredPapers.length} papers`, 12, canvas.height - 12);
+        }
+
+        function handleZoom(e) {
+            e.preventDefault();
+            const [mx, my] = canvasCoords(e);
+            const [dx, dy] = screenToData(mx, my);
+            const factor = e.deltaY > 0 ? 0.9 : 1.1;
+            zoomLevel *= factor;
+            zoomLevel = Math.max(0.3, Math.min(20, zoomLevel));
+            const [sx2, sy2] = dataToScreen(dx, dy);
+            const pad = 40;
+            const w = canvas.width - 2 * pad;
+            const h = canvas.height - 2 * pad;
+            const rangeX = projMaxX - projMinX || 1;
+            const rangeY = projMaxY - projMinY || 1;
+            const scale = Math.min(w / rangeX, h / rangeY) * zoomLevel;
+            panX += (sx2 - mx) / scale;
+            panY -= (sy2 - my) / scale;
+            renderMap();
+        }
+
+        // Convert CSS mouse position to canvas buffer coordinates
+        // Needed because CSS width:100% can differ from canvas.width
+        function canvasCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const cssX = e.clientX - rect.left;
+            const cssY = e.clientY - rect.top;
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return [cssX * scaleX, cssY * scaleY];
+        }
+
+        function handleCanvasMouseDown(e) {
+            // Shift+click always pans regardless of mode
+            if (e.shiftKey) {
+                isShiftPanning = true;
+                shiftPanStart = { x: e.clientX, y: e.clientY };
+                return;
+            }
+
+            if (selectionMode === 'pan') {
+                isDragging = true;
+                dragStart = { x: e.clientX, y: e.clientY };
+                mouseDownPos = { x: e.clientX, y: e.clientY };
+            } else if (selectionMode === 'lasso') {
+                lassoPoints = [];
+                const [cx, cy] = canvasCoords(e);
+                lassoPoints.push([cx, cy]);
+            } else if (selectionMode === 'rect') {
+                const [cx, cy] = canvasCoords(e);
+                rectStart = [cx, cy];
+            }
+        }
+
+        function handleCanvasMouseMove(e) {
+            const [mouseX, mouseY] = canvasCoords(e);
+
+            // Shift-pan
+            if (isShiftPanning && shiftPanStart) {
+                const dx = e.clientX - shiftPanStart.x;
+                const dy = e.clientY - shiftPanStart.y;
+                const pad = 40;
+                const w = canvas.width - 2 * pad;
+                const h = canvas.height - 2 * pad;
+                const rangeX = projMaxX - projMinX || 1;
+                const rangeY = projMaxY - projMinY || 1;
+                const scale = Math.min(w / rangeX, h / rangeY) * zoomLevel;
+                panX -= dx / scale;
+                panY += dy / scale;
+                shiftPanStart = { x: e.clientX, y: e.clientY };
+                renderMap();
+                return;
+            }
+
+            if (isDragging) {
+                const dx = e.clientX - dragStart.x;
+                const dy = e.clientY - dragStart.y;
+                const pad = 40;
+                const w = canvas.width - 2 * pad;
+                const h = canvas.height - 2 * pad;
+                const rangeX = projMaxX - projMinX || 1;
+                const rangeY = projMaxY - projMinY || 1;
+                const scale = Math.min(w / rangeX, h / rangeY) * zoomLevel;
+                panX -= dx / scale;
+                panY += dy / scale;
+                dragStart = { x: e.clientX, y: e.clientY };
+                renderMap();
+            }
+
+            if (selectionMode === 'lasso' && lassoPoints.length > 0) {
+                lassoPoints.push([mouseX, mouseY]);
+                drawLasso();
+            }
+
+            if (selectionMode === 'rect' && rectStart) {
+                lassoCtx.clearRect(0, 0, lassoCanvas.width, lassoCanvas.height);
+                lassoCtx.strokeStyle = '#64b5f6';
+                lassoCtx.lineWidth = 2;
+                const width = mouseX - rectStart[0];
+                const height = mouseY - rectStart[1];
+                lassoCtx.strokeRect(rectStart[0], rectStart[1], width, height);
+            }
+
+            // Show tooltip
+            showTooltip(mouseX, mouseY, e.clientX, e.clientY);
+        }
+
+        function handleCanvasMouseUp(e) {
+            // End shift-pan
+            if (isShiftPanning) {
+                isShiftPanning = false;
+                shiftPanStart = null;
+                return;
+            }
+
+            const wasDragging = isDragging;
+            isDragging = false;
+
+            // Single click to select in pan mode (only if we didn't drag)
+            if (selectionMode === 'pan' && wasDragging) {
+                const dx = e.clientX - mouseDownPos.x;
+                const dy = e.clientY - mouseDownPos.y;
+                if (Math.abs(dx) < 3 && Math.abs(dy) < 3) {
+                    const [mx, my] = canvasCoords(e);
+                    let hitIdx = -1, minDist = 12;
+                    filteredPapers.forEach((paper, idx) => {
+                        if (paper._sx === undefined) return;
+                        const d = Math.hypot(paper._sx - mx, paper._sy - my);
+                        if (d < minDist) { minDist = d; hitIdx = idx; }
+                    });
+                    if (hitIdx >= 0) {
+                        const paper = filteredPapers[hitIdx];
+                        const allIdx = allPapers.indexOf(paper);
+                        selectedPapers.clear();
+                        if (allIdx !== -1) selectedPapers.add(allIdx);
+                        showDetailPanel([paper]);
+                        renderMap();
+                    } else {
+                        // Clicked blank space — clear selection and collapse panel
+                        selectedPapers.clear();
+                        const panel = document.getElementById('detailPanel');
+                        panel.style.display = 'none';
+                        document.getElementById('panelContent').innerHTML = '';
+                        renderMap();
+                    }
+                }
+            }
+
+            if (selectionMode === 'lasso' && lassoPoints.length > 0) {
+                selectByLasso();
+                lassoPoints = [];
+                lassoCtx.clearRect(0, 0, lassoCanvas.width, lassoCanvas.height);
+            }
+
+            if (selectionMode === 'rect' && rectStart) {
+                const [endX, endY] = canvasCoords(e);
+                selectByRect(rectStart[0], rectStart[1], endX, endY);
+                rectStart = null;
+                lassoCtx.clearRect(0, 0, lassoCanvas.width, lassoCanvas.height);
+            }
+        }
+
+        function drawLasso() {
+            lassoCtx.clearRect(0, 0, lassoCanvas.width, lassoCanvas.height);
+            lassoCtx.strokeStyle = '#64b5f6';
+            lassoCtx.lineWidth = 2;
+            lassoCtx.beginPath();
+            lassoPoints.forEach((pt, i) => {
+                if (i === 0) lassoCtx.moveTo(pt[0], pt[1]);
+                else lassoCtx.lineTo(pt[0], pt[1]);
+            });
+            lassoCtx.stroke();
+        }
+
+        function pointInPolygon(point, polygon) {
+            const [x, y] = point;
+            let inside = false;
+            for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                const [xi, yi] = polygon[i];
+                const [xj, yj] = polygon[j];
+                const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+            return inside;
+        }
+
+        function selectByLasso() {
+            selectedPapers.clear();
+            filteredPapers.forEach((paper, idx) => {
+                const proj = paper.projections && paper.projections[currentProjection];
+                if (!proj) return;
+                const [sx, sy] = dataToScreen(proj[0], proj[1]);
+                if (pointInPolygon([sx, sy], lassoPoints)) {
+                    const allIdx = allPapers.indexOf(paper);
+                    if (allIdx !== -1) selectedPapers.add(allIdx);
+                }
+            });
+
+            if (selectedPapers.size > 0) {
+                const papers = Array.from(selectedPapers).map(idx => allPapers[idx]).filter(Boolean);
+                showDetailPanel(papers);
+            }
+            renderMap();
+        }
+
+        function selectByRect(x1, y1, x2, y2) {
+            const minX = Math.min(x1, x2);
+            const maxX = Math.max(x1, x2);
+            const minY = Math.min(y1, y2);
+            const maxY = Math.max(y1, y2);
+
+            selectedPapers.clear();
+            filteredPapers.forEach((paper, idx) => {
+                const proj = paper.projections && paper.projections[currentProjection];
+                if (!proj) return;
+                const [sx, sy] = dataToScreen(proj[0], proj[1]);
+                if (sx >= minX && sx <= maxX && sy >= minY && sy <= maxY) {
+                    const allIdx = allPapers.indexOf(paper);
+                    if (allIdx !== -1) selectedPapers.add(allIdx);
+                }
+            });
+
+            if (selectedPapers.size > 0) {
+                const papers = Array.from(selectedPapers).map(idx => allPapers[idx]).filter(Boolean);
+                showDetailPanel(papers);
+            }
+            renderMap();
+        }
+
+        function resetZoom() {
+            zoomLevel = 1;
+            panX = 0;
+            panY = 0;
+            computeBounds();
+            renderMap();
+        }
+
+        function showTooltip(mouseX, mouseY, pageX, pageY) {
+            const tooltip = document.getElementById('tooltip');
+            let hoveredPaper = null;
+            let minDist = 12;
+
+            filteredPapers.forEach((paper, idx) => {
+                if (paper._sx === undefined) return;
+                const distance = Math.hypot(paper._sx - mouseX, paper._sy - mouseY);
+                if (distance < minDist) {
+                    minDist = distance;
+                    hoveredPaper = paper;
+                }
+            });
+
+            if (hoveredPaper) {
+                const channels = Array.isArray(hoveredPaper.channels) ? hoveredPaper.channels.map(ch => channelDisplayName(ch)).join(', ') : '';
+                const dateShared = hoveredPaper.first_shared ? new Date(hoveredPaper.first_shared).toLocaleDateString() : '';
+
+                tooltip.innerHTML = `
+                    <div class="tooltip-title">${hoveredPaper.title || 'Untitled'}</div>
+                    <div class="tooltip-content">
+                        ${personDisplay(hoveredPaper.shared_by)} · ${dateShared} · ${channels}
+                    </div>
+                    <div class="tooltip-content">
+                        ${hoveredPaper.year || ''} · ${hoveredPaper.journal || ''} · ${hoveredPaper.cluster_label || ''}
+                    </div>
+                `;
+                tooltip.classList.add('visible');
+
+                let tx = pageX + 14;
+                let ty = pageY + 14;
+                if (tx + 300 > window.innerWidth) tx = pageX - 310;
+                if (ty + 100 > window.innerHeight) ty = pageY - 110;
+                tooltip.style.left = tx + 'px';
+                tooltip.style.top = ty + 'px';
+            } else {
+                tooltip.classList.remove('visible');
+            }
+        }
+
+        // ===== DETAIL PANEL =====
+        function showDetailPanel(papers) {
+            const panel = document.getElementById('detailPanel');
+            const content = document.getElementById('panelContent');
+
+            if (papers.length === 0) {
+                panel.classList.remove('expanded');
+                return;
+            }
+
+            panel.classList.add('expanded');
+            document.getElementById('panelToggle').textContent = '\u25BC';
+
+            content.innerHTML = `
+                <div class="select-all-checkbox">
+                    <input type="checkbox" id="selectAllCheckbox" checked>
+                    <label for="selectAllCheckbox">Select All (${papers.length})</label>
+                </div>
+                <div class="download-selected">
+                    <button id="downloadSelectedCsv">CSV</button>
+                    <button id="downloadSelectedXlsx">XLSX</button>
+                </div>
+            `;
+
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const checkboxes = [];
+
+            papers.forEach((paper, i) => {
+                const allIdx = allPapers.indexOf(paper);
+                const card = document.createElement('div');
+                card.className = 'paper-card';
+
+                // Build tags
+                const channelTags = (paper.channels || []).map(ch =>
+                    `<span class="card-tag channel-tag">${channelDisplayName(ch)}</span>`
+                ).join('');
+
+                const personTag = paper.shared_by
+                    ? `<span class="card-tag person-tag">${personDisplay(paper.shared_by)}</span>`
+                    : '';
+
+                const clusterTag = paper.cluster_label
+                    ? `<span class="card-tag cluster-tag">${paper.cluster_label}</span>`
+                    : '';
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-checkbox-area">
+                            <input type="checkbox" class="paper-checkbox" data-idx="${allIdx}" checked>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">${paper.title || 'Untitled'}</div>
+                            <div class="card-meta">
+                                ${paper.year || ''} &middot; ${(paper.cited_by_count || 0)} cites
+                            </div>
+                            <div class="card-tags">
+                                ${channelTags}
+                                ${personTag}
+                                ${clusterTag}
+                            </div>
+                            <div class="card-details">
+                                <div class="detail-row">
+                                    <div class="detail-label">Authors</div>
+                                    <div class="detail-value">${(paper.authors || []).join(', ')}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Journal</div>
+                                    <div class="detail-value">${paper.journal || 'N/A'}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Abstract</div>
+                                    <div class="detail-value">${(paper.abstract || 'N/A').substring(0, 200)}${(paper.abstract || '').length > 200 ? '...' : ''}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Links</div>
+                                    <div class="detail-value">
+                                        ${paper.url ? `<a href="${paper.url}" target="_blank">Paper</a>` : ''}
+                                        ${paper.doi ? ` &middot; <a href="https://doi.org/${paper.doi}" target="_blank">DOI</a>` : ''}
+                                        ${paper.openalex_url ? ` &middot; <a href="${paper.openalex_url}" target="_blank">OpenAlex</a>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                const checkbox = card.querySelector('.paper-checkbox');
+                checkboxes.push(checkbox);
+                checkbox.addEventListener('change', () => {
+                    const idx = parseInt(checkbox.dataset.idx);
+                    if (checkbox.checked) {
+                        selectedPapers.add(idx);
+                    } else {
+                        selectedPapers.delete(idx);
+                    }
+                    updateSelectAll();
+                    renderMap();
+                });
+
+                card.addEventListener('click', (e) => {
+                    if (e.target.type !== 'checkbox') {
+                        const details = card.querySelector('.card-details');
+                        details.classList.toggle('visible');
+                    }
+                });
+
+                content.appendChild(card);
+            });
+
+            selectAllCheckbox.addEventListener('change', () => {
+                checkboxes.forEach(cb => {
+                    cb.checked = selectAllCheckbox.checked;
+                    const idx = parseInt(cb.dataset.idx);
+                    if (selectAllCheckbox.checked) {
+                        selectedPapers.add(idx);
+                    } else {
+                        selectedPapers.delete(idx);
+                    }
+                });
+                updateSelectAll();
+                renderMap();
+            });
+
+            function updateSelectAll() {
+                const checkedCount = checkboxes.filter(cb => cb.checked).length;
+                selectAllCheckbox.checked = checkedCount === checkboxes.length && checkboxes.length > 0;
+                selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+            }
+
+            document.getElementById('downloadSelectedCsv').addEventListener('click', () => downloadSelected('csv'));
+            document.getElementById('downloadSelectedXlsx').addEventListener('click', () => downloadSelected('xlsx'));
+        }
+
+        // ===== SEMANTIC SEARCH =====
+        function computeSemanticSimilarity(query) {
+            semanticScores.clear();
+            const queryTerms = query.toLowerCase().split(/\s+/).filter(t => t.length > 2);
+
+            filteredPapers.forEach(paper => {
+                const text = ((paper.title || '') + ' ' + (paper.abstract || '')).toLowerCase();
+                let score = 0;
+                queryTerms.forEach(term => {
+                    if (text.includes(term)) {
+                        const matches = (text.match(new RegExp(term, 'g')) || []).length;
+                        score += matches * (term.length / 10);
+                    }
+                });
+                semanticScores.set(paper.title, Math.min(1, score / queryTerms.length));
+            });
+        }
+
+        function autoSelectTopN() {
+            if (!semanticQuery) return;
+            const topN = parseInt(document.getElementById('selectTopN').value);
+            const sorted = Array.from(filteredPapers.entries())
+                .sort((a, b) => (semanticScores.get(b[1].title) || 0) - (semanticScores.get(a[1].title) || 0))
+                .slice(0, topN);
+
+            selectedPapers.clear();
+            const selectedPapersList = [];
+            sorted.forEach(([idx, paper]) => {
+                const allIdx = allPapers.indexOf(paper);
+                if (allIdx !== -1) selectedPapers.add(allIdx);
+                selectedPapersList.push(paper);
+            });
+
+            if (selectedPapersList.length > 0) {
+                showDetailPanel(selectedPapersList);
+            }
+            renderMap();
+        }
+
+        // ===== TABLE OPERATIONS =====
+        function setupTableEvents() {
+            const headers = document.querySelectorAll('.data-table th[data-field]');
+            headers.forEach(header => {
+                header.addEventListener('click', (e) => {
+                    // Don't sort when clicking resizer
+                    if (e.target.classList.contains('th-resizer')) return;
+                    const field = header.dataset.field;
+                    if (field === 'actions') return;
+
+                    if (sortField === field) {
+                        sortAscending = !sortAscending;
+                    } else {
+                        sortField = field;
+                        sortAscending = true;
+                    }
+                    filterPapers();
+
+                    headers.forEach(h => {
+                        const indicator = h.querySelector('.sort-indicator');
+                        if (indicator) indicator.textContent = '';
+                    });
+                    const indicator = header.querySelector('.sort-indicator');
+                    if (indicator) {
+                        indicator.textContent = sortAscending ? ' \u2191' : ' \u2193';
+                    }
+                });
+            });
+
+            const filters = document.querySelectorAll('.column-filter');
+            filters.forEach(filter => {
+                filter.addEventListener('click', (e) => e.stopPropagation());
+                filter.addEventListener('input', () => {
+                    columnFilters[filter.dataset.field] = filter.value;
+                    filterPapers();
+                });
+            });
+        }
+
+        // ===== EXPORT =====
+        function downloadSelected(format) {
+            const papers = Array.from(selectedPapers).map(idx => allPapers[idx]).filter(Boolean);
+            downloadPapers(papers, format);
+        }
+
+        function downloadFiltered(format) {
+            downloadPapers(filteredPapers, format);
+        }
+
+        function downloadPapers(papers, format) {
+            const data = papers.map(p => ({
+                Title: p.title || '',
+                Authors: (p.authors || []).join('; '),
+                Year: p.year || '',
+                Journal: p.journal || '',
+                Channels: (p.channels || []).map(ch => channelDisplayName(ch)).join('; '),
+                'Shared By': p.shared_by || '',
+                'Date Shared': p.first_shared ? new Date(p.first_shared).toLocaleDateString() : '',
+                Citations: p.cited_by_count || 0,
+                Cluster: p.cluster_label || '',
+                DOI: p.doi || '',
+                URL: p.url || '',
+                Abstract: p.abstract || ''
+            }));
+
+            if (format === 'csv') {
+                const csv = [Object.keys(data[0]).join(',')];
+                data.forEach(row => {
+                    csv.push(Object.values(row).map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+                });
+                const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'papers.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+            } else if (format === 'xlsx') {
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Papers');
+                XLSX.writeFile(wb, 'papers.xlsx');
+            }
+        }
+
+        // ===== CHATBOT (top bar) =====
+        function initChatbot() {
+            const input = document.getElementById('chatbotInput');
+            const resultsPanel = document.getElementById('chatbotResults');
+
+            // Example buttons
+            document.querySelectorAll('.chatbot-example-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    input.value = btn.dataset.query;
+                    runChatSearch(btn.dataset.query);
+                });
+            });
+
+            // Enter to search (only if autocomplete isn't active)
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const dropdown = document.getElementById('autocompleteDropdown');
+                    const hasActiveItem = dropdown.classList.contains('visible') && dropdown.querySelector('.ac-active');
+                    if (!hasActiveItem) {
+                        runChatSearch(input.value.trim());
+                    }
+                }
+            });
+
+            // Autocomplete
+            input.addEventListener('input', () => {
+                const value = input.value;
+                if (value.includes('@') || value.includes('#')) {
+                    showAutocomplete(value);
+                } else {
+                    hideAutocomplete();
+                }
+            });
+
+            // Keyboard navigation for autocomplete (arrows + enter)
+            input.addEventListener('keydown', (e) => {
+                const dropdown = document.getElementById('autocompleteDropdown');
+                if (!dropdown.classList.contains('visible')) return;
+                const items = dropdown.querySelectorAll('.autocomplete-item');
+                if (items.length === 0) return;
+
+                let activeIdx = -1;
+                items.forEach((item, i) => {
+                    if (item.classList.contains('ac-active')) activeIdx = i;
+                });
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    activeIdx = (activeIdx + 1) % items.length;
+                    items.forEach(item => item.classList.remove('ac-active'));
+                    items[activeIdx].classList.add('ac-active');
+                    items[activeIdx].scrollIntoView({ block: 'nearest' });
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    activeIdx = activeIdx <= 0 ? items.length - 1 : activeIdx - 1;
+                    items.forEach(item => item.classList.remove('ac-active'));
+                    items[activeIdx].classList.add('ac-active');
+                    items[activeIdx].scrollIntoView({ block: 'nearest' });
+                } else if (e.key === 'Enter' && activeIdx >= 0) {
+                    e.preventDefault();
+                    items[activeIdx].click();
+                } else if (e.key === 'Escape') {
+                    hideAutocomplete();
+                }
+            });
+
+            // Close results when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.chatbot-bar')) {
+                    resultsPanel.classList.remove('visible');
+                    document.getElementById('chatbotSettingsPopup').classList.remove('visible');
+                }
+            });
+
+            // Settings gear
+            const settingsBtn = document.getElementById('chatbotSettingsBtn');
+            const settingsPopup = document.getElementById('chatbotSettingsPopup');
+            settingsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                settingsPopup.classList.toggle('visible');
+                const keyInput = document.getElementById('apiKeyInput');
+                if (claudeApiKey) {
+                    keyInput.value = claudeApiKey.slice(0, 10) + '...';
+                }
+            });
+
+            document.getElementById('apiKeySave').addEventListener('click', () => {
+                const key = document.getElementById('apiKeyInput').value.trim();
+                claudeModel = document.getElementById('modelSelect').value;
+                if (key && key.startsWith('sk-')) {
+                    claudeApiKey = key;
+                    const modelName = document.getElementById('modelSelect').selectedOptions[0].text;
+                    document.getElementById('apiKeyStatus').textContent = 'AI agent active · ' + modelName;
+                    document.getElementById('apiKeyStatus').style.color = '#66bb6a';
+                    settingsBtn.classList.add('has-key');
+                    settingsPopup.classList.remove('visible');
+                } else {
+                    document.getElementById('apiKeyStatus').textContent = 'Invalid key. Should start with sk-';
+                    document.getElementById('apiKeyStatus').style.color = '#ef5350';
+                }
+            });
+
+            // Allow model change without re-saving key
+            document.getElementById('modelSelect').addEventListener('change', () => {
+                claudeModel = document.getElementById('modelSelect').value;
+                if (claudeApiKey) {
+                    const modelName = document.getElementById('modelSelect').selectedOptions[0].text;
+                    document.getElementById('apiKeyStatus').textContent = 'Switched to ' + modelName;
+                    document.getElementById('apiKeyStatus').style.color = '#66bb6a';
+                }
+            });
+
+            document.getElementById('apiKeyClear').addEventListener('click', () => {
+                claudeApiKey = null;
+                document.getElementById('apiKeyInput').value = '';
+                document.getElementById('apiKeyStatus').textContent = 'API key cleared. Using local search.';
+                document.getElementById('apiKeyStatus').style.color = '#ffa726';
+                settingsBtn.classList.remove('has-key');
+            });
+        }
+
+        // ===== LLM AGENT =====
+        let claudeApiKey = null;
+        let claudeModel = 'claude-sonnet-4-20250514';
+
+        function buildDatasetSummary() {
+            const people = new Set();
+            const channels = new Set();
+            const clusters = new Set();
+            let minDate = null, maxDate = null;
+            allPapers.forEach(p => {
+                if (p.shared_by) people.add(p.shared_by);
+                (p.channels || []).forEach(ch => channels.add(ch));
+                if (p.cluster_label) clusters.add(p.cluster_label);
+                if (p.first_shared) {
+                    const d = new Date(p.first_shared);
+                    if (!minDate || d < minDate) minDate = d;
+                    if (!maxDate || d > maxDate) maxDate = d;
+                }
+            });
+            return {
+                total_papers: allPapers.length,
+                channels: Array.from(channels),
+                people: Array.from(people),
+                cluster_labels: Array.from(clusters),
+                date_range: { from: minDate?.toISOString()?.slice(0,10), to: maxDate?.toISOString()?.slice(0,10) },
+                fields_per_paper: ['title','authors','year','journal','abstract','channels','shared_by','first_shared','cited_by_count','cluster_label','cluster_id','doi','url']
+            };
+        }
+
+        function buildSystemPrompt() {
+            const summary = buildDatasetSummary();
+            return `You are an AI assistant embedded in PaperTrail, a dashboard for exploring academic papers shared in a team's Slack channels.
+
+DATASET SUMMARY:
+- ${summary.total_papers} papers total
+- Channels: ${summary.channels.join(', ')}
+- People who shared: ${summary.people.join(', ')}
+- Cluster labels: ${summary.cluster_labels.join(', ')}
+- Date range: ${summary.date_range.from} to ${summary.date_range.to}
+- Fields per paper: ${summary.fields_per_paper.join(', ')}
+
+You have a tool called "search_papers" to query the dataset. Use it to answer user questions.
+
+When the user asks a question:
+1. Figure out what filters to apply (person, channels, date range, keywords, sort, limit)
+2. Call the search_papers tool with those filters
+3. After getting results, provide a brief, helpful natural language answer
+
+For date filters, today is ${new Date().toISOString().slice(0,10)}.
+
+For channels, use the exact channel names from the dataset (e.g. "papers-dl", "papers-genomics", "paper_digest_moon").
+For people, use the exact names from the dataset.
+
+Be concise and conversational. 2-3 sentences max for the answer.`;
+        }
+
+        const SEARCH_TOOL = {
+            name: "search_papers",
+            description: "Search and filter the paper dataset. All fields are optional — omit any filter you don't need.",
+            input_schema: {
+                type: "object",
+                properties: {
+                    people: {
+                        type: "array",
+                        items: { type: "string" },
+                        description: "Filter by who shared the paper. Use exact names from dataset."
+                    },
+                    channels: {
+                        type: "array",
+                        items: { type: "string" },
+                        description: "Filter by Slack channel. Use exact channel names."
+                    },
+                    date_from: {
+                        type: "string",
+                        description: "ISO date string for earliest share date (inclusive)"
+                    },
+                    date_to: {
+                        type: "string",
+                        description: "ISO date string for latest share date (inclusive)"
+                    },
+                    keywords: {
+                        type: "array",
+                        items: { type: "string" },
+                        description: "Keywords to match against title, abstract, journal, authors"
+                    },
+                    cluster_labels: {
+                        type: "array",
+                        items: { type: "string" },
+                        description: "Filter by cluster label"
+                    },
+                    sort_by: {
+                        type: "string",
+                        enum: ["relevance", "cited_by_count", "first_shared", "year"],
+                        description: "Sort results by this field"
+                    },
+                    sort_dir: {
+                        type: "string",
+                        enum: ["asc", "desc"],
+                        description: "Sort direction"
+                    },
+                    limit: {
+                        type: "integer",
+                        description: "Max results to return"
+                    }
+                }
+            }
+        };
+
+        function executeSearchTool(params) {
+            let results = [...filteredPapers];
+
+            // Person filter
+            if (params.people && params.people.length > 0) {
+                const ppl = params.people.map(p => p.toLowerCase());
+                results = results.filter(p => {
+                    const s = (p.shared_by || '').toLowerCase();
+                    return ppl.some(pp => s.includes(pp) || pp.includes(s));
+                });
+            }
+
+            // Channel filter
+            if (params.channels && params.channels.length > 0) {
+                const chs = params.channels.map(c => c.toLowerCase());
+                results = results.filter(p => {
+                    const pChs = (p.channels || []).map(c => c.toLowerCase());
+                    return chs.some(ch => pChs.some(pc => pc.includes(ch) || ch.includes(pc)));
+                });
+            }
+
+            // Date filter
+            if (params.date_from) {
+                const from = new Date(params.date_from);
+                results = results.filter(p => p.first_shared && new Date(p.first_shared) >= from);
+            }
+            if (params.date_to) {
+                const to = new Date(params.date_to);
+                results = results.filter(p => p.first_shared && new Date(p.first_shared) <= to);
+            }
+
+            // Cluster filter
+            if (params.cluster_labels && params.cluster_labels.length > 0) {
+                const cls = params.cluster_labels.map(c => c.toLowerCase());
+                results = results.filter(p => {
+                    const cl = (p.cluster_label || '').toLowerCase();
+                    return cls.some(c => cl.includes(c) || c.includes(cl));
+                });
+            }
+
+            // Keyword scoring
+            if (params.keywords && params.keywords.length > 0) {
+                const kws = params.keywords.map(k => k.toLowerCase());
+                results = results.map(p => {
+                    const text = ((p.title||'') + ' ' + (p.abstract||'') + ' ' + (p.journal||'') + ' ' + (p.authors||[]).join(' ')).toLowerCase();
+                    let score = 0;
+                    for (const kw of kws) {
+                        if (text.includes(kw)) {
+                            if ((p.title||'').toLowerCase().includes(kw)) score += 3;
+                            else score += 1;
+                        }
+                    }
+                    return { paper: p, score };
+                }).filter(r => r.score > 0);
+
+                results.sort((a, b) => b.score - a.score);
+                results = results.map(r => r.paper);
+            }
+
+            // Sort
+            if (params.sort_by && params.sort_by !== 'relevance') {
+                results.sort((a, b) => {
+                    let av = a[params.sort_by] || 0;
+                    let bv = b[params.sort_by] || 0;
+                    if (typeof av === 'string') av = new Date(av).getTime() || 0;
+                    if (typeof bv === 'string') bv = new Date(bv).getTime() || 0;
+                    return params.sort_dir === 'asc' ? av - bv : bv - av;
+                });
+            }
+
+            // Limit
+            const limit = params.limit || 25;
+            const total = results.length;
+            results = results.slice(0, limit);
+
+            return {
+                total_found: total,
+                returned: results.length,
+                papers: results.map(p => ({
+                    title: p.title,
+                    year: p.year,
+                    journal: p.journal,
+                    authors: (p.authors || []).slice(0, 3).join(', ') + ((p.authors||[]).length > 3 ? ' et al.' : ''),
+                    channels: p.channels,
+                    shared_by: p.shared_by,
+                    first_shared: p.first_shared,
+                    cited_by_count: p.cited_by_count,
+                    cluster_label: p.cluster_label
+                })),
+                _full_papers: results  // internal: not sent to LLM, used for UI
+            };
+        }
+
+        async function callClaudeAgent(query) {
+            const messages = [{ role: 'user', content: query }];
+
+            // First call: let Claude decide what tool to use
+            const resp1 = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': claudeApiKey,
+                    'anthropic-version': '2023-06-01',
+                    'anthropic-dangerous-direct-browser-access': 'true'
+                },
+                body: JSON.stringify({
+                    model: claudeModel,
+                    max_tokens: 1024,
+                    system: buildSystemPrompt(),
+                    tools: [SEARCH_TOOL],
+                    messages
+                })
+            });
+
+            if (!resp1.ok) {
+                const err = await resp1.text();
+                throw new Error(`API error ${resp1.status}: ${err}`);
+            }
+
+            const data1 = await resp1.json();
+
+            // Check if Claude wants to use a tool
+            let toolUseBlock = null;
+            let textBlocks = [];
+            for (const block of data1.content) {
+                if (block.type === 'tool_use') toolUseBlock = block;
+                if (block.type === 'text') textBlocks.push(block.text);
+            }
+
+            if (!toolUseBlock) {
+                // Claude answered directly without using the tool
+                return {
+                    text: textBlocks.join('\n'),
+                    results: [],
+                    _full_papers: []
+                };
+            }
+
+            // Execute the tool
+            const toolResult = executeSearchTool(toolUseBlock.input);
+            const fullPapers = toolResult._full_papers;
+            delete toolResult._full_papers;
+
+            // Second call: feed results back to Claude for a natural language answer
+            messages.push({ role: 'assistant', content: data1.content });
+            messages.push({
+                role: 'user',
+                content: [{
+                    type: 'tool_result',
+                    tool_use_id: toolUseBlock.id,
+                    content: JSON.stringify(toolResult)
+                }]
+            });
+
+            const resp2 = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': claudeApiKey,
+                    'anthropic-version': '2023-06-01',
+                    'anthropic-dangerous-direct-browser-access': 'true'
+                },
+                body: JSON.stringify({
+                    model: claudeModel,
+                    max_tokens: 512,
+                    system: buildSystemPrompt(),
+                    tools: [SEARCH_TOOL],
+                    messages
+                })
+            });
+
+            if (!resp2.ok) {
+                const err = await resp2.text();
+                throw new Error(`API error ${resp2.status}: ${err}`);
+            }
+
+            const data2 = await resp2.json();
+            const answerText = data2.content
+                .filter(b => b.type === 'text')
+                .map(b => b.text)
+                .join('\n');
+
+            return {
+                text: answerText,
+                results: toolResult.papers,
+                _full_papers: fullPapers,
+                filters: toolUseBlock.input
+            };
+        }
+
+        async function runChatSearch(query) {
+            if (!query) return;
+            const resultsPanel = document.getElementById('chatbotResults');
+
+            if (claudeApiKey) {
+                // LLM Agent mode
+                resultsPanel.innerHTML = `
+                    <div class="chatbot-results-header">
+                        <span>Thinking<span class="ai-mode-badge llm">${claudeModel.includes('opus') ? 'Opus' : claudeModel.includes('haiku') ? 'Haiku' : 'Sonnet'}</span></span>
+                        <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
+                    </div>
+                    <div class="ai-thinking">
+                        <div class="ai-thinking-dots"><span></span><span></span><span></span></div>
+                        Searching papers...
+                    </div>`;
+                resultsPanel.classList.add('visible');
+
+                try {
+                    const agentResult = await callClaudeAgent(query);
+                    renderChatResults(resultsPanel, agentResult.text, agentResult._full_papers || [], 'llm');
+                } catch (err) {
+                    console.error('LLM agent error:', err);
+                    // Fall back to local
+                    resultsPanel.innerHTML = `
+                        <div class="chatbot-results-header">
+                            <span style="color:#ffa726;">AI error, falling back to local search<span class="ai-mode-badge local">local</span></span>
+                            <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
+                        </div>
+                        <div style="padding:8px 14px;font-size:11px;color:#888;">${err.message}</div>`;
+                    // Run local search below the error
+                    const localResults = searchPapers(query);
+                    appendPaperResults(resultsPanel, localResults, 'local');
+                }
+            } else {
+                // Local parser mode
+                const results = searchPapers(query);
+                const parsed = parseQuery(query);
+                const explanation = parsed.explanation.length > 0
+                    ? parsed.explanation.join(' &middot; ')
+                    : 'all papers';
+
+                if (results.length === 0) {
+                    resultsPanel.innerHTML = `
+                        <div class="chatbot-results-header">
+                            <span>No papers found<span class="ai-mode-badge local">local</span></span>
+                            <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
+                        </div>
+                        <div style="padding:12px;font-size:12px;color:#888;">
+                            Searched: ${explanation}<br>
+                            <span style="color:#64b5f6;cursor:pointer;" onclick="document.getElementById('chatbotSettingsBtn').click()">Add an API key</span> to enable the AI agent for smarter queries.
+                        </div>`;
+                } else {
+                    resultsPanel.innerHTML = '';
+                    renderChatResults(resultsPanel, `Found ${results.length} papers matching: ${explanation}`, results, 'local');
+                }
+                resultsPanel.classList.add('visible');
+            }
+        }
+
+        function renderChatResults(panel, aiText, papers, mode) {
+            let html = `
+                <div class="chatbot-results-header">
+                    <span>${papers.length} paper${papers.length !== 1 ? 's' : ''}<span class="ai-mode-badge ${mode}">${mode === 'llm' ? (claudeModel.includes('opus') ? 'Opus' : claudeModel.includes('haiku') ? 'Haiku' : 'Sonnet') : 'local'}</span></span>
+                    <div style="display:flex;gap:6px;align-items:center;">
+                        ${papers.length > 0 ? '<button class="chatbot-results-close" id="chatSelectAll" title="Select all on map" style="font-size:11px;color:#64b5f6;cursor:pointer;background:none;border:1px solid #3a3a4e;border-radius:4px;padding:2px 8px;">Select all</button>' : ''}
+                        <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
+                    </div>
+                </div>`;
+
+            if (aiText) {
+                html += `<div class="ai-response">${aiText}</div>`;
+            }
+
+            const shown = papers.slice(0, 15);
+            shown.forEach((paper, i) => {
+                const channels = (paper.channels || []).map(ch => channelDisplayName(ch)).join(', ');
+                const date = paper.first_shared ? new Date(paper.first_shared).toLocaleDateString() : '';
+                html += `
+                    <div class="chatbot-result-item" data-paper-idx="${i}">
+                        <div class="chatbot-result-title">${paper.title || 'Untitled'}</div>
+                        <div class="chatbot-result-meta">${paper.year || ''} &middot; ${personDisplay(paper.shared_by)} &middot; ${channels}${date ? ' &middot; ' + date : ''}</div>
+                    </div>`;
+            });
+            if (papers.length > 15) {
+                html += `<div style="padding:8px 14px;font-size:11px;color:#666;">+ ${papers.length - 15} more</div>`;
+            }
+
+            panel.innerHTML = html;
+            panel.classList.add('visible');
+
+            // Wire click handlers
+            panel.querySelectorAll('.chatbot-result-item').forEach((item, i) => {
+                item.addEventListener('click', () => {
+                    const paper = shown[i];
+                    const allIdx = allPapers.indexOf(paper);
+                    selectedPapers.clear();
+                    if (allIdx !== -1) selectedPapers.add(allIdx);
+                    showDetailPanel([paper]);
+                    renderMap();
+                    panel.classList.remove('visible');
+                });
+            });
+
+            const selectAllBtn = document.getElementById('chatSelectAll');
+            if (selectAllBtn) {
+                selectAllBtn.addEventListener('click', () => {
+                    selectedPapers.clear();
+                    papers.forEach(paper => {
+                        const allIdx = allPapers.indexOf(paper);
+                        if (allIdx !== -1) selectedPapers.add(allIdx);
+                    });
+                    showDetailPanel(papers.slice(0, 50));
+                    renderMap();
+                    panel.classList.remove('visible');
+                });
+            }
+        }
+
+        function appendPaperResults(panel, papers, mode) {
+            const shown = papers.slice(0, 10);
+            shown.forEach((paper, i) => {
+                const channels = (paper.channels || []).map(ch => channelDisplayName(ch)).join(', ');
+                const div = document.createElement('div');
+                div.className = 'chatbot-result-item';
+                div.innerHTML = `
+                    <div class="chatbot-result-title">${paper.title || 'Untitled'}</div>
+                    <div class="chatbot-result-meta">${paper.year || ''} &middot; ${personDisplay(paper.shared_by)} &middot; ${channels}</div>`;
+                div.addEventListener('click', () => {
+                    const allIdx = allPapers.indexOf(paper);
+                    selectedPapers.clear();
+                    if (allIdx !== -1) selectedPapers.add(allIdx);
+                    showDetailPanel([paper]);
+                    renderMap();
+                    panel.classList.remove('visible');
+                });
+                panel.appendChild(div);
+            });
+        }
+
+        // ===== SMART QUERY ENGINE =====
+        // Parses natural language queries into structured filters:
+        //   @person, #channel, date expressions, sort/rank, keyword matching
+        function parseQuery(query) {
+            const parsed = {
+                people: [],
+                channels: [],
+                dateFrom: null,
+                dateTo: null,
+                sortBy: null,
+                sortDir: 'desc',
+                limit: null,
+                keywords: [],
+                explanation: []
+            };
+
+            let q = query;
+
+            // 1. Extract @person mentions (handle multi-word names)
+            // Pattern: @FirstName LastName (greedy up to next keyword/punctuation)
+            const allPeople = new Set();
+            allPapers.forEach(p => { if (p.shared_by) allPeople.add(p.shared_by.toLowerCase()); });
+
+            // Try explicit @mentions first
+            const atPattern = /@([\w\s]+?)(?=\s+(?:in|from|shared|on|during|last|this|since|before|after|#|@|$)|\s*$)/gi;
+            let atMatch;
+            while ((atMatch = atPattern.exec(q)) !== null) {
+                const name = atMatch[1].trim().toLowerCase();
+                // Find best match among known people
+                const match = findBestPersonMatch(name, allPeople);
+                if (match) {
+                    parsed.people.push(match);
+                    parsed.explanation.push(`by @${match}`);
+                }
+            }
+            q = q.replace(/@[\w\s]+?(?=\s+(?:in|from|shared|on|during|last|this|since|before|after|#|@|$)|\s*$)/gi, ' ');
+
+            // Also detect "shared by PersonName" or "by PersonName" without @
+            const byPattern = /(?:shared\s+by|by)\s+([\w\s]+?)(?=\s+(?:in|from|on|during|last|this|since|before|after|#|@|$)|\s*$)/gi;
+            let byMatch;
+            while ((byMatch = byPattern.exec(q)) !== null) {
+                const name = byMatch[1].trim().toLowerCase();
+                const match = findBestPersonMatch(name, allPeople);
+                if (match && !parsed.people.includes(match)) {
+                    parsed.people.push(match);
+                    parsed.explanation.push(`by @${match}`);
+                }
+            }
+            q = q.replace(/(?:shared\s+by|by)\s+[\w\s]+?(?=\s+(?:in|from|on|during|last|this|since|before|after|#|@|$)|\s*$)/gi, ' ');
+
+            // 2. Extract #channel mentions
+            const chPattern = /#([\w-]+)/g;
+            let chMatch;
+            while ((chMatch = chPattern.exec(query)) !== null) {
+                const chName = chMatch[1].toLowerCase();
+                // Match against known channels (fuzzy)
+                const match = findBestChannelMatch(chName);
+                if (match) {
+                    parsed.channels.push(match);
+                    parsed.explanation.push(`in ${channelDisplayName(match)}`);
+                }
+            }
+            q = q.replace(/#[\w-]+/g, ' ');
+
+            // Also detect "in channel-name" without #
+            const inChPattern = /\bin\s+(papers?[-_]?\w+|genomics|protein|phenomics|dl|health|ai[-_]?agents|moon|digest)/gi;
+            let inChMatch;
+            while ((inChMatch = inChPattern.exec(q)) !== null) {
+                const chName = inChMatch[1].toLowerCase();
+                const match = findBestChannelMatch(chName);
+                if (match && !parsed.channels.includes(match)) {
+                    parsed.channels.push(match);
+                    parsed.explanation.push(`in ${channelDisplayName(match)}`);
+                }
+            }
+            q = q.replace(/\bin\s+(?:papers?[-_]?\w+|genomics|protein|phenomics|dl|health|ai[-_]?agents|moon|digest)/gi, ' ');
+
+            // 3. Parse date/time expressions
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth(); // 0-based
+
+            const dateExprs = [
+                // "last summer" = June-August of previous year
+                { pattern: /last\s+summer/i, fn: () => {
+                    parsed.dateFrom = new Date(currentYear - 1, 5, 1);
+                    parsed.dateTo = new Date(currentYear - 1, 8, 0);
+                    parsed.explanation.push(`${currentYear-1} summer (Jun–Aug)`);
+                }},
+                // "this summer"
+                { pattern: /this\s+summer/i, fn: () => {
+                    parsed.dateFrom = new Date(currentYear, 5, 1);
+                    parsed.dateTo = new Date(currentYear, 8, 0);
+                    parsed.explanation.push(`${currentYear} summer (Jun–Aug)`);
+                }},
+                // "last winter"
+                { pattern: /last\s+winter/i, fn: () => {
+                    parsed.dateFrom = new Date(currentYear - 1, 11, 1);
+                    parsed.dateTo = new Date(currentYear, 2, 0);
+                    parsed.explanation.push(`winter ${currentYear-1}/${currentYear}`);
+                }},
+                // "last spring"
+                { pattern: /last\s+spring/i, fn: () => {
+                    parsed.dateFrom = new Date(currentYear - 1, 2, 1);
+                    parsed.dateTo = new Date(currentYear - 1, 5, 0);
+                    parsed.explanation.push(`${currentYear-1} spring (Mar–May)`);
+                }},
+                // "last fall" / "last autumn"
+                { pattern: /last\s+(?:fall|autumn)/i, fn: () => {
+                    parsed.dateFrom = new Date(currentYear - 1, 8, 1);
+                    parsed.dateTo = new Date(currentYear - 1, 11, 0);
+                    parsed.explanation.push(`${currentYear-1} fall (Sep–Nov)`);
+                }},
+                // "last year"
+                { pattern: /last\s+year/i, fn: () => {
+                    parsed.dateFrom = new Date(currentYear - 1, 0, 1);
+                    parsed.dateTo = new Date(currentYear - 1, 11, 31);
+                    parsed.explanation.push(`${currentYear-1}`);
+                }},
+                // "this year"
+                { pattern: /this\s+year/i, fn: () => {
+                    parsed.dateFrom = new Date(currentYear, 0, 1);
+                    parsed.dateTo = now;
+                    parsed.explanation.push(`${currentYear} so far`);
+                }},
+                // "last month"
+                { pattern: /last\s+month/i, fn: () => {
+                    const m = currentMonth === 0 ? 11 : currentMonth - 1;
+                    const y = currentMonth === 0 ? currentYear - 1 : currentYear;
+                    parsed.dateFrom = new Date(y, m, 1);
+                    parsed.dateTo = new Date(y, m + 1, 0);
+                    parsed.explanation.push(`last month`);
+                }},
+                // "last N months"
+                { pattern: /last\s+(\d+)\s+months?/i, fn: (m) => {
+                    const n = parseInt(m[1]);
+                    parsed.dateFrom = new Date(now);
+                    parsed.dateFrom.setMonth(parsed.dateFrom.getMonth() - n);
+                    parsed.dateTo = now;
+                    parsed.explanation.push(`last ${n} month${n>1?'s':''}`);
+                }},
+                // "last week"
+                { pattern: /last\s+week/i, fn: () => {
+                    parsed.dateFrom = new Date(now);
+                    parsed.dateFrom.setDate(parsed.dateFrom.getDate() - 7);
+                    parsed.dateTo = now;
+                    parsed.explanation.push(`last 7 days`);
+                }},
+                // "since YYYY"
+                { pattern: /since\s+(\d{4})/i, fn: (m) => {
+                    parsed.dateFrom = new Date(parseInt(m[1]), 0, 1);
+                    parsed.dateTo = now;
+                    parsed.explanation.push(`since ${m[1]}`);
+                }},
+                // "in YYYY"
+                { pattern: /\bin\s+(\d{4})\b/i, fn: (m) => {
+                    const y = parseInt(m[1]);
+                    if (y > 2000 && y < 2100) {
+                        parsed.dateFrom = new Date(y, 0, 1);
+                        parsed.dateTo = new Date(y, 11, 31);
+                        parsed.explanation.push(`in ${y}`);
+                    }
+                }},
+                // "before YYYY"
+                { pattern: /before\s+(\d{4})/i, fn: (m) => {
+                    parsed.dateTo = new Date(parseInt(m[1]), 0, 1);
+                    parsed.explanation.push(`before ${m[1]}`);
+                }},
+                // "after YYYY"
+                { pattern: /after\s+(\d{4})/i, fn: (m) => {
+                    parsed.dateFrom = new Date(parseInt(m[1]), 11, 31);
+                    parsed.dateTo = now;
+                    parsed.explanation.push(`after ${m[1]}`);
+                }},
+                // "recently" / "recent"
+                { pattern: /\brecent(?:ly)?\b/i, fn: () => {
+                    parsed.dateFrom = new Date(now);
+                    parsed.dateFrom.setMonth(parsed.dateFrom.getMonth() - 3);
+                    parsed.dateTo = now;
+                    parsed.explanation.push(`last 3 months`);
+                }},
+            ];
+
+            for (const expr of dateExprs) {
+                const m = q.match(expr.pattern);
+                if (m) {
+                    expr.fn(m);
+                    q = q.replace(expr.pattern, ' ');
+                    break; // only one date expression
+                }
+            }
+
+            // 4. Parse sort/rank expressions
+            const sortExprs = [
+                { pattern: /\b(?:most|top|highest)\s+cit(?:ed|ations?)\b/i, fn: () => {
+                    parsed.sortBy = 'cited_by_count';
+                    parsed.sortDir = 'desc';
+                    parsed.explanation.push('sorted by citations');
+                }},
+                { pattern: /\b(?:least|lowest)\s+cit(?:ed|ations?)\b/i, fn: () => {
+                    parsed.sortBy = 'cited_by_count';
+                    parsed.sortDir = 'asc';
+                    parsed.explanation.push('least cited first');
+                }},
+                { pattern: /\b(?:newest|latest|most\s+recent)\b/i, fn: () => {
+                    parsed.sortBy = 'first_shared';
+                    parsed.sortDir = 'desc';
+                    parsed.explanation.push('newest first');
+                }},
+                { pattern: /\boldest\b/i, fn: () => {
+                    parsed.sortBy = 'first_shared';
+                    parsed.sortDir = 'asc';
+                    parsed.explanation.push('oldest first');
+                }},
+                { pattern: /\btop\s+(\d+)\b/i, fn: (m) => {
+                    parsed.limit = parseInt(m[1]);
+                    parsed.explanation.push(`top ${m[1]}`);
+                }},
+            ];
+
+            for (const expr of sortExprs) {
+                const m = q.match(expr.pattern);
+                if (m) {
+                    expr.fn(m);
+                    q = q.replace(expr.pattern, ' ');
+                }
+            }
+
+            // 5. Clean up remaining text into keywords
+            // Remove stop words and extract meaningful terms
+            const stopWords = new Set(['the','a','an','and','or','but','in','on','at','to','for',
+                'of','with','by','from','is','are','was','were','be','been','being','have','has',
+                'had','do','does','did','will','would','could','should','may','might','shall',
+                'can','about','into','through','during','before','after','above','below','between',
+                'same','each','every','all','both','few','more','most','other','some','any','no',
+                'not','only','very','just','than','too','also','now','then','here','there','when',
+                'where','why','how','what','which','who','whom','whose','that','these','those',
+                'this','it','its','my','our','your','their','his','her','we','they','them','us',
+                'me','him','her','i','you','he','she','papers','paper','shared','find','show',
+                'get','list','search','look','looking']);
+
+            q = q.replace(/[^\w\s-]/g, ' ').trim();
+            const keywords = q.split(/\s+/)
+                .map(w => w.toLowerCase().trim())
+                .filter(w => w.length > 1 && !stopWords.has(w));
+
+            parsed.keywords = keywords;
+            if (keywords.length > 0) {
+                parsed.explanation.push(`matching "${keywords.join(' ')}"`);
+            }
+
+            return parsed;
+        }
+
+        function findBestPersonMatch(input, allPeople) {
+            input = input.toLowerCase().trim();
+            // Exact match
+            if (allPeople.has(input)) return input;
+            // Partial match (first name, last name, or substring)
+            let best = null, bestScore = 0;
+            for (const person of allPeople) {
+                const parts = person.split(/\s+/);
+                // Check if input matches first name, last name, or full name substring
+                if (person.includes(input)) {
+                    const score = input.length / person.length;
+                    if (score > bestScore) { bestScore = score; best = person; }
+                }
+                // Check individual parts
+                for (const part of parts) {
+                    if (part.startsWith(input) || input.startsWith(part)) {
+                        const score = Math.min(input.length, part.length) / Math.max(input.length, part.length);
+                        if (score > bestScore) { bestScore = score; best = person; }
+                    }
+                }
+            }
+            return best;
+        }
+
+        function findBestChannelMatch(input) {
+            input = input.toLowerCase().trim();
+            const allChannels = Object.keys(CHANNEL_COLORS);
+            // Exact match
+            if (allChannels.includes(input)) return input;
+            // Try with papers- prefix
+            if (allChannels.includes('papers-' + input)) return 'papers-' + input;
+            // Try partial match
+            for (const ch of allChannels) {
+                if (ch.includes(input) || input.includes(ch.replace('papers-', ''))) return ch;
+            }
+            return null;
+        }
+
+        function searchPapers(query) {
+            const parsed = parseQuery(query);
+
+            // Score and filter papers
+            const scored = filteredPapers.map(paper => {
+                let score = 1; // base score
+                let passes = true;
+
+                // Person filter
+                if (parsed.people.length > 0) {
+                    const sharedBy = (paper.shared_by || '').toLowerCase();
+                    if (!parsed.people.some(p => sharedBy === p || sharedBy.includes(p))) {
+                        passes = false;
+                    }
+                }
+
+                // Channel filter
+                if (parsed.channels.length > 0) {
+                    const paperChannels = (paper.channels || []).map(ch => ch.toLowerCase());
+                    if (!parsed.channels.some(ch => paperChannels.includes(ch))) {
+                        passes = false;
+                    }
+                }
+
+                // Date filter (using first_shared field)
+                if (parsed.dateFrom || parsed.dateTo) {
+                    const shared = paper.first_shared ? new Date(paper.first_shared) : null;
+                    if (!shared) {
+                        passes = false;
+                    } else {
+                        if (parsed.dateFrom && shared < parsed.dateFrom) passes = false;
+                        if (parsed.dateTo && shared > parsed.dateTo) passes = false;
+                    }
+                }
+
+                // Keyword scoring (fuzzy)
+                if (parsed.keywords.length > 0 && passes) {
+                    const text = ((paper.title || '') + ' ' + (paper.abstract || '') + ' ' +
+                                  (paper.journal || '') + ' ' + (paper.authors || []).join(' ') +
+                                  ' ' + (paper.cluster_label || '')).toLowerCase();
+
+                    let keywordScore = 0;
+                    let matchedKeywords = 0;
+                    for (const kw of parsed.keywords) {
+                        if (text.includes(kw)) {
+                            matchedKeywords++;
+                            // Title matches score higher
+                            if ((paper.title || '').toLowerCase().includes(kw)) keywordScore += 3;
+                            else if ((paper.abstract || '').toLowerCase().includes(kw)) keywordScore += 1;
+                            else keywordScore += 0.5;
+                        }
+                    }
+
+                    // Require at least one keyword match if we have keywords
+                    if (matchedKeywords === 0) {
+                        passes = false;
+                    } else {
+                        score = keywordScore * (matchedKeywords / parsed.keywords.length);
+                    }
+                }
+
+                // Boost by citations for relevance
+                if (passes) {
+                    score += Math.min(1, (paper.cited_by_count || 0) / 200);
+                }
+
+                return { paper, score, passes };
+            });
+
+            // Filter and sort
+            let results = scored.filter(s => s.passes);
+
+            if (parsed.sortBy) {
+                results.sort((a, b) => {
+                    let aVal = a.paper[parsed.sortBy] || 0;
+                    let bVal = b.paper[parsed.sortBy] || 0;
+                    if (typeof aVal === 'string') aVal = new Date(aVal).getTime() || 0;
+                    if (typeof bVal === 'string') bVal = new Date(bVal).getTime() || 0;
+                    return parsed.sortDir === 'desc' ? bVal - aVal : aVal - bVal;
+                });
+            } else {
+                // Default: sort by relevance score
+                results.sort((a, b) => b.score - a.score);
+            }
+
+            if (parsed.limit) {
+                results = results.slice(0, parsed.limit);
+            }
+
+            // Attach parsed info for UI display
+            results._parsed = parsed;
+
+            return results.map(r => r.paper);
+        }
+
+        function showAutocomplete(value) {
+            const dropdown = document.getElementById('autocompleteDropdown');
+            const lastToken = value.split(/\s+/).pop();
+            const suggestions = [];
+
+            if (lastToken.startsWith('@')) {
+                const userPrefix = lastToken.substring(1).toLowerCase();
+                const users = new Set();
+                filteredPapers.forEach(p => users.add(p.shared_by));
+                users.forEach(u => {
+                    if (u && u.toLowerCase().includes(userPrefix)) {
+                        suggestions.push('@' + u);
+                    }
+                });
+            } else if (lastToken.startsWith('#')) {
+                const channelPrefix = lastToken.substring(1).toLowerCase();
+                selectedChannels.forEach(ch => {
+                    if (ch.toLowerCase().includes(channelPrefix)) {
+                        suggestions.push('#' + ch);
+                    }
+                });
+            }
+
+            if (suggestions.length > 0) {
+                dropdown.innerHTML = suggestions.map(s =>
+                    `<div class="autocomplete-item">${s}</div>`
+                ).join('');
+                dropdown.classList.add('visible');
+
+                document.querySelectorAll('.autocomplete-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const input = document.getElementById('chatbotInput');
+                        const parts = input.value.split(/\s+/);
+                        parts[parts.length - 1] = item.textContent;
+                        input.value = parts.join(' ') + ' ';
+                        hideAutocomplete();
+                        input.focus();
+                    });
+                });
+            } else {
+                hideAutocomplete();
+            }
+        }
+
+        function hideAutocomplete() {
+            document.getElementById('autocompleteDropdown').classList.remove('visible');
+        }
+
+        // ===== EVENT LISTENERS =====
+        document.getElementById('mapToggle').addEventListener('click', () => {
+            currentView = 'map';
+            document.getElementById('mapToggle').classList.add('active');
+            document.getElementById('tableToggle').classList.remove('active');
+            document.getElementById('mapView').classList.add('visible');
+            document.getElementById('tableView').classList.remove('visible');
+            document.getElementById('exportButtons').classList.remove('visible');
+            renderMap();
+        });
+
+        document.getElementById('tableToggle').addEventListener('click', () => {
+            currentView = 'table';
+            document.getElementById('mapToggle').classList.remove('active');
+            document.getElementById('tableToggle').classList.add('active');
+            document.getElementById('mapView').classList.remove('visible');
+            document.getElementById('tableView').classList.add('visible');
+            document.getElementById('exportButtons').classList.add('visible');
+            renderTable();
+            setupTableEvents();
+        });
+
+        document.getElementById('projectionSelect').addEventListener('change', (e) => {
+            currentProjection = e.target.value;
+            zoomLevel = 1; panX = 0; panY = 0;
+            computeBounds();
+            renderMap();
+        });
+
+        document.getElementById('colorBySelect').addEventListener('change', (e) => {
+            colorByMode = e.target.value;
+            renderMap();
+        });
+
+        document.getElementById('scaleBySelect').addEventListener('change', (e) => {
+            scaleByMode = e.target.value;
+            renderMap();
+        });
+
+        document.getElementById('semanticSearch').addEventListener('click', () => {
+            const query = document.getElementById('semanticQuery').value.trim();
+            if (!query) return;
+
+            semanticQuery = query;
+            computeSemanticSimilarity(query);
+            document.getElementById('semanticActive').style.display = 'block';
+            document.getElementById('semanticClear').style.display = 'block';
+            document.getElementById('topNSection').style.display = 'block';
+            document.getElementById('scaleBySelect').value = 'relevance';
+            scaleByMode = 'relevance';
+            // Auto-select top N immediately
+            autoSelectTopN();
+        });
+
+        document.getElementById('semanticClear').addEventListener('click', () => {
+            semanticQuery = null;
+            semanticScores.clear();
+            document.getElementById('semanticQuery').value = '';
+            document.getElementById('semanticActive').style.display = 'none';
+            document.getElementById('semanticClear').style.display = 'none';
+            document.getElementById('topNSection').style.display = 'none';
+            document.getElementById('scaleBySelect').value = 'uniform';
+            scaleByMode = 'uniform';
+            selectedPapers.clear();
+            renderMap();
+        });
+
+        document.getElementById('selectTopN').addEventListener('input', (e) => {
+            document.getElementById('topNDisplay').textContent = e.target.value;
+            // Auto-select as slider moves
+            autoSelectTopN();
+        });
+
+        document.getElementById('exportCsv').addEventListener('click', () => downloadFiltered('csv'));
+        document.getElementById('exportXlsx').addEventListener('click', () => downloadFiltered('xlsx'));
+
+        document.getElementById('panelToggle').addEventListener('click', () => {
+            const panel = document.getElementById('detailPanel');
+            panel.classList.toggle('expanded');
+            document.getElementById('panelToggle').textContent = panel.classList.contains('expanded') ? '\u25BC' : '\u25B6';
+        });
+
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            initCanvas();
+            initChatbot();
+            initTableResize();
+            setSelectionMode('pan');
+        });
+    </script>
+</body>
+</html>
