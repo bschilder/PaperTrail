@@ -2336,69 +2336,7 @@
                     <button class="chatbot-example-btn" data-query="What topics are trending in the last 6 months?">trending</button>
                     <button class="chatbot-example-btn" data-query="Who are the most active contributors and what do they focus on?">contributors</button>
                 </div>
-                <div class="chatbot-settings-popup" id="chatbotSettingsPopup_INLINE" style="display:none;">
-                    <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:10px;">AI Agent Setup</div>
-
-                    <!-- Service selector -->
-                    <div style="font-size:11px;color:#888;margin-bottom:8px;">Connect an AI service to unlock powerful search, analysis, and web search capabilities.</div>
-
-                    <div style="margin-bottom:10px;">
-                        <div style="font-size:11px;color:#888;margin-bottom:4px;">Service</div>
-                        <select id="serviceSelect" class="color-by-select" style="width:100%;font-size:12px;margin-bottom:6px;">
-                            <option value="anthropic">Anthropic (Claude) — recommended</option>
-                            <option value="openai">OpenAI (GPT-4)</option>
-                        </select>
-                    </div>
-
-                    <!-- API Key input -->
-                    <div style="margin-bottom:8px;">
-                        <div style="font-size:11px;color:#888;margin-bottom:4px;">API Key</div>
-                        <input type="password" class="chatbot-bar-input" id="apiKeyInput" placeholder="sk-ant-..." style="font-size:12px;padding-right:12px;">
-                    </div>
-
-                    <!-- Model selector (changes based on service) -->
-                    <div style="margin-bottom:8px;">
-                        <div style="font-size:11px;color:#888;margin-bottom:4px;">Model</div>
-                        <select id="modelSelect" class="color-by-select" style="width:100%;font-size:12px;">
-                            <option value="claude-sonnet-4-20250514">Sonnet 4 — fast + smart (default)</option>
-                            <option value="claude-opus-4-20250514">Opus 4 — most capable</option>
-                            <option value="claude-haiku-3-5-20241022">Haiku 3.5 — fastest + cheapest</option>
-                        </select>
-                    </div>
-
-                    <div style="display:flex;gap:6px;margin-bottom:6px;">
-                        <button id="apiKeySave" style="flex:1;padding:8px;background:#64b5f6;border:none;color:#fff;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">Connect</button>
-                        <button id="apiKeyClear" style="padding:8px 12px;background:#3a3a4e;border:1px solid #4a4a5e;color:#e0e0e0;border-radius:6px;cursor:pointer;font-size:12px;">Disconnect</button>
-                    </div>
-
-                    <div id="apiKeyStatus" style="font-size:11px;color:#666;margin-bottom:8px;"></div>
-
-                    <!-- Connected services -->
-                    <div id="connectedServices" style="border-top:1px solid #2a2a3e;padding-top:8px;margin-bottom:8px;"></div>
-
-                    <!-- What you get -->
-                    <div style="border-top:1px solid #2a2a3e;padding-top:8px;margin-bottom:8px;">
-                        <div style="font-size:10px;text-transform:uppercase;color:#555;letter-spacing:0.5px;margin-bottom:4px;">With AI Connected</div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;font-size:10px;color:#888;">
-                            <span>&#x2713; Natural language queries</span>
-                            <span>&#x2713; Web search</span>
-                            <span>&#x2713; Trend analysis</span>
-                            <span>&#x2713; Channel comparisons</span>
-                            <span>&#x2713; Contributor profiles</span>
-                            <span>&#x2713; Multi-turn chat</span>
-                        </div>
-                    </div>
-
-                    <!-- Display settings -->
-                    <div style="border-top:1px solid #2a2a3e;padding-top:8px;">
-                        <div style="font-size:11px;font-weight:600;color:#aaa;margin-bottom:4px;">Display</div>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <span style="font-size:11px;color:#888;">Text Size</span>
-                            <input type="range" id="textScaleSlider" min="80" max="130" value="100" style="flex:1;">
-                            <span id="textScaleDisplay" style="font-size:11px;color:#64b5f6;min-width:30px;">100%</span>
-                        </div>
-                    </div>
-                </div>
+                <!-- Old inline settings removed — using body-level modal (#settingsOverlay) -->
             </div>
             <div id="statsDisplay" style="display:none;">Loading...</div>
         </div>
@@ -6776,11 +6714,12 @@
                         claudeApiKey = key;
                         claudeModel = model;
                     }
-                    document.getElementById('apiKeyStatus').textContent = esc(svc) + ' connected ✓';
+                    document.getElementById('apiKeyStatus').innerHTML = '<span style="color:#66bb6a;font-weight:600;">&#x2713; ' + esc(svc) + ' connected!</span> You can now use AI-powered search.';
                     document.getElementById('apiKeyStatus').style.color = '#66bb6a';
                     settingsBtn.classList.add('has-key');
                     updateConnectedServicesUI();
-                    settingsPopup.classList.remove('visible');
+                    // Keep modal open for 2s to show success, then close
+                    setTimeout(() => { settingsPopup.classList.remove('visible'); }, 2000);
                 } else {
                     document.getElementById('apiKeyStatus').textContent = 'Invalid key format';
                     document.getElementById('apiKeyStatus').style.color = '#ef5350';
