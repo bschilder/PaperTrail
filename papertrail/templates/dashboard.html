@@ -5094,6 +5094,9 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
         async function runChatSearch(query) {
             if (!query) return;
             const resultsPanel = document.getElementById('chatbotResults');
+            // Always ensure panel is visible and cleared for new search
+            resultsPanel.innerHTML = '';
+            resultsPanel.classList.add('visible');
 
             if (claudeApiKey) {
                 // LLM Agent mode
