@@ -2308,7 +2308,7 @@
                     <button class="chatbot-example-btn" data-query="What topics are trending in the last 6 months?">trending</button>
                     <button class="chatbot-example-btn" data-query="Who are the most active contributors and what do they focus on?">contributors</button>
                 </div>
-                <div class="chatbot-settings-popup" id="chatbotSettingsPopup" style="width:380px;">
+                <div class="chatbot-settings-popup" id="chatbotSettingsPopup_INLINE" style="display:none;">
                     <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:10px;">AI Agent Setup</div>
 
                     <!-- Service selector -->
@@ -2656,6 +2656,67 @@
 
     <!-- Tooltip -->
     <div class="tooltip" id="tooltip"></div>
+
+    <!-- Settings modal overlay -->
+    <div class="profile-modal" id="settingsOverlay">
+        <div class="profile-card" style="width:400px;max-width:95vw;">
+            <button class="profile-close" onclick="document.getElementById('settingsOverlay').classList.remove('visible')">&times;</button>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#64b5f6;margin-bottom:4px;">&#x2699; Settings</div>
+            <div class="profile-name" style="font-size:18px;">AI Agent Setup</div>
+            <div style="font-size:12px;color:#888;margin:8px 0 12px;">Connect an AI service to unlock powerful search, analysis, and web search.</div>
+
+            <div style="margin-bottom:10px;">
+                <div style="font-size:11px;color:#888;margin-bottom:4px;">Service</div>
+                <select id="serviceSelect" class="color-by-select" style="width:100%;font-size:12px;">
+                    <option value="anthropic">Anthropic (Claude) — recommended</option>
+                    <option value="openai">OpenAI (GPT-4)</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom:8px;">
+                <div style="font-size:11px;color:#888;margin-bottom:4px;">API Key</div>
+                <input type="password" class="chatbot-bar-input" id="apiKeyInput" placeholder="sk-ant-..." style="font-size:13px;">
+            </div>
+
+            <div style="margin-bottom:8px;">
+                <div style="font-size:11px;color:#888;margin-bottom:4px;">Model</div>
+                <select id="modelSelect" class="color-by-select" style="width:100%;font-size:12px;">
+                    <option value="claude-sonnet-4-20250514">Sonnet 4 — fast + smart (default)</option>
+                    <option value="claude-opus-4-20250514">Opus 4 — most capable</option>
+                    <option value="claude-haiku-3-5-20241022">Haiku 3.5 — fastest</option>
+                </select>
+            </div>
+
+            <div style="display:flex;gap:6px;margin-bottom:8px;">
+                <button id="apiKeySave" style="flex:1;padding:10px;background:#64b5f6;border:none;color:#fff;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">Connect</button>
+                <button id="apiKeyClear" style="padding:10px 14px;background:#3a3a4e;border:1px solid #4a4a5e;color:#e0e0e0;border-radius:8px;cursor:pointer;font-size:13px;">Disconnect</button>
+            </div>
+
+            <div id="apiKeyStatus" style="font-size:11px;color:#666;margin-bottom:8px;"></div>
+            <div id="connectedServices" style="border-top:1px solid #2a2a3e;padding-top:8px;margin-bottom:8px;"></div>
+
+            <div style="border-top:1px solid #2a2a3e;padding-top:8px;margin-bottom:8px;">
+                <div style="font-size:10px;text-transform:uppercase;color:#555;letter-spacing:0.5px;margin-bottom:4px;">With AI Connected</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:11px;color:#888;">
+                    <span>&#x2713; Natural language queries</span>
+                    <span>&#x2713; Web search</span>
+                    <span>&#x2713; Trend analysis</span>
+                    <span>&#x2713; Channel comparisons</span>
+                    <span>&#x2713; Contributor profiles</span>
+                    <span>&#x2713; Multi-turn chat</span>
+                </div>
+            </div>
+
+            <div style="border-top:1px solid #2a2a3e;padding-top:8px;">
+                <div style="font-size:11px;font-weight:600;color:#aaa;margin-bottom:4px;">Display</div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:11px;color:#888;">Text Size</span>
+                    <input type="range" id="textScaleSlider" min="80" max="130" value="100" style="flex:1;">
+                    <span id="textScaleDisplay" style="font-size:11px;color:#64b5f6;min-width:30px;">100%</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Contributor profile modal -->
     <div class="profile-modal" id="profileModal">
@@ -6594,7 +6655,9 @@
             const settingsPopup = document.getElementById('chatbotSettingsPopup');
             settingsBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                settingsPopup.classList.toggle('visible');
+                // Use the modal overlay instead of inline popup
+                const overlay = document.getElementById('settingsOverlay');
+                overlay.classList.toggle('visible');
                 const keyInput = document.getElementById('apiKeyInput');
                 if (claudeApiKey) {
                     keyInput.value = claudeApiKey.slice(0, 10) + '...';
@@ -8458,6 +8521,13 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     setTimeout(() => {
                         document.getElementById('chatbotInput').placeholder = 'Ask about papers... try @person, #channel, or keywords';
                     }, 2000);
+                }
+            });
+
+            // Settings overlay: click outside to close
+            document.getElementById('settingsOverlay').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('settingsOverlay')) {
+                    document.getElementById('settingsOverlay').classList.remove('visible');
                 }
             });
 
