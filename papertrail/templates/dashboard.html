@@ -2229,6 +2229,15 @@
 
             <div style="flex:1;"></div>
 
+            <!-- Semantic search mascot button -->
+            <button class="agent-mascot" id="semanticMascotBtn" title="Semantic Search" style="background:linear-gradient(135deg,#1a3520,#1a4025);">
+                <svg class="mascot-svg" viewBox="0 0 16 16" style="color:#66bb6a;">
+                    <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    <line x1="11" y1="11" x2="14" y2="14" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span class="mascot-label">Search</span>
+            </button>
+
             <!-- Agent mascot button -->
             <button class="agent-mascot" id="agentMascotBtn" title="Ask the AI Agent (/)">
                 <svg class="mascot-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -2258,6 +2267,18 @@
                 <span class="mascot-label">Ask AI</span>
             </button>
 
+        </div>
+
+        <!-- Collapsible Semantic Search Panel -->
+        <div class="agent-panel" id="semanticPanel" style="background:linear-gradient(135deg,#172530,#1a2e35);">
+            <div style="display:flex;align-items:center;gap:10px;max-width:900px;margin:0 auto;">
+                <input type="text" class="chatbot-bar-input" id="semanticPanelInput" placeholder="Type a semantic query and press Enter..." style="flex:1;">
+                <div style="display:flex;gap:6px;">
+                    <button class="chatbot-example-btn" onclick="document.getElementById('semanticPanelInput').value='single cell RNA sequencing';triggerSemanticFromPanel();">scRNA-seq</button>
+                    <button class="chatbot-example-btn" onclick="document.getElementById('semanticPanelInput').value='protein structure prediction';triggerSemanticFromPanel();">protein structure</button>
+                    <button class="chatbot-example-btn" onclick="document.getElementById('semanticPanelInput').value='attention mechanism transformer';triggerSemanticFromPanel();">attention</button>
+                </div>
+            </div>
         </div>
 
         <!-- Collapsible Agent Panel -->
@@ -6208,6 +6229,23 @@
             renderMap();
         }
 
+        function triggerSemanticFromPanel() {
+            const query = document.getElementById('semanticPanelInput').value.trim();
+            if (!query) return;
+            // Sync with sidebar semantic search
+            document.getElementById('semanticQuery').value = query;
+            semanticQuery = query;
+            computeSemanticSimilarity(query);
+            document.getElementById('semanticActive').style.display = 'block';
+            document.getElementById('semanticClear').style.display = 'block';
+            document.getElementById('topNSection').style.display = 'block';
+            document.getElementById('scaleBySelect').value = 'relevance';
+            scaleByMode = 'relevance';
+            // Switch to map view
+            document.getElementById('mapToggle').click();
+            autoSelectTopN();
+        }
+
         // ===== TABLE OPERATIONS =====
         function setupTableEvents() {
             const headers = document.querySelectorAll('.data-table th[data-field]');
@@ -7988,6 +8026,37 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 panOffset3D = { x: 0, y: 0, z: 0 };
                 flyTarget3D = null;
                 velTheta = 0; velPhi = 0;
+            });
+
+            // Semantic search mascot toggle
+            document.getElementById('semanticMascotBtn').addEventListener('click', () => {
+                const panel = document.getElementById('semanticPanel');
+                const btn = document.getElementById('semanticMascotBtn');
+                panel.classList.toggle('visible');
+                btn.classList.toggle('active');
+                if (panel.classList.contains('visible')) {
+                    setTimeout(() => document.getElementById('semanticPanelInput').focus(), 200);
+                } else {
+                    // Clear semantic search when closing
+                    semanticQuery = null;
+                    semanticScores.clear();
+                    document.getElementById('semanticQuery').value = '';
+                    document.getElementById('semanticActive').style.display = 'none';
+                    document.getElementById('semanticClear').style.display = 'none';
+                    document.getElementById('topNSection').style.display = 'none';
+                    scaleByMode = 'uniform';
+                    document.getElementById('scaleBySelect').value = 'uniform';
+                    selectedPapers.clear();
+                    renderMap();
+                }
+            });
+
+            // Semantic panel Enter key
+            document.getElementById('semanticPanelInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    triggerSemanticFromPanel();
+                }
             });
 
             // Agent mascot toggle
