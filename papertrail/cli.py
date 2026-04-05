@@ -174,6 +174,26 @@ def build(input_file: str, output: str, title: str) -> None:
 
 
 @main.command()
+@click.argument("input_file", type=click.Path(exists=True))
+@click.option("--output", "-o", default=None, help="Output JSON path (default: overwrite input).")
+@click.option("--email", default="papertrail@example.com", help="Email for OpenAlex polite pool.")
+def fill(input_file: str, output: str | None, email: str) -> None:
+    """Fill missing metadata using OpenAlex title search."""
+    from papertrail.enricher import fill_missing_metadata
+
+    with open(input_file) as f:
+        papers = json.load(f)
+
+    click.echo(f"Filling metadata for {len(papers)} papers...")
+    count = fill_missing_metadata(papers, email=email)
+
+    out = output or input_file
+    with open(out, "w") as f:
+        json.dump(papers, f, indent=2)
+    click.echo(f"Enriched {count} papers → {out}")
+
+
+@main.command()
 @click.option("--query", "-q", prompt="Search query", help="Text to search for.")
 @click.option("--faiss-dir", default="faiss_index", help="FAISS index directory.")
 @click.option("--top-k", "-k", default=5, help="Number of results.")

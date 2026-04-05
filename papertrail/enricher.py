@@ -1004,3 +1004,107 @@ def enrich_paper(url: str, timeout: int = DEFAULT_TIMEOUT) -> dict[str, Any]:
 
     # Remove None values
     return {k: v for k, v in result.items() if v is not None}
+
+
+def fill_missing_metadata(
+    papers: list[dict[str, Any]],
+    email: str = "papertrail@example.com",
+    fields: tuple[str, ...] = ("abstract", "authors", "journal", "year", "cited_by_count"),
+) -> int:
+    """
+    Fill missing metadata for a list of papers using OpenAlex title search.
+
+    This is a fast batch operation that uses OpenAlex's title search to find
+    papers that are missing key fields. It modifies papers in-place.
+
+    Parameters
+    ----------
+    papers : list[dict]
+        Papers with at least 'title' and 'url' fields.
+    email : str
+        Email for OpenAlex polite pool (10 req/s vs 1 req/s).
+    fields : tuple
+        Which fields to fill if missing.
+
+    Returns
+    -------
+    int
+        Number of papers enriched.
+    """
+    headers = {"User-Agent": f"PaperTrail/1.0 (mailto:{email})"}
+    enriched = 0
+
+    needs = [p for p in papers if any(not p.get(f) for f in fields) and p.get("title")]
+    logger.info("Filling missing metadata for %d papers via OpenAlex title search", len(needs))
+
+    for p in needs:
+        title = p.get("title", "")
+        if len(title) < 10:
+            continue
+
+        # Try DOI first (faster)
+        doi_match = re.search(r"(10\.\d{4,}/[^\s,\]>]+)", p.get("url", ""))
+        doi = doi_match.group(1) if doi_match else None
+
+        try:
+            if doi:
+                resp = requests.get(
+                    f"{OPENALEX_API}/doi:{doi}",
+                    headers=headers,
+                    timeout=10,
+                )
+            else:
+                resp = requests.get(
+                    OPENALEX_API,
+                    params={"filter": f"title.search:{title[:100]}", "per_page": 1},
+                    headers=headers,
+                    timeout=10,
+                )
+
+            if not resp.ok:
+                continue
+
+            data = resp.json()
+            if not doi:
+                results = data.get("results", [])
+                data = results[0] if results else None
+            if not data:
+                continue
+
+            changed = False
+            if "year" in fields and not p.get("year") and data.get("publication_year"):
+                p["year"] = data["publication_year"]
+                changed = True
+            if "journal" in fields and not p.get("journal"):
+                src = data.get("primary_location", {}).get("source", {})
+                if src.get("display_name"):
+                    p["journal"] = src["display_name"]
+                    changed = True
+            if "authors" in fields and not p.get("authors") and data.get("authorships"):
+                p["authors"] = [a["author"]["display_name"] for a in data["authorships"][:10]]
+                changed = True
+            if "abstract" in fields and not p.get("abstract") and data.get("abstract_inverted_index"):
+                inv = data["abstract_inverted_index"]
+                words: dict[int, str] = {}
+                for word, positions in inv.items():
+                    for pos in positions:
+                        words[pos] = word
+                if words:
+                    p["abstract"] = " ".join(words.get(i, "") for i in range(max(words) + 1))
+                    changed = True
+            if "cited_by_count" in fields and not p.get("cited_by_count") and data.get("cited_by_count"):
+                p["cited_by_count"] = data["cited_by_count"]
+                changed = True
+            if not p.get("openalex_url") and data.get("id"):
+                p["openalex_url"] = data["id"]
+
+            if changed:
+                enriched += 1
+
+        except Exception as exc:
+            logger.debug("OpenAlex error for '%s': %s", title[:40], exc)
+
+        time.sleep(0.1)  # rate limit
+
+    logger.info("Enriched %d / %d papers", enriched, len(needs))
+    return enriched
