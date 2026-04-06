@@ -2275,6 +2275,8 @@
                 <span class="mascot-label">Search</span>
             </button>
 
+            <a href="https://bschilder.github.io/PaperTrail/" target="_blank" style="color:#888;font-size:12px;text-decoration:none;padding:4px 8px;border:1px solid #3a3a4e;border-radius:6px;display:flex;align-items:center;gap:4px;transition:all 0.15s;" onmouseover="this.style.color='#e0e0e0';this.style.borderColor='#4a4a5e'" onmouseout="this.style.color='#888';this.style.borderColor='#3a3a4e'" title="Documentation">&#x1F4D6; Docs</a>
+
             <!-- Agent mascot button -->
             <button class="agent-mascot" id="agentMascotBtn" title="Ask the AI Agent (/)">
                 <svg class="mascot-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -6926,6 +6928,16 @@
             const summary = buildDatasetSummary();
             return `You are an AI assistant embedded in PaperTrail, a dashboard for exploring academic papers shared in a team's Slack channels.
 
+APP FEATURES (answer "how do I..." questions with this):
+- 4 views: Map (2D scatter), 3D (WebGL), Table (sortable), Leaderboard (rankings)
+- Keyboard: Arrow keys switch views, 1/2/3 change projection, V/L/R for pan/lasso/rect, / opens agent, ? shows all shortcuts, Esc closes panels
+- Map: KDE background toggle, Color By (channel/cluster/year/citations/density/contributor/journal), Scale By, Transform (linear/log/sqrt)
+- Selection: lasso draw, rectangle draw, click point, shift+drag to pan
+- Time travel: play button animates papers chronologically, slider scrubs through time
+- Semantic search: magnifying glass icon, ranks by content similarity
+- Click any person/topic/channel name anywhere to see details
+- Docs: https://bschilder.github.io/PaperTrail/
+
 DATASET: ${summary.total_papers} papers, ${summary.channels.length} channels, ${summary.people.length} contributors, ${summary.cluster_labels.length} clusters.
 Date range: ${summary.date_range.from} to ${summary.date_range.to}.
 Channels: ${summary.channels.join(', ')}.
@@ -7845,7 +7857,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         <input type="checkbox" id="chatCheckAll" style="cursor:pointer;">
                         <label for="chatCheckAll" style="font-size:12px;color:#a0a0b0;cursor:pointer;">${shown.length} papers found</label>
                     </div>
-                    <button id="chatShowOnMap" style="padding:5px 12px;background:#64b5f6;border:none;color:#fff;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">Show on Map</button>
+                    <button id="chatShowOnMap" style="padding:5px 12px;background:#64b5f6;border:none;color:#fff;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">Highlight All</button>
                 </div>`;
             }
 
@@ -7889,7 +7901,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 });
             }
 
-            // Show on Map button — selects checked papers
+            // Highlight All button — selects checked papers
             const showOnMapBtn = document.getElementById('chatShowOnMap');
             if (showOnMapBtn) {
                 showOnMapBtn.addEventListener('click', () => {
