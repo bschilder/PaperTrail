@@ -7748,7 +7748,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 const thinkingEl = document.createElement('div');
                 resultsPanel.innerHTML = `
                     <div class="chatbot-results-header">
-                        <span>Thinking<span class="ai-mode-badge llm">${usingHF ? hfModel.split('/').pop() : claudeModel.includes('opus') ? 'Opus 4' : claudeModel.includes('haiku') ? 'Haiku 3.5' : 'Sonnet 4'}</span></span>
+                        <span>Thinking${modelBadgeLink(true)}</span>
                         <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
                     </div>
                     <div class="ai-thinking" id="agentThinkingStatus">
@@ -7878,12 +7878,28 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             return html;
         }
 
-        function renderChatResults(panel, aiText, papers, mode) {
-            const modelBadge = mode === 'llm' ? (activeService === 'huggingface' ? hfModel.split('/').pop() : claudeModel.includes('opus') ? 'Opus 4' : claudeModel.includes('haiku') ? 'Haiku 3.5' : 'Sonnet 4') : 'local';
+        function modelBadgeLink(isLLM) {
+            if (!isLLM) return '<span class="ai-mode-badge local">local</span>';
+            let name, url;
+            if (activeService === 'huggingface') {
+                name = hfModel.split('/').pop();
+                url = 'https://huggingface.co/' + hfModel;
+            } else if (activeService === 'anthropic') {
+                name = claudeModel.includes('opus') ? 'Opus 4' : claudeModel.includes('haiku') ? 'Haiku 3.5' : 'Sonnet 4';
+                url = 'https://docs.anthropic.com/en/docs/about-claude/models';
+            } else if (activeService === 'openai') {
+                name = 'GPT-4o';
+                url = 'https://platform.openai.com/docs/models';
+            } else {
+                return '<span class="ai-mode-badge local">local</span>';
+            }
+            return `<a href="${url}" target="_blank" rel="noopener" class="ai-mode-badge llm" style="text-decoration:none;color:inherit;cursor:pointer;">${name}</a>`;
+        }
 
+        function renderChatResults(panel, aiText, papers, mode) {
             let html = `
                 <div class="chatbot-results-header">
-                    <span><span class="ai-mode-badge ${mode}">${modelBadge}</span></span>
+                    <span>${modelBadgeLink(mode === 'llm')}</span>
                     <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')" style="font-size:18px;">&times;</button>
                 </div>`;
 
