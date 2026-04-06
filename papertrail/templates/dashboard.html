@@ -155,13 +155,13 @@
         /* Collapsible agent panel */
         .agent-panel {
             display: none;
-            background: linear-gradient(135deg, #171730 0%, #1a1a35 50%, #1d1d38 100%);
-            border-bottom: 2px solid rgba(100,181,246,0.25);
-            border-top: 1px solid rgba(100,181,246,0.1);
+            background: linear-gradient(135deg, #141430 0%, #1a1a40 50%, #1e2045 100%);
+            border-bottom: 2px solid rgba(100,181,246,0.35);
+            border-top: 1px solid rgba(100,181,246,0.15);
             padding: 10px 20px;
             flex-shrink: 0;
             overflow: visible;
-            box-shadow: 0 4px 20px rgba(100,181,246,0.06), inset 0 1px 0 rgba(100,181,246,0.08);
+            box-shadow: 0 4px 24px rgba(100,181,246,0.1), inset 0 1px 0 rgba(100,181,246,0.12);
         }
         .agent-panel.visible {
             display: block;
@@ -443,6 +443,10 @@
 
         .chatbot-result-item:hover {
             background: #252538;
+        }
+        .chatbot-result-item.result-focused {
+            background: rgba(100,181,246,0.12);
+            border-left: 3px solid #64b5f6;
         }
 
         .chatbot-result-item:last-child {
@@ -2331,7 +2335,7 @@
                 <div class="chatbot-bar-input-wrap">
                     <input type="text" class="chatbot-bar-input" id="chatbotInput" placeholder="Ask about papers... try @person, #channel, or keywords">
                     <button class="agent-send-btn" id="agentSendBtn" title="Send">&#10148;</button>
-                    <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+                    <!-- autocomplete moved to body level -->
                     <!-- results moved to body level for fixed positioning -->
                 </div>
                 <div class="chatbot-examples">
@@ -2628,6 +2632,9 @@
 
     <!-- Tooltip -->
     <div class="tooltip" id="tooltip"></div>
+
+    <!-- Autocomplete dropdown (body level for z-index) -->
+    <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
 
     <!-- Agent results overlay -->
     <div class="chatbot-results" id="chatbotResults"></div>
@@ -6655,10 +6662,8 @@
             // Close results when clicking outside
             document.addEventListener('click', (e) => {
                 // Don't close results when a modal is open or when clicking inside results/agent
-                const anyModalOpen = document.querySelector('.profile-modal.visible');
-                if (!e.target.closest('.chatbot-bar') && !e.target.closest('.agent-panel') && !e.target.closest('.chatbot-results') && !e.target.closest('.profile-card') && !anyModalOpen) {
-                    resultsPanel.classList.remove('visible');
-                }
+                // Results only close via explicit X button — never via outside clicks
+                // This prevents accidental dismissal when interacting with modals/tags
             });
 
             // Settings gear
@@ -8943,6 +8948,26 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         document.getElementById('semanticMascotBtn').classList.remove('active');
                         return;
                     }
+                }
+
+                // Arrow keys in agent results: navigate paper list (#98)
+                if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && document.getElementById('chatbotResults')?.classList.contains('visible')) {
+                    const items = document.querySelectorAll('#chatbotResults .chatbot-result-item');
+                    if (items.length > 0) {
+                        e.preventDefault();
+                        const current = document.querySelector('#chatbotResults .chatbot-result-item.result-focused');
+                        let idx = current ? Array.from(items).indexOf(current) : -1;
+                        if (current) current.classList.remove('result-focused');
+                        idx = e.key === 'ArrowDown' ? Math.min(idx + 1, items.length - 1) : Math.max(idx - 1, 0);
+                        items[idx].classList.add('result-focused');
+                        items[idx].scrollIntoView({ block: 'nearest' });
+                        return;
+                    }
+                }
+                if (e.key === 'Enter' && document.querySelector('#chatbotResults .result-focused')) {
+                    e.preventDefault();
+                    document.querySelector('#chatbotResults .result-focused .chatbot-result-title')?.click();
+                    return;
                 }
 
                 // Arrow keys while modal is open from leaderboard: cycle items
