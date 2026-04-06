@@ -490,7 +490,10 @@
         }
 
         .autocomplete-item:hover, .autocomplete-item.ac-active {
-            background: #3a3a4e;
+            background: rgba(100,181,246,0.15);
+            color: #fff;
+            border-left: 3px solid #64b5f6;
+            padding-left: 9px;
         }
 
         .export-buttons {
@@ -2328,6 +2331,7 @@
         <div class="agent-panel" id="agentPanel">
             <div class="chatbot-bar" style="max-width:none;">
                 <div class="chatbot-bar-input-wrap">
+                    <div id="chatInputTags" style="display:none;position:absolute;top:-2px;left:12px;right:40px;display:flex;gap:4px;flex-wrap:wrap;pointer-events:none;z-index:2;"></div>
                     <input type="text" class="chatbot-bar-input" id="chatbotInput" placeholder="Ask about papers... try @person, #channel, or keywords">
                     <button class="agent-send-btn" id="agentSendBtn" title="Send">&#10148;</button>
                     <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
@@ -6614,8 +6618,10 @@
                 const value = input.value;
                 if (value.includes('@') || value.includes('#')) {
                     showAutocomplete(value);
+                    updateInputTags(value);
                 } else {
                     hideAutocomplete();
+                    updateInputTags(value);
                 }
             });
 
@@ -8379,11 +8385,37 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         input.value = parts.join(' ') + ' ';
                         hideAutocomplete();
                         input.focus();
+                        updateInputTags(input.value);
                     });
                 });
             } else {
                 hideAutocomplete();
             }
+        }
+
+        function updateInputTags(text) {
+            const tagsDiv = document.getElementById('chatInputTags');
+            if (!tagsDiv) return;
+            const tags = [];
+            // Find @person mentions
+            const personRe = /@([\w\s]+?)(?=\s+(?:in|from|shared|on|#|@|$)|\s*$)/gi;
+            let m;
+            while ((m = personRe.exec(text)) !== null) {
+                const name = m[1].trim();
+                const allPeople = new Set(allPapers.map(p => p.shared_by).filter(Boolean).map(s => s.toLowerCase()));
+                if (findBestPersonMatch(name.toLowerCase(), allPeople)) {
+                    tags.push(`<span class="card-tag person-tag" style="font-size:10px;pointer-events:none;">@${esc(name)}</span>`);
+                }
+            }
+            // Find #channel mentions
+            const chRe = /#([\w-]+)/g;
+            while ((m = chRe.exec(text)) !== null) {
+                if (findBestChannelMatch(m[1])) {
+                    tags.push(`<span class="card-tag channel-tag" style="font-size:10px;pointer-events:none;">#${esc(m[1])}</span>`);
+                }
+            }
+            tagsDiv.style.display = tags.length > 0 ? 'flex' : 'none';
+            tagsDiv.innerHTML = tags.join('');
         }
 
         function hideAutocomplete() {
