@@ -281,30 +281,26 @@
             color: #e0e0e0;
         }
 
-        .chatbot-settings-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            background: #252538;
-            border: 1px solid #3a3a4e;
-            color: #a0a0a0;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+        .mascot-settings {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            margin-left: 2px;
+            padding: 2px 4px;
+            border-radius: 4px;
             transition: all 0.2s;
         }
-
-        .chatbot-settings-btn:hover {
-            background: #3a3a4e;
-            color: #e0e0e0;
+        .agent-mascot:hover .mascot-settings {
+            color: rgba(255,255,255,0.7);
         }
-
-        .chatbot-settings-btn.has-key {
+        .agent-mascot.active .mascot-settings {
+            color: rgba(255,255,255,0.6);
+        }
+        .mascot-settings:hover {
+            color: #fff !important;
+            background: rgba(255,255,255,0.15);
+        }
+        .mascot-settings.has-key {
             color: #66bb6a;
-            border-color: #66bb6a;
         }
 
         .chatbot-settings-popup {
@@ -2281,8 +2277,6 @@
                 <span class="mascot-label">Search</span>
             </button>
 
-            <a href="https://bschilder.github.io/PaperTrail/" target="_blank" style="color:#888;font-size:12px;text-decoration:none;padding:4px 8px;border:1px solid #3a3a4e;border-radius:6px;display:flex;align-items:center;gap:4px;transition:all 0.15s;" onmouseover="this.style.color='#e0e0e0';this.style.borderColor='#4a4a5e'" onmouseout="this.style.color='#888';this.style.borderColor='#3a3a4e'" title="Documentation">&#x1F4D6; Docs</a>
-
             <!-- Agent mascot button -->
             <button class="agent-mascot" id="agentMascotBtn" title="Ask the AI Agent (/)">
                 <svg class="mascot-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -2310,8 +2304,10 @@
                     <rect x="9" y="7" width="2" height="2" fill="#0f0f17" class="mascot-eye"/>
                 </svg>
                 <span class="mascot-label">Ask AI</span>
+                <span class="mascot-settings" id="chatbotSettingsBtn" title="AI Settings">⚙</span>
             </button>
-            <button class="chatbot-settings-btn" id="chatbotSettingsBtn" title="AI Settings" style="margin-left:-6px;">⚙</button>
+
+            <a href="https://bschilder.github.io/PaperTrail/" target="_blank" style="color:#a0a0b0;font-size:14px;text-decoration:none;padding:8px 14px;border:1px solid #3a3a4e;border-radius:8px;display:flex;align-items:center;gap:6px;transition:all 0.2s;font-weight:500;" onmouseover="this.style.color='#e0e0e0';this.style.borderColor='#4a4a5e';this.style.background='#252538'" onmouseout="this.style.color='#a0a0b0';this.style.borderColor='#3a3a4e';this.style.background=''" title="Documentation">&#x1F4D6; Docs</a>
 
         </div>
 
