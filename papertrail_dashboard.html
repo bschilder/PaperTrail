@@ -278,6 +278,7 @@
             padding: 2px 6px;
             border-radius: 4px;
             transition: all 0.2s;
+            position: relative;
         }
         .agent-mascot:hover .mascot-settings {
             color: rgba(255,255,255,0.7);
@@ -288,6 +289,26 @@
         .mascot-settings:hover {
             color: #fff !important;
             background: rgba(255,255,255,0.15);
+        }
+        .mascot-settings::after {
+            content: 'AI Settings';
+            position: absolute;
+            bottom: -28px;
+            right: 0;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            border: 1px solid #3a3a4e;
+            z-index: 100;
+        }
+        .mascot-settings:hover::after {
+            opacity: 1;
         }
         .mascot-settings.has-key {
             color: rgba(255,255,255,0.7);
