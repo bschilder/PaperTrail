@@ -7676,7 +7676,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
         function renderChatResults(panel, aiText, papers, mode) {
             let html = `
                 <div class="chatbot-results-header">
-                    <span>${papers.length} paper${papers.length !== 1 ? 's' : ''}<span class="ai-mode-badge ${mode}">${mode === 'llm' ? (claudeModel.includes('opus') ? 'Opus' : claudeModel.includes('haiku') ? 'Haiku' : 'Sonnet') : 'local'}</span></span>
+                    <span>${papers.length} paper${papers.length !== 1 ? 's' : ''}<span class="ai-mode-badge ${mode}">${mode === 'llm' ? (activeService === 'huggingface' ? hfModel.split('/').pop() : claudeModel.includes('opus') ? 'Opus 4' : claudeModel.includes('haiku') ? 'Haiku 3.5' : 'Sonnet 4') : 'local'}</span></span>
                     <div style="display:flex;gap:6px;align-items:center;">
                         ${papers.length > 0 ? '<button class="chatbot-results-close" id="chatSelectAll" title="Select all on map" style="font-size:11px;color:#64b5f6;cursor:pointer;background:none;border:1px solid #3a3a4e;border-radius:4px;padding:2px 8px;">Select all</button>' : ''}
                         <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
