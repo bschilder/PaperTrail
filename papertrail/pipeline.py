@@ -157,6 +157,7 @@ def run_pipeline(
     # Only enrich papers that still lack metadata
     from papertrail.enricher import PaperEnricher
 
+    email = os.environ.get("OPENALEX_EMAIL") or config.get("openalex_email", "papertrail@example.com")
     to_enrich = [p for p in all_papers if not p.get("title") or p["title"] == "Unknown Title"]
     logger.info("Enriching %d new papers (skipping %d already known)...", len(to_enrich), len(all_papers) - len(to_enrich))
 
