@@ -7683,11 +7683,40 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
 
         function simpleMarkdown(text) {
             if (!text) return '';
-            return text
+            let html = text
                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                 .replace(/`(.+?)`/g, '<code style="background:#252538;padding:1px 4px;border-radius:3px;font-size:11px;">$1</code>')
                 .replace(/\n\n/g, '</p><p style="margin-top:8px;">')
                 .replace(/\n/g, '<br>');
+
+            // Replace known entity names with clickable tags
+            // People
+            const people = new Set(allPapers.map(p => p.shared_by).filter(Boolean));
+            people.forEach(name => {
+                if (name.length < 4) return;
+                const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const re = new RegExp(`\\b${escaped}\\b`, 'g');
+                html = html.replace(re, `<span class="card-tag person-tag" style="cursor:pointer;font-size:11px;" onclick="showContributorProfile('${esc(name).replace(/'/g, "\\'")}')">${esc(name)}</span>`);
+            });
+
+            // Channels
+            Object.keys(CHANNEL_COLORS).forEach(ch => {
+                const re = new RegExp(`\\b${ch}\\b|${channelDisplayName(ch).replace('#', '\\#')}`, 'gi');
+                html = html.replace(re, `<span class="card-tag channel-tag" style="cursor:pointer;font-size:11px;" onclick="showChannelInfo('${esc(ch).replace(/'/g, "\\'")}')">${channelDisplayName(ch)}</span>`);
+            });
+
+            // Cluster labels
+            const clusters = new Set(allPapers.map(p => p.cluster_label).filter(Boolean));
+            clusters.forEach(label => {
+                if (label.length < 5) return;
+                const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const re = new RegExp(escaped, 'gi');
+                if (html.includes(label)) {
+                    html = html.replace(re, `<span class="card-tag cluster-tag" style="cursor:pointer;font-size:11px;" onclick="showTopicInfo('${esc(label).replace(/'/g, "\\'")}')">${esc(label)}</span>`);
+                }
+            });
+
+            return html;
         }
 
         function renderChatResults(panel, aiText, papers, mode) {
