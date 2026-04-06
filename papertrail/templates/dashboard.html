@@ -6955,7 +6955,7 @@ Top contributors: ${summary.people.slice(0, 10).join(', ')}.
 You have powerful tools to analyze this dataset:
 
 TOOLS AVAILABLE:
-1. **search_papers** — Find papers by person, channel, date, keywords, cluster, with sorting
+1. **search_papers** — Find papers by person, channel, date, keywords, cluster. Sort by relevance, cited_by_count, engagement (team reactions+replies), first_shared, year. Each result includes engagement count.
 2. **analyze_trends** — Track how topics evolve over time (monthly/quarterly/yearly)
 3. **compare_channels** — Compare channels by focus areas, contributors, citations
 4. **summarize_cluster** — Deep-dive into a topic cluster: top papers, key authors, trends
@@ -7018,7 +7018,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     },
                     sort_by: {
                         type: "string",
-                        enum: ["relevance", "cited_by_count", "first_shared", "year"],
+                        enum: ["relevance", "cited_by_count", "engagement", "first_shared", "year"],
                         description: "Sort results by this field"
                     },
                     sort_dir: {
@@ -7240,7 +7240,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 channels: Object.entries(channels).sort((a, b) => b[1] - a[1]).map(([ch, c]) => `${ch} (${c})`),
                 top_topics: Object.entries(clusters).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([l, c]) => `${l} (${c})`),
                 activity_by_month: Object.entries(byMonth).sort((a, b) => a[0].localeCompare(b[0])).map(([m, c]) => `${m}: ${c}`),
-                most_cited_shares: topPapers.map(p => ({ title: p.title, citations: p.cited_by_count || 0 })),
+                most_cited_shares: topPapers.map(p => ({ title: p.title, citations: p.cited_by_count || 0, engagement: p.engagement || 0 })),
                 _full_papers: topPapers
             };
         }
@@ -7332,6 +7332,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     shared_by: p.shared_by,
                     first_shared: p.first_shared,
                     cited_by_count: p.cited_by_count,
+                    engagement: p.engagement || 0,
                     cluster_label: p.cluster_label
                 })),
                 _full_papers: results  // internal: not sent to LLM, used for UI
