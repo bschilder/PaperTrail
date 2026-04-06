@@ -7390,6 +7390,11 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             };
         }
 
+        // Strip <think>...</think> blocks from Qwen 3 reasoning output
+        function stripThinkingTags(text) {
+            return text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+        }
+
         // Status callback for thinking UI
         let agentStatusCallback = null;
 
@@ -7408,6 +7413,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     tools,
                     tool_choice: 'auto',
                     max_tokens: 1024,
+                    chat_template_kwargs: { enable_thinking: false },
                 })
             });
 
@@ -7429,16 +7435,16 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 const resp2 = await fetch(`https://router.huggingface.co/v1/chat/completions`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${hfToken}` },
-                    body: JSON.stringify({ model: hfModel, messages: [{ role: 'system', content: buildSystemPrompt() }, ...msgs2], max_tokens: 1024 })
+                    body: JSON.stringify({ model: hfModel, messages: [{ role: 'system', content: buildSystemPrompt() }, ...msgs2], max_tokens: 1024, chat_template_kwargs: { enable_thinking: false } })
                 });
                 if (!resp2.ok) throw new Error(`HF API error ${resp2.status}`);
                 const data2 = await resp2.json();
-                const answer = data2.choices?.[0]?.message?.content || '';
+                const answer = stripThinkingTags(data2.choices?.[0]?.message?.content || '');
                 conversationHistory.push({ role: 'user', content: query }, { role: 'assistant', content: answer });
                 return { text: answer, results: [], _full_papers: fullPapers, toolCalls: [{ name: tc.function.name, input: params }] };
             }
 
-            const answer = msg?.content || '';
+            const answer = stripThinkingTags(msg?.content || '');
             conversationHistory.push({ role: 'user', content: query }, { role: 'assistant', content: answer });
             return { text: answer, results: [], _full_papers: [], toolCalls: [] };
         }
