@@ -7428,55 +7428,57 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
         let agentStatusCallback = null;
 
         async function callHFAgent(query) {
-            const messages = [...conversationHistory, { role: 'user', content: query }];
+            const msgs = [...conversationHistory, { role: 'user', content: query }];
             const tools = ALL_TOOLS.map(t => ({ type: 'function', function: { name: t.name, description: t.description, parameters: t.input_schema } }));
+            const sysContent = buildSystemPrompt() + (enableThinking ? '' : '\n\n/no_think');
+            const maxTokens = enableThinking ? 4096 : 1024;
+            const maxRounds = 4;
+            let allPapersFound = [];
+            let allToolCalls = [];
+            let allThinking = [];
 
-            if (agentStatusCallback) agentStatusCallback('Thinking...');
+            for (let round = 0; round < maxRounds; round++) {
+                if (agentStatusCallback) agentStatusCallback(round === 0 ? 'Thinking...' : `Working (step ${round + 1})...`);
 
-            const resp = await fetch(`https://router.huggingface.co/v1/chat/completions`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${hfToken}` },
-                body: JSON.stringify({
-                    model: hfModel,
-                    messages: [{ role: 'system', content: buildSystemPrompt() + (enableThinking ? '' : '\n\n/no_think') }, ...messages],
-                    tools,
-                    tool_choice: 'auto',
-                    max_tokens: enableThinking ? 4096 : 1024,
-                })
-            });
-
-            if (!resp.ok) throw new Error(`HF API error ${resp.status}: ${(await resp.text()).substring(0, 200)}`);
-            const data = await resp.json();
-            const choice = data.choices?.[0];
-            const msg = choice?.message;
-
-            if (msg?.tool_calls?.length > 0) {
-                const tc = msg.tool_calls[0];
-                if (agentStatusCallback) agentStatusCallback(`Running ${tc.function.name}...`);
-                const params = JSON.parse(tc.function.arguments || '{}');
-                const result = executeTool(tc.function.name, params);
-                const fullPapers = result._full_papers || [];
-                delete result._full_papers;
-
-                // Second call with tool result
-                const msgs2 = [...messages, msg, { role: 'tool', tool_call_id: tc.id, content: JSON.stringify(result) }];
-                const resp2 = await fetch(`https://router.huggingface.co/v1/chat/completions`, {
+                const isLastRound = round === maxRounds - 1;
+                const callMsgs = [...msgs];
+                if (isLastRound && allToolCalls.length > 0) {
+                    callMsgs.push({ role: 'user', content: 'Now provide your final answer based on all the data gathered. Do not call any more tools.' });
+                }
+                const resp = await fetch('https://router.huggingface.co/v1/chat/completions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${hfToken}` },
-                    body: JSON.stringify({ model: hfModel, messages: [{ role: 'system', content: buildSystemPrompt() + (enableThinking ? '' : '\n\n/no_think') }, ...msgs2], max_tokens: enableThinking ? 4096 : 1024 })
+                    body: JSON.stringify({ model: hfModel, messages: [{ role: 'system', content: sysContent }, ...callMsgs], tools: isLastRound ? undefined : tools, tool_choice: isLastRound ? undefined : 'auto', max_tokens: maxTokens })
                 });
-                if (!resp2.ok) throw new Error(`HF API error ${resp2.status}`);
-                const data2 = await resp2.json();
-                const raw2 = data2.choices?.[0]?.message?.content || '';
-                const parsed2 = extractThinking(raw2);
-                conversationHistory.push({ role: 'user', content: query }, { role: 'assistant', content: parsed2.text });
-                return { text: parsed2.text, thinking: parsed2.thinking, results: [], _full_papers: fullPapers, toolCalls: [{ name: tc.function.name, input: params }] };
+                if (!resp.ok) throw new Error(`HF API error ${resp.status}: ${(await resp.text()).substring(0, 200)}`);
+                const data = await resp.json();
+                const msg = data.choices?.[0]?.message;
+
+                if (!isLastRound && msg?.tool_calls?.length > 0) {
+                    const tc = msg.tool_calls[0];
+                    if (agentStatusCallback) agentStatusCallback(`Running ${tc.function.name}...`);
+                    const params = JSON.parse(tc.function.arguments || '{}');
+                    const result = executeTool(tc.function.name, params);
+                    if (result._full_papers) { allPapersFound.push(...result._full_papers); delete result._full_papers; }
+                    allToolCalls.push({ name: tc.function.name, input: params });
+
+                    // Clean thinking from assistant content before adding to history
+                    const cleanMsg = { ...msg, content: msg.content ? extractThinking(msg.content).text || null : null };
+                    msgs.push(cleanMsg, { role: 'tool', tool_call_id: tc.id, content: JSON.stringify(result) });
+                    continue;
+                }
+
+                // Final text response
+                const raw = msg?.content || '';
+                const parsed = extractThinking(raw);
+                if (parsed.thinking) allThinking.push(parsed.thinking);
+                conversationHistory.push({ role: 'user', content: query }, { role: 'assistant', content: parsed.text });
+                return { text: parsed.text, thinking: allThinking.join('\n\n'), results: [], _full_papers: allPapersFound, toolCalls: allToolCalls };
             }
 
-            const raw = msg?.content || '';
-            const parsed = extractThinking(raw);
-            conversationHistory.push({ role: 'user', content: query }, { role: 'assistant', content: parsed.text });
-            return { text: parsed.text, thinking: parsed.thinking, results: [], _full_papers: [], toolCalls: [] };
+            // Max rounds reached — try to use whatever we have
+            conversationHistory.push({ role: 'user', content: query }, { role: 'assistant', content: 'Reached maximum reasoning steps.' });
+            return { text: 'Reached maximum reasoning steps.', thinking: allThinking.join('\n\n'), results: [], _full_papers: allPapersFound, toolCalls: allToolCalls };
         }
 
         async function callClaudeAgent(query) {
