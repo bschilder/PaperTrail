@@ -6832,7 +6832,8 @@
                 response,
                 papers: (papers || []).slice(0, 5).map(p => ({ title: p.title, url: p.url, cluster_label: p.cluster_label })),
                 timestamp: new Date().toISOString(),
-                service: activeService
+                service: activeService,
+                model: activeService === 'huggingface' ? hfModel : activeService === 'anthropic' ? claudeModel : activeService === 'openai' ? 'gpt-4o' : 'local'
             });
             // Keep last 50 conversations
             if (chatLog.length > 50) chatLog = chatLog.slice(-50);
@@ -6847,10 +6848,10 @@
                 filename = 'papertrail_chat_history.json';
             } else {
                 const escape = s => '"' + String(s || '').replace(/"/g, '""').replace(/\n/g, ' ') + '"';
-                const rows = [['timestamp', 'service', 'query', 'response', 'papers'].join(',')];
+                const rows = [['timestamp', 'service', 'model', 'query', 'response', 'papers'].join(',')];
                 chatLog.forEach(e => {
                     const papers = (e.papers || []).map(p => p.title).join('; ');
-                    rows.push([escape(e.timestamp), escape(e.service), escape(e.query), escape(e.response), escape(papers)].join(','));
+                    rows.push([escape(e.timestamp), escape(e.service), escape(e.model), escape(e.query), escape(e.response), escape(papers)].join(','));
                 });
                 blob = new Blob([rows.join('\n')], { type: 'text/csv' });
                 filename = 'papertrail_chat_history.csv';
@@ -6905,7 +6906,7 @@
                         <div class="profile-paper-item" style="cursor:pointer;padding:10px 12px;margin-bottom:4px;" data-history-idx="${realIdx}">
                             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
                                 <span style="font-size:13px;font-weight:600;color:#64b5f6;">${esc(entry.query)}</span>
-                                <span style="font-size:10px;color:#555;">${new Date(entry.timestamp).toLocaleDateString()} · ${entry.service || 'local'}</span>
+                                <span style="font-size:10px;color:#555;">${new Date(entry.timestamp).toLocaleDateString()} · ${(entry.model || entry.service || 'local').split('/').pop()}</span>
                             </div>
                             <div style="font-size:12px;color:#a0a0b0;line-height:1.4;">${esc((entry.response || '').substring(0, 120))}${(entry.response || '').length > 120 ? '...' : ''}</div>
                             ${entry.papers?.length > 0 ? `<div style="margin-top:4px;font-size:10px;color:#666;">${entry.papers.length} papers</div>` : ''}
