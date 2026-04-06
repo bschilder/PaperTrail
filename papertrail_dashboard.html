@@ -6822,7 +6822,8 @@
             }
             if (connectedServices.huggingface) {
                 hfToken = connectedServices.huggingface.key;
-                hfModel = connectedServices.huggingface.model || 'Qwen/Qwen3-8B';
+                // Use the dropdown's current value (default), not stale stored model
+                hfModel = document.getElementById('modelSelect').value || 'Qwen/Qwen3-8B';
                 if (!claudeApiKey) settingsBtn.classList.add('has-key');
             }
             activeService = localStorage.getItem('papertrail_active_service') || (hfToken ? 'huggingface' : claudeApiKey ? 'anthropic' : 'local');
