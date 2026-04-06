@@ -6971,6 +6971,8 @@ GUIDELINES:
 - For questions about methods, techniques, or topics NOT in the dataset → use web_search
 - You can combine dataset tools with web_search for comprehensive answers
 - ALWAYS provide conversational answers. Don't just list data — synthesize and explain.
+- IMPORTANT: Use the tool_call mechanism to call tools. NEVER write JSON tool calls in your text response. Use the tools parameter, not text.
+- If a search returns no results, try broadening the search (remove date filters, try different keywords).
 - For finding specific papers → use search_papers
 - You can call multiple tools if needed.
 
@@ -7810,7 +7812,11 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
 
         function simpleMarkdown(text) {
             if (!text) return '';
-            let html = text
+            // Strip raw JSON tool calls that the LLM sometimes outputs as text
+            let cleaned = text.replace(/```json\s*\{[\s\S]*?\}\s*```/g, '').replace(/`\s*json\s*\{[\s\S]*?\}\s*`/g, '');
+            // Also strip orphaned tool call descriptions
+            cleaned = cleaned.replace(/Let me (?:check|search|look|call|use)[\s\S]*?(?:first|now)\.\s*/gi, '');
+            let html = cleaned
                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                 .replace(/`(.+?)`/g, '<code style="background:#252538;padding:1px 4px;border-radius:3px;font-size:11px;">$1</code>')
                 .replace(/\n\n/g, '</p><p style="margin-top:8px;">')
