@@ -6703,7 +6703,7 @@
                 container.innerHTML = services.map(([svc, data]) =>
                     `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;">
                         <span style="color:#66bb6a;">&#x2713;</span>
-                        <span style="font-size:11px;color:#e0e0e0;flex:1;">${esc(svc)} · ${esc(data.model || 'default')}</span>
+                        <span style="font-size:11px;color:#e0e0e0;flex:1;">${esc(svc)}</span>
                         <button onclick="disconnectService('${svc}')" style="background:none;border:1px solid #3a3a4e;color:#888;padding:1px 6px;border-radius:4px;cursor:pointer;font-size:9px;">Remove</button>
                     </div>`
                 ).join('');
