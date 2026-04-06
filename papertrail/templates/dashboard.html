@@ -7577,7 +7577,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 const thinkingEl = document.createElement('div');
                 resultsPanel.innerHTML = `
                     <div class="chatbot-results-header">
-                        <span>Thinking<span class="ai-mode-badge llm">${usingHF ? 'Qwen (HF)' : claudeModel.includes('opus') ? 'Opus' : claudeModel.includes('haiku') ? 'Haiku' : 'Sonnet'}</span></span>
+                        <span>Thinking<span class="ai-mode-badge llm">${usingHF ? hfModel.split('/').pop() : claudeModel.includes('opus') ? 'Opus 4' : claudeModel.includes('haiku') ? 'Haiku 3.5' : 'Sonnet 4'}</span></span>
                         <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
                     </div>
                     <div class="ai-thinking" id="agentThinkingStatus">
