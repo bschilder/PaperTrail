@@ -2713,6 +2713,15 @@
             </div>
 
             <div style="border-top:1px solid #2a2a3e;padding-top:8px;margin-bottom:8px;">
+                <div style="font-size:10px;text-transform:uppercase;color:#8a8aaa;letter-spacing:0.5px;margin-bottom:6px;font-weight:600;">Options</div>
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#c0c0d0;">
+                    <input type="checkbox" id="thinkingToggle" style="accent-color:#64b5f6;width:16px;height:16px;">
+                    Enable reasoning traces
+                    <span style="font-size:10px;color:#666;">(slower, shows model thinking)</span>
+                </label>
+            </div>
+
+            <div style="border-top:1px solid #2a2a3e;padding-top:8px;margin-bottom:8px;">
                 <div style="font-size:10px;text-transform:uppercase;color:#555;letter-spacing:0.5px;margin-bottom:4px;">With AI Connected</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:11px;color:#888;">
                     <span>&#x2713; Natural language queries</span>
@@ -6828,6 +6837,14 @@
             }
             activeService = localStorage.getItem('papertrail_active_service') || (hfToken ? 'huggingface' : claudeApiKey ? 'anthropic' : 'local');
             updateConnectedServicesUI();
+
+            // Thinking toggle
+            const thinkingToggle = document.getElementById('thinkingToggle');
+            thinkingToggle.checked = enableThinking;
+            thinkingToggle.addEventListener('change', () => {
+                enableThinking = thinkingToggle.checked;
+                localStorage.setItem('papertrail_enable_thinking', JSON.stringify(enableThinking));
+            });
         }
 
         // ===== LLM AGENT =====
@@ -6838,6 +6855,7 @@
         if (hfToken === "{" + "{HF_TOKEN}}") hfToken = null; // template not replaced
         let hfModel = 'Qwen/Qwen3-8B';
         let claudeModel = 'claude-sonnet-4-20250514';
+        let enableThinking = JSON.parse(localStorage.getItem('papertrail_enable_thinking') || 'false');
         let conversationHistory = []; // persistent message history for multi-turn
         // Browsable chat log stored in localStorage
         let chatLog = JSON.parse(localStorage.getItem('papertrail_chat_log') || '[]');
@@ -7390,9 +7408,14 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             };
         }
 
-        // Strip <think>...</think> blocks from Qwen 3 reasoning output
-        function stripThinkingTags(text) {
-            return text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+        // Extract and separate <think>...</think> blocks from Qwen 3 reasoning output
+        function extractThinking(text) {
+            const thinkBlocks = [];
+            const cleaned = text.replace(/<think>([\s\S]*?)<\/think>/gi, (_, content) => {
+                thinkBlocks.push(content.trim());
+                return '';
+            }).trim();
+            return { text: cleaned, thinking: thinkBlocks.join('\n\n') };
         }
 
         // Status callback for thinking UI
@@ -7412,8 +7435,8 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     messages: [{ role: 'system', content: buildSystemPrompt() }, ...messages],
                     tools,
                     tool_choice: 'auto',
-                    max_tokens: 1024,
-                    chat_template_kwargs: { enable_thinking: false },
+                    max_tokens: enableThinking ? 4096 : 1024,
+                    chat_template_kwargs: { enable_thinking: enableThinking },
                 })
             });
 
@@ -7435,18 +7458,20 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 const resp2 = await fetch(`https://router.huggingface.co/v1/chat/completions`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${hfToken}` },
-                    body: JSON.stringify({ model: hfModel, messages: [{ role: 'system', content: buildSystemPrompt() }, ...msgs2], max_tokens: 1024, chat_template_kwargs: { enable_thinking: false } })
+                    body: JSON.stringify({ model: hfModel, messages: [{ role: 'system', content: buildSystemPrompt() }, ...msgs2], max_tokens: enableThinking ? 4096 : 1024, chat_template_kwargs: { enable_thinking: enableThinking } })
                 });
                 if (!resp2.ok) throw new Error(`HF API error ${resp2.status}`);
                 const data2 = await resp2.json();
-                const answer = stripThinkingTags(data2.choices?.[0]?.message?.content || '');
-                conversationHistory.push({ role: 'user', content: query }, { role: 'assistant', content: answer });
-                return { text: answer, results: [], _full_papers: fullPapers, toolCalls: [{ name: tc.function.name, input: params }] };
+                const raw2 = data2.choices?.[0]?.message?.content || '';
+                const parsed2 = extractThinking(raw2);
+                conversationHistory.push({ role: 'user', content: query }, { role: 'assistant', content: parsed2.text });
+                return { text: parsed2.text, thinking: parsed2.thinking, results: [], _full_papers: fullPapers, toolCalls: [{ name: tc.function.name, input: params }] };
             }
 
-            const answer = stripThinkingTags(msg?.content || '');
-            conversationHistory.push({ role: 'user', content: query }, { role: 'assistant', content: answer });
-            return { text: answer, results: [], _full_papers: [], toolCalls: [] };
+            const raw = msg?.content || '';
+            const parsed = extractThinking(raw);
+            conversationHistory.push({ role: 'user', content: query }, { role: 'assistant', content: parsed.text });
+            return { text: parsed.text, thinking: parsed.thinking, results: [], _full_papers: [], toolCalls: [] };
         }
 
         async function callClaudeAgent(query) {
@@ -7797,10 +7822,10 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     const agentResult = usingHF ? await callHFAgent(query) : await callClaudeAgent(query);
                     agentStatusCallback = null;
 
-                    // Show tool calls as expandable thinking
-                    let thinkingHTML = '';
+                    // Show tool calls and reasoning traces as expandable details
+                    let metaHTML = '';
                     if (agentResult.toolCalls && agentResult.toolCalls.length > 0) {
-                        thinkingHTML = `<details class="agent-thinking-details">
+                        metaHTML += `<details class="agent-thinking-details">
                             <summary style="font-size:11px;color:#666;cursor:pointer;padding:6px 14px;">
                                 &#x1F9E0; ${agentResult.toolCalls.length} tool${agentResult.toolCalls.length > 1 ? 's' : ''} used
                             </summary>
@@ -7809,8 +7834,18 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                             </div>
                         </details>`;
                     }
+                    if (agentResult.thinking) {
+                        metaHTML += `<details class="agent-thinking-details">
+                            <summary style="font-size:11px;color:#666;cursor:pointer;padding:6px 14px;">
+                                &#x1F4AD; Reasoning trace
+                            </summary>
+                            <div style="padding:4px 14px 8px;font-size:11px;color:#555;white-space:pre-wrap;max-height:300px;overflow-y:auto;">
+                                ${esc(agentResult.thinking)}
+                            </div>
+                        </details>`;
+                    }
 
-                    renderChatResults(resultsPanel, thinkingHTML + agentResult.text, agentResult._full_papers || [], 'llm');
+                    renderChatResults(resultsPanel, metaHTML + agentResult.text, agentResult._full_papers || [], 'llm');
                     saveChatEntry(query, agentResult.text, agentResult._full_papers);
 
                     // Show conversation count
