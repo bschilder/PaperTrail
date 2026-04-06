@@ -2679,11 +2679,11 @@
                 <div style="font-size:11px;color:#888;margin-bottom:4px;">Model</div>
                 <div style="display:flex;gap:6px;align-items:center;">
                     <select id="modelSelect" class="color-by-select" style="flex:1;font-size:12px;">
-                        <option value="Qwen/Qwen2.5-72B-Instruct">Qwen 2.5 72B (recommended)</option>
+                        <option value="Qwen/Qwen3-8B">Qwen 3 8B (recommended)</option>
                         <option value="meta-llama/Llama-3.3-70B-Instruct">Llama 3.3 70B</option>
                         <option value="Qwen/Qwen3-8B">Qwen 3 8B (fast)</option>
                     </select>
-                    <a id="modelInfoLink" href="https://huggingface.co/Qwen/Qwen2.5-72B-Instruct" target="_blank" style="color:#64b5f6;font-size:14px;text-decoration:none;" title="View model page">&#x2139;</a>
+                    <a id="modelInfoLink" href="https://huggingface.co/Qwen/Qwen3-8B" target="_blank" style="color:#64b5f6;font-size:14px;text-decoration:none;" title="View model page">&#x2139;</a>
                 </div>
             </div>
 
@@ -6721,9 +6721,9 @@
                     modelSelect.innerHTML = '<option value="gpt-4o">GPT-4o (default)</option><option value="gpt-4o-mini">GPT-4o Mini (fast)</option>';
                     apiInput.placeholder = 'sk-...';
                 } else if (svc === 'huggingface') {
-                    modelSelect.innerHTML = '<option value="Qwen/Qwen2.5-72B-Instruct">Qwen 2.5 72B (recommended)</option><option value="meta-llama/Llama-3.3-70B-Instruct">Llama 3.3 70B</option><option value="Qwen/Qwen3-8B">Qwen 3 8B (fast)</option>';
+                    modelSelect.innerHTML = '<option value="Qwen/Qwen3-8B">Qwen 3 8B (recommended)</option><option value="Qwen/Qwen2.5-72B-Instruct">Qwen 2.5 72B</option><option value="meta-llama/Llama-3.3-70B-Instruct">Llama 3.3 70B</option>';
                     apiInput.placeholder = 'hf_...';
-                    document.getElementById('modelInfoLink').href = 'https://huggingface.co/Qwen/Qwen2.5-72B-Instruct';
+                    document.getElementById('modelInfoLink').href = 'https://huggingface.co/Qwen/Qwen3-8B';
                 } else {
                     modelSelect.innerHTML = '<option value="claude-sonnet-4-20250514">Sonnet 4 — fast + smart</option><option value="claude-opus-4-20250514">Opus 4 — most capable</option><option value="claude-haiku-3-5-20241022">Haiku 3.5 — fastest</option>';
                     document.getElementById('modelInfoLink').href = 'https://docs.anthropic.com/en/docs/about-claude/models';
@@ -6800,7 +6800,7 @@
             }
             if (connectedServices.huggingface) {
                 hfToken = connectedServices.huggingface.key;
-                hfModel = connectedServices.huggingface.model || 'Qwen/Qwen2.5-72B-Instruct';
+                hfModel = connectedServices.huggingface.model || 'Qwen/Qwen3-8B';
                 if (!claudeApiKey) settingsBtn.classList.add('has-key');
             }
             activeService = localStorage.getItem('papertrail_active_service') || (hfToken ? 'huggingface' : claudeApiKey ? 'anthropic' : 'local');
@@ -6813,7 +6813,7 @@
         // HuggingFace token injected at build time for zero-config AI
         let hfToken = "{{HF_TOKEN}}";
         if (hfToken === "{" + "{HF_TOKEN}}") hfToken = null; // template not replaced
-        let hfModel = 'Qwen/Qwen2.5-72B-Instruct';
+        let hfModel = 'Qwen/Qwen3-8B';
         let claudeModel = 'claude-sonnet-4-20250514';
         let conversationHistory = []; // persistent message history for multi-turn
         // Browsable chat log stored in localStorage
