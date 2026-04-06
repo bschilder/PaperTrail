@@ -4249,8 +4249,8 @@
             xs.sort((a, b) => a - b);
             ys.sort((a, b) => a - b);
 
-            const lo = Math.floor(xs.length * 0.02);
-            const hi = Math.ceil(xs.length * 0.98) - 1;
+            const lo = Math.floor(xs.length * 0.005);
+            const hi = Math.ceil(xs.length * 0.995) - 1;
 
             projMinX = xs[lo];
             projMaxX = xs[hi];
@@ -8948,8 +8948,8 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     }
                     case 'ArrowLeft':
                     case 'ArrowRight': {
-                        if (currentView === 'leaderboard' && !e.metaKey && !e.ctrlKey) {
-                            // Leaderboard: cycle items within section with Left/Right
+                        if (currentView === 'leaderboard' && leaderboardFocusSection >= 0 && !e.metaKey && !e.ctrlKey) {
+                            // Leaderboard: cycle items within section with Left/Right (only when focused)
                             e.preventDefault();
                             const sections = document.querySelectorAll('.lb-section');
                             if (sections.length === 0) break;
