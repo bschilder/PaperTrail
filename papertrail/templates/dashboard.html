@@ -7411,8 +7411,14 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
         // Extract and separate <think>...</think> blocks from Qwen 3 reasoning output
         function extractThinking(text) {
             const thinkBlocks = [];
-            const cleaned = text.replace(/<think>([\s\S]*?)<\/think>/gi, (_, content) => {
+            // Match complete <think>...</think> blocks
+            let cleaned = text.replace(/<think>([\s\S]*?)<\/think>/gi, (_, content) => {
                 thinkBlocks.push(content.trim());
+                return '';
+            });
+            // Also strip incomplete <think> blocks (no closing tag, e.g. truncated response)
+            cleaned = cleaned.replace(/<think>[\s\S]*/gi, (match) => {
+                thinkBlocks.push(match.replace(/<think>/i, '').trim());
                 return '';
             }).trim();
             return { text: cleaned, thinking: thinkBlocks.join('\n\n') };
@@ -7432,11 +7438,10 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${hfToken}` },
                 body: JSON.stringify({
                     model: hfModel,
-                    messages: [{ role: 'system', content: buildSystemPrompt() }, ...messages],
+                    messages: [{ role: 'system', content: buildSystemPrompt() + (enableThinking ? '' : '\n\n/no_think') }, ...messages],
                     tools,
                     tool_choice: 'auto',
                     max_tokens: enableThinking ? 4096 : 1024,
-                    chat_template_kwargs: { enable_thinking: enableThinking },
                 })
             });
 
@@ -7458,7 +7463,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 const resp2 = await fetch(`https://router.huggingface.co/v1/chat/completions`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${hfToken}` },
-                    body: JSON.stringify({ model: hfModel, messages: [{ role: 'system', content: buildSystemPrompt() }, ...msgs2], max_tokens: enableThinking ? 4096 : 1024, chat_template_kwargs: { enable_thinking: enableThinking } })
+                    body: JSON.stringify({ model: hfModel, messages: [{ role: 'system', content: buildSystemPrompt() + (enableThinking ? '' : '\n\n/no_think') }, ...msgs2], max_tokens: enableThinking ? 4096 : 1024 })
                 });
                 if (!resp2.ok) throw new Error(`HF API error ${resp2.status}`);
                 const data2 = await resp2.json();
@@ -7866,7 +7871,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         <div style="padding:10px 14px;font-size:12px;color:#a0a0b0;line-height:1.5;">
                             ${err.message.includes('credit balance')
                                 ? '<strong style="color:#ffa726;">Your Anthropic account needs credits.</strong> <a href="https://console.anthropic.com/settings/billing" target="_blank" style="color:#64b5f6;">Add credits here &rarr;</a><br><br>Using local search in the meantime.'
-                                : err.message.includes('401') || err.message.includes('invalid')
+                                : err.message.includes('401') || err.message.includes('invalid_x_api_key')
                                     ? '<strong style="color:#ef5350;">Invalid API key.</strong> Check your key in settings (gear icon).'
                                     : `<span style="color:#888;">${esc(err.message)}</span>`
                             }
