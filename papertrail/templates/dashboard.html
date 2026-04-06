@@ -6832,6 +6832,29 @@
             localStorage.setItem('papertrail_chat_log', JSON.stringify(chatLog));
         }
 
+        function downloadChatLog(format) {
+            if (chatLog.length === 0) return;
+            let blob, filename;
+            if (format === 'json') {
+                blob = new Blob([JSON.stringify(chatLog, null, 2)], { type: 'application/json' });
+                filename = 'papertrail_chat_history.json';
+            } else {
+                const escape = s => '"' + String(s || '').replace(/"/g, '""').replace(/\n/g, ' ') + '"';
+                const rows = [['timestamp', 'service', 'query', 'response', 'papers'].join(',')];
+                chatLog.forEach(e => {
+                    const papers = (e.papers || []).map(p => p.title).join('; ');
+                    rows.push([escape(e.timestamp), escape(e.service), escape(e.query), escape(e.response), escape(papers)].join(','));
+                });
+                blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+                filename = 'papertrail_chat_history.csv';
+            }
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
         function replayChatEntry(entry) {
             // Close history modal and show the entry as if it just completed
             document.getElementById('topicModal').classList.remove('visible');
@@ -6883,6 +6906,8 @@
                     }).join('')}
                 </div>
                 <div class="profile-actions">
+                    <button class="profile-action-btn" onclick="downloadChatLog('json')">Download JSON</button>
+                    <button class="profile-action-btn" onclick="downloadChatLog('csv')">Download CSV</button>
                     <button class="profile-action-btn" onclick="chatLog=[];localStorage.removeItem('papertrail_chat_log');document.getElementById('topicModal').classList.remove('visible');modalHistory=[];">Clear History</button>
                 </div>`;
             }
