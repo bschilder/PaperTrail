@@ -6821,6 +6821,28 @@
             localStorage.setItem('papertrail_chat_log', JSON.stringify(chatLog));
         }
 
+        function replayChatEntry(entry) {
+            // Close history modal and show the entry as if it just completed
+            document.getElementById('topicModal').classList.remove('visible');
+            modalHistory = [];
+            const resultsPanel = document.getElementById('chatbotResults');
+            // Find matching full papers from allPapers by title
+            const fullPapers = (entry.papers || []).map(ep =>
+                allPapers.find(p => p.title === ep.title)
+            ).filter(Boolean);
+
+            renderChatResults(resultsPanel, entry.response, fullPapers, 'llm');
+            // Set the input to the original query
+            const input = document.getElementById('chatbotInput');
+            if (input) input.value = entry.query;
+            // Open agent panel if not open
+            const panel = document.getElementById('agentPanel');
+            if (panel && !panel.classList.contains('visible')) {
+                panel.classList.add('visible');
+                document.getElementById('agentMascotBtn').classList.add('active');
+            }
+        }
+
         function showChatHistory() {
             const modal = document.getElementById('topicModal');
             const header = document.getElementById('topicHeader');
@@ -6836,24 +6858,43 @@
                 body.innerHTML = '<div style="padding:20px;color:#888;text-align:center;">No conversations yet. Ask the AI agent something!</div>';
             } else {
                 body.innerHTML = `<div style="max-height:400px;overflow-y:auto;">
-                    ${chatLog.slice().reverse().map((entry, i) => `
-                        <div style="padding:10px 0;border-bottom:1px solid #2a2a3e;">
+                    ${chatLog.slice().reverse().map((entry, i) => {
+                        const realIdx = chatLog.length - 1 - i;
+                        return `
+                        <div class="profile-paper-item" style="cursor:pointer;padding:10px 12px;margin-bottom:4px;" data-history-idx="${realIdx}">
                             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                                <span style="font-size:12px;font-weight:600;color:#64b5f6;">${esc(entry.query)}</span>
+                                <span style="font-size:13px;font-weight:600;color:#64b5f6;">${esc(entry.query)}</span>
                                 <span style="font-size:10px;color:#555;">${new Date(entry.timestamp).toLocaleDateString()} · ${entry.service || 'local'}</span>
                             </div>
-                            <div style="font-size:12px;color:#a0a0b0;line-height:1.5;">${simpleMarkdown(entry.response?.substring(0, 200))}${entry.response?.length > 200 ? '...' : ''}</div>
-                            ${entry.papers?.length > 0 ? `<div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px;">${entry.papers.map(p => `<span class="card-tag cluster-tag" style="font-size:9px;">${esc((p.title || '').substring(0, 30))}</span>`).join('')}</div>` : ''}
-                        </div>
-                    `).join('')}
+                            <div style="font-size:12px;color:#a0a0b0;line-height:1.4;">${esc((entry.response || '').substring(0, 120))}${(entry.response || '').length > 120 ? '...' : ''}</div>
+                            ${entry.papers?.length > 0 ? `<div style="margin-top:4px;font-size:10px;color:#666;">${entry.papers.length} papers</div>` : ''}
+                        </div>`;
+                    }).join('')}
                 </div>
                 <div class="profile-actions">
-                    <button class="profile-action-btn" onclick="chatLog=[];localStorage.removeItem('papertrail_chat_log');document.getElementById('topicModal').classList.remove('visible');">Clear History</button>
+                    <button class="profile-action-btn" onclick="chatLog=[];localStorage.removeItem('papertrail_chat_log');document.getElementById('topicModal').classList.remove('visible');modalHistory=[];">Clear History</button>
                 </div>`;
             }
 
             modal.classList.add('visible');
             updateBackButtons();
+
+            // Wire click handlers for replay
+            body.querySelectorAll('[data-history-idx]').forEach(el => {
+                el.addEventListener('click', () => {
+                    const idx = parseInt(el.dataset.historyIdx);
+                    if (chatLog[idx]) replayChatEntry(chatLog[idx]);
+                });
+            });
+
+            // Click outside to close
+            modal.addEventListener('click', function handler(e) {
+                if (e.target === modal) {
+                    modal.classList.remove('visible');
+                    modalHistory = [];
+                    modal.removeEventListener('click', handler);
+                }
+            });
         }
 
         function buildDatasetSummary() {
