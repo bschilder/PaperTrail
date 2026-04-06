@@ -3091,7 +3091,8 @@
                     allPapers = [];
                 } else {
                     const jsonStr = atob(dataB64);
-                    allPapers = JSON.parse(jsonStr);
+                    const parsed = JSON.parse(jsonStr);
+                    allPapers = Array.isArray(parsed) ? parsed : (parsed.papers || []);
                 }
             } catch (error) {
                 console.error("Error loading data:", error);
