@@ -155,13 +155,13 @@
         /* Collapsible agent panel */
         .agent-panel {
             display: none;
-            background: linear-gradient(135deg, #141430 0%, #1a1a40 50%, #1e2045 100%);
-            border-bottom: 2px solid rgba(100,181,246,0.35);
-            border-top: 1px solid rgba(100,181,246,0.15);
+            background: linear-gradient(135deg, #2a4a7a 0%, #3a6bbe 50%, #4a80d0 100%);
+            border-bottom: 2px solid rgba(100,181,246,0.5);
+            border-top: 1px solid rgba(100,181,246,0.3);
             padding: 10px 20px;
             flex-shrink: 0;
             overflow: visible;
-            box-shadow: 0 4px 24px rgba(100,181,246,0.1), inset 0 1px 0 rgba(100,181,246,0.12);
+            box-shadow: 0 4px 24px rgba(100,181,246,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
         }
         .agent-panel.visible {
             display: block;
@@ -2701,7 +2701,7 @@
 
             <div id="apiKeyStatus" style="font-size:11px;color:#666;margin-bottom:8px;"></div>
             <div style="border-top:1px solid #2a2a3e;padding-top:8px;margin-bottom:8px;">
-                <div style="font-size:10px;text-transform:uppercase;color:#555;letter-spacing:0.5px;margin-bottom:6px;">API Keys</div>
+                <div style="font-size:10px;text-transform:uppercase;color:#8a8aaa;letter-spacing:0.5px;margin-bottom:6px;font-weight:600;">API Keys</div>
                 <div id="connectedServices"></div>
             </div>
 
@@ -6710,7 +6710,7 @@
                         <span style="color:#66bb6a;">&#x2713;</span>
                         <div style="flex:1;min-width:0;">
                             <div style="font-size:11px;color:#e0e0e0;">${esc(svc)}</div>
-                            <div style="font-size:9px;color:#555;font-family:monospace;">${esc(preview)}${added ? ' · ' + added : ''}</div>
+                            <div style="font-size:10px;color:#8a8a9a;font-family:monospace;">${esc(preview)}${added ? ' · ' + added : ''}</div>
                         </div>
                         <button onclick="disconnectService('${svc}')" style="background:none;border:1px solid #3a3a4e;color:#888;padding:1px 6px;border-radius:4px;cursor:pointer;font-size:9px;">Remove</button>
                     </div>`;
