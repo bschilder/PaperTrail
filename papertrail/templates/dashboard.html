@@ -7772,59 +7772,87 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
         }
 
         function renderChatResults(panel, aiText, papers, mode) {
+            const modelBadge = mode === 'llm' ? (activeService === 'huggingface' ? hfModel.split('/').pop() : claudeModel.includes('opus') ? 'Opus 4' : claudeModel.includes('haiku') ? 'Haiku 3.5' : 'Sonnet 4') : 'local';
+
             let html = `
                 <div class="chatbot-results-header">
-                    <span>${papers.length} paper${papers.length !== 1 ? 's' : ''}<span class="ai-mode-badge ${mode}">${mode === 'llm' ? (activeService === 'huggingface' ? hfModel.split('/').pop() : claudeModel.includes('opus') ? 'Opus 4' : claudeModel.includes('haiku') ? 'Haiku 3.5' : 'Sonnet 4') : 'local'}</span></span>
-                    <div style="display:flex;gap:6px;align-items:center;">
-                        ${papers.length > 0 ? '<button class="chatbot-results-close" id="chatSelectAll" title="Select all on map" style="font-size:11px;color:#64b5f6;cursor:pointer;background:none;border:1px solid #3a3a4e;border-radius:4px;padding:2px 8px;">Select all</button>' : ''}
-                        <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
-                    </div>
+                    <span><span class="ai-mode-badge ${mode}">${modelBadge}</span></span>
+                    <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')" style="font-size:18px;">&times;</button>
                 </div>`;
 
             if (aiText) {
                 html += `<div class="ai-response"><p>${simpleMarkdown(aiText)}</p></div>`;
             }
 
-            const shown = papers.slice(0, 15);
+            const shown = papers.slice(0, 20);
+            if (shown.length > 0) {
+                html += `<div style="padding:8px 14px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #2a2a3e;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <input type="checkbox" id="chatCheckAll" style="cursor:pointer;">
+                        <label for="chatCheckAll" style="font-size:12px;color:#a0a0b0;cursor:pointer;">${shown.length} papers found</label>
+                    </div>
+                    <button id="chatShowOnMap" style="padding:5px 12px;background:#64b5f6;border:none;color:#fff;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">Show on Map</button>
+                </div>`;
+            }
+
             shown.forEach((paper, i) => {
                 const channels = (paper.channels || []).map(ch => channelDisplayName(ch)).join(', ');
                 const date = paper.first_shared ? new Date(paper.first_shared).toLocaleDateString() : '';
                 html += `
-                    <div class="chatbot-result-item" data-paper-idx="${i}">
-                        <div class="chatbot-result-title">${paper.title || 'Untitled'}</div>
-                        <div class="chatbot-result-meta">${paper.year || ''} &middot; ${personDisplay(paper.shared_by)} &middot; ${channels}${date ? ' &middot; ' + date : ''}</div>
+                    <div class="chatbot-result-item" data-paper-idx="${i}" style="display:flex;align-items:flex-start;gap:8px;">
+                        <input type="checkbox" class="chat-paper-cb" data-idx="${i}" checked style="margin-top:3px;cursor:pointer;flex-shrink:0;">
+                        <div style="flex:1;min-width:0;">
+                            <div class="chatbot-result-title">${esc(paper.title) || 'Untitled'}</div>
+                            <div class="chatbot-result-meta">${paper.year || ''} &middot; ${personDisplay(paper.shared_by)} &middot; ${channels}${date ? ' &middot; ' + date : ''}</div>
+                        </div>
                     </div>`;
             });
-            if (papers.length > 15) {
-                html += `<div style="padding:8px 14px;font-size:11px;color:#666;">+ ${papers.length - 15} more</div>`;
+            if (papers.length > 20) {
+                html += `<div style="padding:8px 14px;font-size:11px;color:#666;">+ ${papers.length - 20} more</div>`;
             }
 
             panel.innerHTML = html;
             panel.classList.add('visible');
 
-            // Wire click handlers
+            // Wire click handlers — click paper title to view, checkbox to select
             panel.querySelectorAll('.chatbot-result-item').forEach((item, i) => {
-                item.addEventListener('click', () => {
+                item.querySelector('.chatbot-result-title')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     const paper = shown[i];
                     const allIdx = (paperIndexMap.get(paper) ?? -1);
                     selectedPapers.clear();
                     if (allIdx !== -1) selectedPapers.add(allIdx);
                     showDetailPanel([paper]);
                     renderMap();
-                    panel.classList.remove('visible');
                 });
             });
 
-            const selectAllBtn = document.getElementById('chatSelectAll');
-            if (selectAllBtn) {
-                selectAllBtn.addEventListener('click', () => {
+            // Check All checkbox
+            const checkAll = document.getElementById('chatCheckAll');
+            if (checkAll) {
+                checkAll.addEventListener('change', () => {
+                    panel.querySelectorAll('.chat-paper-cb').forEach(cb => { cb.checked = checkAll.checked; });
+                });
+            }
+
+            // Show on Map button — selects checked papers
+            const showOnMapBtn = document.getElementById('chatShowOnMap');
+            if (showOnMapBtn) {
+                showOnMapBtn.addEventListener('click', () => {
                     selectedPapers.clear();
-                    papers.forEach(paper => {
-                        const allIdx = (paperIndexMap.get(paper) ?? -1);
-                        if (allIdx !== -1) selectedPapers.add(allIdx);
+                    const selected = [];
+                    panel.querySelectorAll('.chat-paper-cb:checked').forEach(cb => {
+                        const paper = shown[parseInt(cb.dataset.idx)];
+                        if (paper) {
+                            const allIdx = (paperIndexMap.get(paper) ?? -1);
+                            if (allIdx !== -1) { selectedPapers.add(allIdx); selected.push(paper); }
+                        }
                     });
-                    showDetailPanel(papers.slice(0, 50));
-                    renderMap();
+                    if (selected.length > 0) {
+                        document.getElementById('mapToggle').click();
+                        showDetailPanel(selected.slice(0, 50));
+                        renderMap();
+                    }
                     panel.classList.remove('visible');
                 });
             }
