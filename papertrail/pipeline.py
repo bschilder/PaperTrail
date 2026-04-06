@@ -155,13 +155,25 @@ def run_pipeline(
     logger.info("Merged metadata for %d papers from existing data", merged)
 
     # Only enrich papers that still lack metadata
-    from papertrail.enricher import enrich_paper
+    from papertrail.enricher import PaperEnricher
 
     to_enrich = [p for p in all_papers if not p.get("title") or p["title"] == "Unknown Title"]
     logger.info("Enriching %d new papers (skipping %d already known)...", len(to_enrich), len(all_papers) - len(to_enrich))
+
+    enricher = PaperEnricher(email=email, openalex_first=True)
     for i, paper in enumerate(to_enrich):
-        metadata = enrich_paper(paper["url"])
-        paper.update(metadata)
+        try:
+            metadata = enricher.enrich_by_url(paper["url"])
+            if metadata and metadata.title:
+                paper["title"] = metadata.title
+                if metadata.authors: paper["authors"] = metadata.authors
+                if metadata.year: paper["year"] = metadata.year
+                if metadata.journal: paper["journal"] = metadata.journal
+                if metadata.abstract: paper["abstract"] = metadata.abstract
+                if metadata.openalex_id: paper["openalex_link"] = metadata.openalex_id
+                if metadata.cited_by_count: paper["cited_by_count"] = metadata.cited_by_count
+        except Exception as e:
+            logger.warning("Failed to enrich %s: %s", paper["url"][:60], e)
         if (i + 1) % 50 == 0:
             logger.info("  Enriched %d / %d", i + 1, len(to_enrich))
 
