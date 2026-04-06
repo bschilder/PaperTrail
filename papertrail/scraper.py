@@ -356,10 +356,19 @@ class SlackPaperScraper:
 
         # Auto-join channel if bot is not a member
         try:
-            self._api_call("conversations.join", channel=channel_id)
+            resp = requests.post(
+                f"{self.BASE_URL}/conversations.join",
+                headers={**self.headers, "Content-Type": "application/json"},
+                json={"channel": channel_id},
+                timeout=10,
+            )
+            data = resp.json()
+            if data.get("ok"):
+                logger.info(f"Joined channel {channel_id}")
+            elif data.get("error") not in ("already_in_channel", "method_not_supported_for_channel_type"):
+                logger.warning(f"Could not join channel {channel_id}: {data.get('error')}")
         except Exception as e:
-            if "already_in_channel" not in str(e) and "method_not_supported_for_channel_type" not in str(e):
-                logger.warning(f"Could not join channel {channel_id}: {e}")
+            logger.warning(f"Could not join channel {channel_id}: {e}")
 
         papers: list[SlackPaper] = []
         seen_urls: set[str] = set()

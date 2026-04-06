@@ -34,6 +34,7 @@ jobs:
         run: pip install -e ".[all]"
 
       - name: Run pipeline
+        timeout-minutes: 30
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -42,9 +43,9 @@ jobs:
         run: |
           if [ "${{ inputs.skip_scrape }}" = "true" ] && [ -f data/papers_final.json ]; then
             echo "Skipping scrape, using existing data"
-            papertrail run-pipeline -c config.yml -o build --skip-scrape --data-file data/papers_final.json
+            papertrail -v run-pipeline -c config.yml -o build --skip-scrape --data-file data/papers_final.json
           else
-            papertrail run-pipeline -c config.yml -o build
+            papertrail -v run-pipeline -c config.yml -o build
           fi
 
       - name: Commit updated data

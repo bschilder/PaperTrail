@@ -51,10 +51,15 @@ def run_pipeline(
         Path to the built dashboard HTML file.
     """
     import os
+    import sys
+
+    # Ensure logs are flushed immediately in CI
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s", stream=sys.stderr, force=True)
 
     config = load_config(config_path)
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
+    logger.info("Pipeline started — output_dir=%s, skip_scrape=%s", output_dir, skip_scrape)
 
     raw_path = out / "papers_raw.json"
     enriched_path = out / "papers_enriched.json"
