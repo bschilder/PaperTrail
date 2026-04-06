@@ -6976,12 +6976,12 @@
         }
 
         function buildDatasetSummary() {
-            const people = new Set();
+            const peopleCounts = {};
             const channels = new Set();
             const clusters = new Set();
             let minDate = null, maxDate = null;
             allPapers.forEach(p => {
-                if (p.shared_by) people.add(p.shared_by);
+                if (p.shared_by) peopleCounts[p.shared_by] = (peopleCounts[p.shared_by] || 0) + 1;
                 (p.channels || []).forEach(ch => channels.add(ch));
                 if (p.cluster_label) clusters.add(p.cluster_label);
                 if (p.first_shared) {
@@ -6990,10 +6990,12 @@
                     if (!maxDate || d > maxDate) maxDate = d;
                 }
             });
+            const sortedPeople = Object.entries(peopleCounts).sort((a,b) => b[1] - a[1]);
             return {
                 total_papers: allPapers.length,
                 channels: Array.from(channels),
-                people: Array.from(people),
+                people: sortedPeople.map(([name]) => name),
+                peopleWithCounts: sortedPeople.slice(0, 15).map(([name, count]) => `${name} (${count})`),
                 cluster_labels: Array.from(clusters),
                 date_range: { from: minDate?.toISOString()?.slice(0,10), to: maxDate?.toISOString()?.slice(0,10) },
                 fields_per_paper: ['title','authors','year','journal','abstract','channels','shared_by','first_shared','cited_by_count','cluster_label','cluster_id','doi','url']
@@ -7017,7 +7019,7 @@ APP FEATURES (answer "how do I..." questions with this):
 DATASET: ${summary.total_papers} papers, ${summary.channels.length} channels, ${summary.people.length} contributors, ${summary.cluster_labels.length} clusters.
 Date range: ${summary.date_range.from} to ${summary.date_range.to}.
 Channels: ${summary.channels.join(', ')}.
-Top contributors: ${summary.people.slice(0, 10).join(', ')}.
+Top contributors (papers shared): ${summary.peopleWithCounts.join(', ')}.
 
 You have powerful tools to analyze this dataset:
 
