@@ -2364,8 +2364,8 @@
                         <span class="sidebar-tip">Cmd+&#8592;&#8594; or keys 1/2/3</span>
                     </div>
                     <div class="projection-buttons" id="projectionButtons">
-                        <button class="proj-btn active" data-proj="umap">UMAP</button>
-                        <button class="proj-btn" data-proj="tsne">t-SNE</button>
+                        <button class="proj-btn" data-proj="umap">UMAP</button>
+                        <button class="proj-btn active" data-proj="tsne">t-SNE</button>
                         <button class="proj-btn" data-proj="pca">PCA</button>
                     </div>
                 </div>
@@ -2929,7 +2929,7 @@
         let kdeCanvas = null; // offscreen canvas for KDE
         let renderedLabels = []; // {x, y, w, h, label} for click detection
         let hiddenClusters = new Set(); // cluster labels hidden via legend toggle
-        let currentProjection = 'umap';
+        let currentProjection = 'tsne';
 
         // Sidebar section focus state for CMD+Up/Down navigation
         let focusedSidebarIdx = -1;
@@ -7480,7 +7480,8 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             return null; // no smart match, fall through to regular search
         }
 
-        // Smart entity queries — provide conversational answer with link to full profile
+        // Smart entity queries — ONLY used when no LLM is available
+          if (!claudeApiKey && !hfToken) {
             const whoIsMatch = query.match(/^(?:who is|about|profile)\s+@?(.+)/i);
             if (whoIsMatch) {
                 const name = whoIsMatch[1].trim();
@@ -7546,9 +7547,10 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     return;
                 }
             }
+          } // end no-LLM entity handlers
 
-            // Smart local agent: handle analytical queries without API key
-            const smartResult = handleSmartLocalQuery(query);
+            // Smart local agent: ONLY when no LLM available
+            const smartResult = (!claudeApiKey && !hfToken) ? handleSmartLocalQuery(query) : null;
             if (smartResult) {
                 const resultsPanel = document.getElementById('chatbotResults');
                 resultsPanel.innerHTML = '';
