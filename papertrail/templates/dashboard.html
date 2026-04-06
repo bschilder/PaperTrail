@@ -2654,9 +2654,9 @@
                 <div style="margin-bottom:8px;">
                     <div style="font-size:11px;color:#888;margin-bottom:4px;">Service</div>
                     <select id="serviceSelect" class="color-by-select" style="width:100%;font-size:12px;">
-                        <option value="huggingface">HuggingFace (Qwen) — free, recommended</option>
-                        <option value="anthropic">Anthropic (Claude)</option>
-                        <option value="openai">OpenAI (GPT-4)</option>
+                        <option value="huggingface">HuggingFace — free, recommended</option>
+                        <option value="anthropic">Anthropic</option>
+                        <option value="openai">OpenAI</option>
                     </select>
                 </div>
                 <div style="margin-bottom:8px;">
@@ -2667,11 +2667,14 @@
 
             <div style="margin-bottom:8px;">
                 <div style="font-size:11px;color:#888;margin-bottom:4px;">Model</div>
-                <select id="modelSelect" class="color-by-select" style="width:100%;font-size:12px;">
-                    <option value="claude-sonnet-4-20250514">Sonnet 4 — fast + smart (default)</option>
-                    <option value="claude-opus-4-20250514">Opus 4 — most capable</option>
-                    <option value="claude-haiku-3-5-20241022">Haiku 3.5 — fastest</option>
-                </select>
+                <div style="display:flex;gap:6px;align-items:center;">
+                    <select id="modelSelect" class="color-by-select" style="flex:1;font-size:12px;">
+                        <option value="Qwen/Qwen2.5-72B-Instruct">Qwen 2.5 72B (recommended)</option>
+                        <option value="meta-llama/Llama-3.3-70B-Instruct">Llama 3.3 70B</option>
+                        <option value="Qwen/Qwen3-8B">Qwen 3 8B (fast)</option>
+                    </select>
+                    <a id="modelInfoLink" href="https://huggingface.co/Qwen/Qwen2.5-72B-Instruct" target="_blank" style="color:#64b5f6;font-size:14px;text-decoration:none;" title="View model page">&#x2139;</a>
+                </div>
             </div>
 
             <div style="display:flex;gap:6px;margin-bottom:8px;">
@@ -6709,8 +6712,10 @@
                 } else if (svc === 'huggingface') {
                     modelSelect.innerHTML = '<option value="Qwen/Qwen2.5-72B-Instruct">Qwen 2.5 72B (recommended)</option><option value="meta-llama/Llama-3.3-70B-Instruct">Llama 3.3 70B</option><option value="Qwen/Qwen3-8B">Qwen 3 8B (fast)</option>';
                     apiInput.placeholder = 'hf_...';
+                    document.getElementById('modelInfoLink').href = 'https://huggingface.co/Qwen/Qwen2.5-72B-Instruct';
                 } else {
-                    modelSelect.innerHTML = '<option value="claude-sonnet-4-20250514">Sonnet 4 — fast + smart (default)</option><option value="claude-opus-4-20250514">Opus 4 — most capable</option><option value="claude-haiku-3-5-20241022">Haiku 3.5 — fastest</option>';
+                    modelSelect.innerHTML = '<option value="claude-sonnet-4-20250514">Sonnet 4 — fast + smart</option><option value="claude-opus-4-20250514">Opus 4 — most capable</option><option value="claude-haiku-3-5-20241022">Haiku 3.5 — fastest</option>';
+                    document.getElementById('modelInfoLink').href = 'https://docs.anthropic.com/en/docs/about-claude/models';
                     apiInput.placeholder = 'sk-ant-...';
                 }
                 // Pre-fill if already connected
@@ -6755,11 +6760,19 @@
                 const svc = document.getElementById('serviceSelect').value;
                 const model = document.getElementById('modelSelect').value;
                 if (svc === 'anthropic') claudeModel = model;
+                if (svc === 'huggingface') hfModel = model;
                 if (connectedServices[svc]) {
                     connectedServices[svc].model = model;
                     localStorage.setItem('papertrail_services', JSON.stringify(connectedServices));
                     document.getElementById('apiKeyStatus').textContent = 'Switched to ' + document.getElementById('modelSelect').selectedOptions[0].text;
                     document.getElementById('apiKeyStatus').style.color = '#66bb6a';
+                }
+                // Update model info link
+                const infoLink = document.getElementById('modelInfoLink');
+                if (infoLink) {
+                    if (svc === 'huggingface') infoLink.href = `https://huggingface.co/${model}`;
+                    else if (svc === 'anthropic') infoLink.href = `https://docs.anthropic.com/en/docs/about-claude/models`;
+                    else if (svc === 'openai') infoLink.href = `https://platform.openai.com/docs/models`;
                 }
             });
 
