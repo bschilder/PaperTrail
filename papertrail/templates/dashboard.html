@@ -6725,6 +6725,8 @@
                         hfToken = key;
                         hfModel = model;
                     }
+                    activeService = svc;
+                    localStorage.setItem('papertrail_active_service', svc);
                     document.getElementById('apiKeyStatus').innerHTML = '<span style="color:#66bb6a;font-weight:600;">&#x2713; ' + esc(svc) + ' connected!</span> You can now use AI-powered search.';
                     document.getElementById('apiKeyStatus').style.color = '#66bb6a';
                     settingsBtn.classList.add('has-key');
@@ -6765,11 +6767,13 @@
                 hfModel = connectedServices.huggingface.model || 'Qwen/Qwen2.5-72B-Instruct';
                 if (!claudeApiKey) settingsBtn.classList.add('has-key');
             }
+            activeService = localStorage.getItem('papertrail_active_service') || (claudeApiKey ? 'anthropic' : hfToken ? 'huggingface' : 'local');
             updateConnectedServicesUI();
         }
 
         // ===== LLM AGENT =====
         let claudeApiKey = null;
+        let activeService = 'local'; // 'anthropic', 'huggingface', 'openai', 'local'
         // HuggingFace token injected at build time for zero-config AI
         let hfToken = "{{HF_TOKEN}}";
         if (hfToken === "{" + "{HF_TOKEN}}") hfToken = null; // template not replaced
@@ -7567,7 +7571,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
 
             if (claudeApiKey || hfToken) {
                 // LLM Agent mode (Claude or HuggingFace)
-                const usingHF = !claudeApiKey && hfToken;
+                const usingHF = (activeService === 'huggingface' && hfToken) || (!claudeApiKey && hfToken);
                 const thinkingEl = document.createElement('div');
                 resultsPanel.innerHTML = `
                     <div class="chatbot-results-header">
@@ -7658,6 +7662,15 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             }
         }
 
+        function simpleMarkdown(text) {
+            if (!text) return '';
+            return text
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/`(.+?)`/g, '<code style="background:#252538;padding:1px 4px;border-radius:3px;font-size:11px;">$1</code>')
+                .replace(/\n\n/g, '</p><p style="margin-top:8px;">')
+                .replace(/\n/g, '<br>');
+        }
+
         function renderChatResults(panel, aiText, papers, mode) {
             let html = `
                 <div class="chatbot-results-header">
@@ -7669,7 +7682,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 </div>`;
 
             if (aiText) {
-                html += `<div class="ai-response">${aiText}</div>`;
+                html += `<div class="ai-response"><p>${simpleMarkdown(aiText)}</p></div>`;
             }
 
             const shown = papers.slice(0, 15);
