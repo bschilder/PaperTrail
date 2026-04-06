@@ -2336,6 +2336,7 @@
                     <button class="chatbot-example-btn" data-query="What topics are trending in the last 6 months?">trending</button>
                     <button class="chatbot-example-btn" data-query="Who are the most active contributors and what do they focus on?">contributors</button>
                 </div>
+                <button class="chatbot-example-btn" onclick="showChatHistory()" style="border-color:#4a4a5e;" title="View conversation history">&#x1F4AC; History</button>
                 <!-- Old inline settings removed — using body-level modal (#settingsOverlay) -->
             </div>
             <div id="statsDisplay" style="display:none;">Loading...</div>
@@ -2653,9 +2654,9 @@
                 <div style="margin-bottom:8px;">
                     <div style="font-size:11px;color:#888;margin-bottom:4px;">Service</div>
                     <select id="serviceSelect" class="color-by-select" style="width:100%;font-size:12px;">
-                        <option value="anthropic">Anthropic (Claude) — recommended</option>
+                        <option value="huggingface">HuggingFace (Qwen) — free, recommended</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
                         <option value="openai">OpenAI (GPT-4)</option>
-                        <option value="huggingface">HuggingFace (Qwen) — free tier</option>
                     </select>
                 </div>
                 <div style="margin-bottom:8px;">
@@ -6778,7 +6779,7 @@
                 hfModel = connectedServices.huggingface.model || 'Qwen/Qwen2.5-72B-Instruct';
                 if (!claudeApiKey) settingsBtn.classList.add('has-key');
             }
-            activeService = localStorage.getItem('papertrail_active_service') || (claudeApiKey ? 'anthropic' : hfToken ? 'huggingface' : 'local');
+            activeService = localStorage.getItem('papertrail_active_service') || (hfToken ? 'huggingface' : claudeApiKey ? 'anthropic' : 'local');
             updateConnectedServicesUI();
         }
 
@@ -6791,6 +6792,56 @@
         let hfModel = 'Qwen/Qwen2.5-72B-Instruct';
         let claudeModel = 'claude-sonnet-4-20250514';
         let conversationHistory = []; // persistent message history for multi-turn
+        // Browsable chat log stored in localStorage
+        let chatLog = JSON.parse(localStorage.getItem('papertrail_chat_log') || '[]');
+
+        function saveChatEntry(query, response, papers) {
+            chatLog.push({
+                query,
+                response,
+                papers: (papers || []).slice(0, 5).map(p => ({ title: p.title, url: p.url, cluster_label: p.cluster_label })),
+                timestamp: new Date().toISOString(),
+                service: activeService
+            });
+            // Keep last 50 conversations
+            if (chatLog.length > 50) chatLog = chatLog.slice(-50);
+            localStorage.setItem('papertrail_chat_log', JSON.stringify(chatLog));
+        }
+
+        function showChatHistory() {
+            const modal = document.getElementById('topicModal');
+            const header = document.getElementById('topicHeader');
+            const body = document.getElementById('topicBody');
+            pushModalHistory();
+
+            header.innerHTML = `
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#64b5f6;margin-bottom:4px;">&#x1F4AC; Chat History</div>
+                <div class="profile-name">${chatLog.length} Conversations</div>
+            `;
+
+            if (chatLog.length === 0) {
+                body.innerHTML = '<div style="padding:20px;color:#888;text-align:center;">No conversations yet. Ask the AI agent something!</div>';
+            } else {
+                body.innerHTML = `<div style="max-height:400px;overflow-y:auto;">
+                    ${chatLog.slice().reverse().map((entry, i) => `
+                        <div style="padding:10px 0;border-bottom:1px solid #2a2a3e;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                                <span style="font-size:12px;font-weight:600;color:#64b5f6;">${esc(entry.query)}</span>
+                                <span style="font-size:10px;color:#555;">${new Date(entry.timestamp).toLocaleDateString()} · ${entry.service || 'local'}</span>
+                            </div>
+                            <div style="font-size:12px;color:#a0a0b0;line-height:1.5;">${simpleMarkdown(entry.response?.substring(0, 200))}${entry.response?.length > 200 ? '...' : ''}</div>
+                            ${entry.papers?.length > 0 ? `<div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:3px;">${entry.papers.map(p => `<span class="card-tag cluster-tag" style="font-size:9px;">${esc((p.title || '').substring(0, 30))}</span>`).join('')}</div>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="profile-actions">
+                    <button class="profile-action-btn" onclick="chatLog=[];localStorage.removeItem('papertrail_chat_log');document.getElementById('topicModal').classList.remove('visible');">Clear History</button>
+                </div>`;
+            }
+
+            modal.classList.add('visible');
+            updateBackButtons();
+        }
 
         function buildDatasetSummary() {
             const people = new Set();
@@ -7627,6 +7678,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     }
 
                     renderChatResults(resultsPanel, thinkingHTML + agentResult.text, agentResult._full_papers || [], 'llm');
+                    saveChatEntry(query, agentResult.text, agentResult._full_papers);
 
                     // Show conversation count
                     if (conversationHistory.length > 2) {
