@@ -4256,13 +4256,11 @@
             xs.sort((a, b) => a - b);
             ys.sort((a, b) => a - b);
 
-            const lo = Math.floor(xs.length * 0.005);
-            const hi = Math.ceil(xs.length * 0.995) - 1;
-
-            projMinX = xs[lo];
-            projMaxX = xs[hi];
-            projMinY = ys[lo];
-            projMaxY = ys[hi];
+            // Use full min/max to include ALL points
+            projMinX = xs[0];
+            projMaxX = xs[xs.length - 1];
+            projMinY = ys[0];
+            projMaxY = ys[ys.length - 1];
 
             const rangeX = projMaxX - projMinX || 1;
             const rangeY = projMaxY - projMinY || 1;
