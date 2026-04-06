@@ -379,9 +379,10 @@
         }
 
         .ai-mode-badge.llm {
-            background: rgba(102,187,106,0.2);
-            color: #66bb6a;
-            border: 1px solid rgba(102,187,106,0.3);
+            background: rgba(102,187,106,0.35);
+            color: #a5d6a7;
+            border: 1px solid rgba(102,187,106,0.5);
+            font-weight: 600;
         }
 
         .ai-mode-badge.local {
@@ -7893,7 +7894,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             } else {
                 return '<span class="ai-mode-badge local">local</span>';
             }
-            return `<a href="${url}" target="_blank" rel="noopener" class="ai-mode-badge llm" style="text-decoration:none;color:inherit;cursor:pointer;">${name}</a>`;
+            return `<a href="${url}" target="_blank" rel="noopener" class="ai-mode-badge llm" style="text-decoration:none;cursor:pointer;">${name}</a>`;
         }
 
         function renderChatResults(panel, aiText, papers, mode) {
