@@ -7204,7 +7204,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
 
             if (agentStatusCallback) agentStatusCallback('Thinking...');
 
-            const resp = await fetch(`https://router.huggingface.co/hf-inference/models/${hfModel}/v1/chat/completions`, {
+            const resp = await fetch(`https://router.huggingface.co/v1/chat/completions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${hfToken}` },
                 body: JSON.stringify({
@@ -7231,7 +7231,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
 
                 // Second call with tool result
                 const msgs2 = [...messages, msg, { role: 'tool', tool_call_id: tc.id, content: JSON.stringify(result) }];
-                const resp2 = await fetch(`https://router.huggingface.co/hf-inference/models/${hfModel}/v1/chat/completions`, {
+                const resp2 = await fetch(`https://router.huggingface.co/v1/chat/completions`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${hfToken}` },
                     body: JSON.stringify({ model: hfModel, messages: [{ role: 'system', content: buildSystemPrompt() }, ...msgs2], max_tokens: 1024 })
