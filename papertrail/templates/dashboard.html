@@ -7902,11 +7902,20 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             return html;
         }
 
+        function getModelDisplayName() {
+            const sel = document.getElementById('modelSelect');
+            if (sel) {
+                const opt = Array.from(sel.options).find(o => o.value === hfModel);
+                if (opt) return opt.text.replace(/\s*\(.*\)$/, '');
+            }
+            return hfModel.split('/').pop();
+        }
+
         function modelBadgeLink(isLLM) {
             if (!isLLM) return '<span class="ai-mode-badge local">local</span>';
             let name, url;
             if (activeService === 'huggingface') {
-                name = hfModel.split('/').pop();
+                name = getModelDisplayName();
                 url = 'https://huggingface.co/' + hfModel;
             } else if (activeService === 'anthropic') {
                 name = claudeModel.includes('opus') ? 'Opus 4' : claudeModel.includes('haiku') ? 'Haiku 3.5' : 'Sonnet 4';
