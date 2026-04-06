@@ -354,6 +354,13 @@ class SlackPaperScraper:
         """
         logger.info(f"Scraping channel {channel_id} (replies={include_replies})")
 
+        # Auto-join channel if bot is not a member
+        try:
+            self._api_call("conversations.join", channel=channel_id)
+        except Exception as e:
+            if "already_in_channel" not in str(e) and "method_not_supported_for_channel_type" not in str(e):
+                logger.warning(f"Could not join channel {channel_id}: {e}")
+
         papers: list[SlackPaper] = []
         seen_urls: set[str] = set()
         cursor = None

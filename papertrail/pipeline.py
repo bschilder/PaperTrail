@@ -86,7 +86,11 @@ def run_pipeline(
 
         for name, channel_id in channels.items():
             logger.info("Scraping #%s (%s)...", name, channel_id)
-            papers = scraper.scrape_channel(channel_id, include_replies=True)
+            try:
+                papers = scraper.scrape_channel(channel_id, include_replies=True)
+            except Exception as e:
+                logger.error("Error scraping #%s: %s — skipping", name, e)
+                continue
             for p in papers:
                 all_papers.append({
                     "channel": p.channel_name,
