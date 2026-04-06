@@ -133,14 +133,37 @@ def run_pipeline(
             json.dump(all_papers, f, indent=2)
 
     # ── Step 2: Enrich ──────────────────────────────────────────
-    logger.info("Enriching %d papers...", len(all_papers))
+    # Merge with existing enriched data to avoid re-enriching known papers
+    existing_path = Path("data/papers_final.json")
+    existing_by_url = {}
+    if existing_path.exists():
+        with open(existing_path) as f:
+            for p in json.load(f):
+                if p.get("url") and p.get("title"):
+                    existing_by_url[p["url"]] = p
+        logger.info("Loaded %d existing enriched papers for merge", len(existing_by_url))
+
+    merged = 0
+    for paper in all_papers:
+        if paper["url"] in existing_by_url:
+            # Preserve existing enrichment, update scrape metadata
+            existing = existing_by_url[paper["url"]]
+            for key in ("title", "abstract", "authors", "year", "journal", "doi", "cited_by_count"):
+                if existing.get(key):
+                    paper[key] = existing[key]
+            merged += 1
+    logger.info("Merged metadata for %d papers from existing data", merged)
+
+    # Only enrich papers that still lack metadata
     from papertrail.enricher import enrich_paper
 
-    for paper in all_papers:
-        if paper.get("title") and paper.get("abstract"):
-            continue  # Already enriched
+    to_enrich = [p for p in all_papers if not p.get("title") or p["title"] == "Unknown Title"]
+    logger.info("Enriching %d new papers (skipping %d already known)...", len(to_enrich), len(all_papers) - len(to_enrich))
+    for i, paper in enumerate(to_enrich):
         metadata = enrich_paper(paper["url"])
         paper.update(metadata)
+        if (i + 1) % 50 == 0:
+            logger.info("  Enriched %d / %d", i + 1, len(to_enrich))
 
     # Fill missing metadata via OpenAlex title search
     from papertrail.enricher import fill_missing_metadata
