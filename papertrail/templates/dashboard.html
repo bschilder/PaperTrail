@@ -463,17 +463,13 @@
         }
 
         .autocomplete-dropdown {
-            position: absolute;
-            top: calc(100% + 4px);
-            left: 0;
-            right: 0;
-            background: #252538;
-            border: 1px solid #3a3a4e;
-            border-top: none;
-            border-radius: 0 0 6px 6px;
-            max-height: 150px;
+            position: fixed;
+            background: linear-gradient(135deg, #1e1e32, #252540);
+            border: 1px solid rgba(100,181,246,0.2);
+            border-radius: 8px;
+            max-height: 200px;
             overflow-y: auto;
-            z-index: 260;
+            z-index: 600;
             display: none;
         }
 
@@ -2339,7 +2335,7 @@
                     <!-- results moved to body level for fixed positioning -->
                 </div>
                 <div class="chatbot-examples">
-                    <button class="chatbot-example-btn" data-query="Compare the focus areas of papers-dl vs papers-genomics">dl vs genomics</button>
+                    <button class="chatbot-example-btn" data-query="Compare #papers-dl vs #papers-genomics">dl vs genomics</button>
                     <button class="chatbot-example-btn" data-query="What topics are trending in the last 6 months?">trending</button>
                     <button class="chatbot-example-btn" data-query="Who are the most active contributors and what do they focus on?">contributors</button>
                 </div>
@@ -8382,13 +8378,18 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                         <span class="card-tag ${tagClass}" style="font-size:12px;">${s}</span>
                     </div>`;
                 }).join('');
+                // Position dropdown below the input
+                const inputRect = document.getElementById('chatbotInput').getBoundingClientRect();
+                dropdown.style.top = (inputRect.bottom + 4) + 'px';
+                dropdown.style.left = inputRect.left + 'px';
+                dropdown.style.width = inputRect.width + 'px';
                 dropdown.classList.add('visible');
 
                 document.querySelectorAll('.autocomplete-item').forEach(item => {
                     item.addEventListener('click', () => {
                         const input = document.getElementById('chatbotInput');
                         const parts = input.value.split(/\s+/);
-                        parts[parts.length - 1] = item.textContent;
+                        parts[parts.length - 1] = item.textContent.trim();
                         input.value = parts.join(' ') + ' ';
                         hideAutocomplete();
                         input.focus();
