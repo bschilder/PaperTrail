@@ -2700,7 +2700,10 @@
             </div>
 
             <div id="apiKeyStatus" style="font-size:11px;color:#666;margin-bottom:8px;"></div>
-            <div id="connectedServices" style="border-top:1px solid #2a2a3e;padding-top:8px;margin-bottom:8px;"></div>
+            <div style="border-top:1px solid #2a2a3e;padding-top:8px;margin-bottom:8px;">
+                <div style="font-size:10px;text-transform:uppercase;color:#555;letter-spacing:0.5px;margin-bottom:6px;">API Keys</div>
+                <div id="connectedServices"></div>
+            </div>
 
             <div style="border-top:1px solid #2a2a3e;padding-top:8px;margin-bottom:8px;">
                 <div style="font-size:10px;text-transform:uppercase;color:#555;letter-spacing:0.5px;margin-bottom:4px;">With AI Connected</div>
@@ -6700,13 +6703,18 @@
                     container.innerHTML = '<div style="font-size:10px;color:#555;">No services connected</div>';
                     return;
                 }
-                container.innerHTML = services.map(([svc, data]) =>
-                    `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;">
+                container.innerHTML = services.map(([svc, data]) => {
+                    const preview = data.key ? data.key.slice(0, 8) + '...' + data.key.slice(-4) : '';
+                    const added = data.added ? new Date(data.added).toLocaleDateString() : '';
+                    return `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;">
                         <span style="color:#66bb6a;">&#x2713;</span>
-                        <span style="font-size:11px;color:#e0e0e0;flex:1;">${esc(svc)}</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:11px;color:#e0e0e0;">${esc(svc)}</div>
+                            <div style="font-size:9px;color:#555;font-family:monospace;">${esc(preview)}${added ? ' · ' + added : ''}</div>
+                        </div>
                         <button onclick="disconnectService('${svc}')" style="background:none;border:1px solid #3a3a4e;color:#888;padding:1px 6px;border-radius:4px;cursor:pointer;font-size:9px;">Remove</button>
-                    </div>`
-                ).join('');
+                    </div>`;
+                }).join('');
             }
 
             // Expose for inline onclick
@@ -6751,7 +6759,7 @@
                 const svc = document.getElementById('serviceSelect').value;
                 const model = document.getElementById('modelSelect').value;
                 if (key && !key.includes('...') && (key.startsWith('sk-') || key.startsWith('hf_') || key.length > 20)) {
-                    connectedServices[svc] = { key, model };
+                    connectedServices[svc] = { key, model, added: new Date().toISOString() };
                     localStorage.setItem('papertrail_services', JSON.stringify(connectedServices));
                     if (svc === 'anthropic') {
                         claudeApiKey = key;
