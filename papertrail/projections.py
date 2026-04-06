@@ -224,4 +224,101 @@ def cluster_papers(
         top_terms = [feature_names[i] for i in top_idx if mean_tfidf[i] > 0]
         labels[cid] = " / ".join(t.title() for t in top_terms) or f"Cluster {cid}"
 
+    # Try LLM-based label refinement
+    refined = refine_cluster_labels_llm(cluster_ids, labels, texts)
+    if refined:
+        labels = refined
+
     return cluster_ids, labels
+
+
+def refine_cluster_labels_llm(
+    cluster_ids: np.ndarray,
+    tfidf_labels: dict[int, str],
+    texts: list[str],
+) -> dict[int, str] | None:
+    """
+    Use an LLM to generate better cluster labels from sample titles.
+
+    Tries HuggingFace (HF_TOKEN) first, falls back to OpenAI (OPENAI_API_KEY).
+    Returns None if no LLM is available.
+    """
+    import os
+
+    hf_token = os.environ.get("HF_TOKEN")
+    openai_key = os.environ.get("OPENAI_API_KEY")
+
+    if not hf_token and not openai_key:
+        logger.info("No LLM token available, using TF-IDF cluster labels")
+        return None
+
+    # Build prompt with sample titles per cluster
+    cluster_info = []
+    for cid, label in sorted(tfidf_labels.items()):
+        mask = cluster_ids == cid
+        indices = np.where(mask)[0]
+        # Get up to 8 sample titles from the texts
+        samples = []
+        for idx in indices[:8]:
+            title = texts[idx].split(".")[0].strip()[:100]
+            if title and len(title) > 10:
+                samples.append(title)
+        cluster_info.append(f"Cluster {cid} ({int(mask.sum())} papers, TF-IDF: \"{label}\"):\n  " + "\n  ".join(samples[:6]))
+
+    prompt = (
+        "You are labeling topic clusters of academic papers. "
+        "For each cluster below, generate a short (2-4 word) descriptive topic label "
+        "based on the sample paper titles. Output ONLY a JSON object mapping cluster ID to label, nothing else.\n\n"
+        + "\n\n".join(cluster_info)
+    )
+
+    try:
+        import json as _json
+        import requests
+
+        if hf_token:
+            logger.info("Generating cluster labels via HuggingFace LLM...")
+            resp = requests.post(
+                "https://router.huggingface.co/v1/chat/completions",
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {hf_token}"},
+                json={
+                    "model": "Qwen/Qwen3-8B",
+                    "messages": [{"role": "user", "content": prompt + "\n\n/no_think"}],
+                    "max_tokens": 512,
+                },
+                timeout=60,
+            )
+            resp.raise_for_status()
+            content = resp.json()["choices"][0]["message"]["content"]
+        else:
+            logger.info("Generating cluster labels via OpenAI...")
+            resp = requests.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {openai_key}"},
+                json={
+                    "model": "gpt-4o-mini",
+                    "messages": [{"role": "user", "content": prompt}],
+                    "max_tokens": 512,
+                },
+                timeout=60,
+            )
+            resp.raise_for_status()
+            content = resp.json()["choices"][0]["message"]["content"]
+
+        # Strip thinking tags and parse JSON
+        import re
+        content = re.sub(r"<think>[\s\S]*?</think>", "", content).strip()
+        content = re.sub(r"<think>[\s\S]*", "", content).strip()
+        # Extract JSON from markdown code block if present
+        json_match = re.search(r"```(?:json)?\s*(\{[\s\S]*?\})\s*```", content)
+        if json_match:
+            content = json_match.group(1)
+
+        refined = _json.loads(content)
+        labels = {int(k): str(v) for k, v in refined.items()}
+        logger.info("LLM cluster labels: %s", labels)
+        return labels
+
+    except Exception as e:
+        logger.warning("LLM cluster labeling failed: %s, using TF-IDF labels", e)
+        return None

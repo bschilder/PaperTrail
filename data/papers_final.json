@@ -494,16 +494,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1592360669000400",
     "openalex_url": "https://openalex.org/W3035370963",
-    "title": "Unknown Title",
-    "year": 2020,
-    "journal": "Molecular Cell",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "title": "",
+    "year": null,
+    "journal": "",
+    "authors": [],
     "cited_by_count": 379,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-01978-5",
@@ -1099,16 +1098,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1599511691001700",
     "openalex_url": "https://openalex.org/W3083216853",
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Trends in genetics : TIG",
-    "year": 2021,
+    "title": "",
+    "authors": [],
+    "journal": "",
+    "year": null,
     "cited_by_count": 333,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://science.sciencemag.org/lookup/doi/10.1126/science.aaz1776",
@@ -1407,16 +1405,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1599711699002900",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Hip international : the journal of clinical and experimental research on hip pathology and therapy",
-    "year": 2026,
+    "title": "",
+    "authors": [],
+    "journal": "",
+    "year": null,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2009.08868",
@@ -2330,16 +2327,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1602551589000400",
     "openalex_url": "https://openalex.org/W3092624702",
-    "title": "Unknown Title",
-    "year": 2020,
-    "journal": "Nature Methods",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "title": "",
+    "year": null,
+    "journal": "",
+    "authors": [],
     "cited_by_count": 317,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.nature.com/articles/s41467-020-18676-2",
@@ -2504,14 +2500,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2020,
-    "journal": "Nature Methods",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41592-020-00978-4",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W3092415159",
     "institutions": [],
     "cited_by_count": 20,
@@ -2761,16 +2755,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1602821155001300",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2020,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://www.nature.com/articles/s41592-020-0960-3",
@@ -2782,14 +2775,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2020,
-    "journal": "Nature Methods",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41592-020-0960-3",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W3091921516",
     "institutions": [],
     "cited_by_count": 222,
@@ -3346,14 +3337,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2020,
-    "journal": "Nature",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41586-020-2843-2",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W3094281091",
     "institutions": [],
     "cited_by_count": 146,
@@ -4865,14 +4854,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2020,
-    "journal": "Nature",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41586-020-03052-3",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W3113121586",
     "institutions": [],
     "cited_by_count": 157,
@@ -6356,14 +6343,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2021,
-    "journal": "Nature Biotechnology",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41587-020-00801-7",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W3121267967",
     "institutions": [],
     "cited_by_count": 164,
@@ -6704,14 +6689,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2021,
-    "journal": "Nature Genetics",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41588-020-00761-3",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W3122552508",
     "institutions": [],
     "cited_by_count": 88,
@@ -8117,14 +8100,12 @@
     "ids": {
       "pmid": "26875865"
     },
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2016,
-    "journal": "Cell",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1016/j.cell.2016.01.004",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W2267370236",
     "institutions": [],
     "cited_by_count": 218,
@@ -9775,14 +9756,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "Review of RNA modifications",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2021,
-    "journal": "Nature Reviews Molecular Cell Biology",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41580-021-00342-0",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W3133557863",
     "institutions": [],
     "cited_by_count": 716,
@@ -10097,16 +10076,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1615255880006700",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2021,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://www.biorxiv.org/content/10.1101/2021.03.08.434469",
@@ -10330,14 +10308,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "Yeast gene regulation revealed",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2021,
-    "journal": "Nature",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41586-021-03314-8",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W3135803532",
     "institutions": [],
     "cited_by_count": 272,
@@ -10397,14 +10373,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "Enhancer review with crispr",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2020,
-    "journal": "Nature Reviews Genetics",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41576-019-0209-0",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W3000799818",
     "institutions": [],
     "cited_by_count": 433,
@@ -10717,16 +10691,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1615665298017500",
     "openalex_url": "https://openalex.org/W3128111751",
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Molecular cell",
-    "year": 2021,
+    "title": "",
+    "authors": [],
+    "journal": "",
+    "year": null,
     "cited_by_count": 176,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.nature.com/articles/s41467-021-21790-4",
@@ -11289,16 +11262,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1616037627002900",
     "openalex_url": "https://openalex.org/W1971451591",
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Cell",
-    "year": 2015,
+    "title": "",
+    "authors": [],
+    "journal": "",
+    "year": null,
     "cited_by_count": 817,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.nature.com/articles/s41467-020-17155-y",
@@ -11706,16 +11678,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1616710528012500",
     "openalex_url": "https://openalex.org/W3137341146",
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Molecular cell",
-    "year": 2021,
+    "title": "",
+    "authors": [],
+    "journal": "",
+    "year": null,
     "cited_by_count": 19,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2103.02559",
@@ -12722,14 +12693,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2021,
-    "journal": "Nature Genetics",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41588-021-00823-0",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W3149376923",
     "institutions": [],
     "cited_by_count": 184,
@@ -13340,16 +13309,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1617822999020300",
     "openalex_url": "https://openalex.org/W3151678771",
-    "title": "Unknown Title",
-    "year": 2021,
-    "journal": "Nature",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "title": "",
+    "year": null,
+    "journal": "",
+    "authors": [],
     "cited_by_count": 728,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.biorxiv.org/content/10.1101/2021.04.07.438649",
@@ -13547,16 +13515,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1618085568024800",
     "openalex_url": "https://openalex.org/W3144951232",
-    "title": "Unknown Title",
-    "year": 2021,
-    "journal": "Nature Genetics",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "title": "",
+    "year": null,
+    "journal": "",
+    "authors": [],
     "cited_by_count": 106,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.nature.com/articles/s41588-021-00812-3",
@@ -13568,14 +13535,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2021,
-    "journal": "Nature Genetics",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41588-021-00812-3",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W3150031743",
     "institutions": [],
     "cited_by_count": 90,
@@ -14389,16 +14354,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1619136804031300",
     "openalex_url": "https://openalex.org/W3119595824",
-    "title": "Unknown Title",
-    "year": 2021,
-    "journal": "Trends in Genetics",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "title": "",
+    "year": null,
+    "journal": "",
+    "authors": [],
     "cited_by_count": 74,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.biorxiv.org/content/10.1101/2021.04.22.440891",
@@ -15498,14 +15462,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2021,
-    "journal": "Nature Methods",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41592-021-01128-0",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W3119035005",
     "institutions": [],
     "cited_by_count": 179,
@@ -15608,16 +15570,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1620732973042300",
     "openalex_url": "https://openalex.org/W3134994147",
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Trends in genetics : TIG",
-    "year": 2021,
+    "title": "",
+    "authors": [],
+    "journal": "",
+    "year": null,
     "cited_by_count": 116,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2105.04857",
@@ -15745,16 +15706,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1621081536042900",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2021,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://www.biorxiv.org/content/10.1101/2021.05.19.444847",
@@ -16302,16 +16262,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1622499748004400",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2021,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://www.biorxiv.org/content/10.1101/2021.05.29.446316",
@@ -17241,14 +17200,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2021,
-    "journal": "Nature",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41586-021-03639-4",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W3168571452",
     "institutions": [],
     "cited_by_count": 193,
@@ -19571,16 +19528,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1628884149008900",
     "openalex_url": "https://openalex.org/W3194509722",
-    "title": "Unknown Title",
-    "year": 2021,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Cell",
+    "authors": [],
+    "journal": "",
     "cited_by_count": 510,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.biorxiv.org/content/10.1101/2021.08.15.456358",
@@ -20124,16 +20080,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1630706693008300",
     "openalex_url": "https://openalex.org/W3197364483",
-    "title": "Unknown Title",
-    "year": 2021,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Nature Genetics",
+    "authors": [],
+    "journal": "",
     "cited_by_count": 2057,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.biorxiv.org/content/10.1101/2021.09.04.458817",
@@ -20919,14 +20874,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2021,
-    "journal": "Nature Methods",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41592-021-01300-6",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4205450255",
     "institutions": [],
     "cited_by_count": 6,
@@ -21234,16 +21187,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1634296785037200",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2021,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2110.05006",
@@ -21582,16 +21534,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1634836415001500",
     "openalex_url": "https://openalex.org/W3203100301",
-    "title": "Unknown Title",
-    "year": 2021,
-    "journal": "Nature Biotechnology",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "title": "",
+    "year": null,
+    "journal": "",
+    "authors": [],
     "cited_by_count": 7,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.biorxiv.org/content/10.1101/2021.10.23.462170",
@@ -22665,16 +22616,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1637957369015400",
     "openalex_url": "https://openalex.org/W3214158901",
-    "title": "Unknown Title",
-    "year": 2021,
-    "journal": "Cell",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "title": "",
+    "year": null,
+    "journal": "",
+    "authors": [],
     "cited_by_count": 504,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2106.01798",
@@ -22760,14 +22710,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "Navigating pitfalls in applying ML in genomics",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2021,
-    "journal": "Nature Reviews Genetics",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41576-021-00434-9",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W3217314753",
     "institutions": [],
     "cited_by_count": 247,
@@ -22942,16 +22890,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1638585449001800",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2021,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2007.02931",
@@ -24784,14 +24731,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "Would be a good journal club paper",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature Machine Intelligence",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s42256-021-00428-6",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4220723906",
     "institutions": [],
     "cited_by_count": 31,
@@ -24894,16 +24839,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1643924220595349",
     "openalex_url": "https://openalex.org/W4221095165",
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Molecular cell",
-    "year": 2022,
+    "title": "",
+    "authors": [],
+    "journal": "",
+    "year": null,
     "cited_by_count": 129,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.nature.com/articles/s41567-021-01462-2",
@@ -25113,16 +25057,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1644270833338429",
     "openalex_url": "https://openalex.org/W4210587306",
-    "title": "Unknown Title",
-    "year": 2022,
-    "journal": "Nature Biotechnology",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "title": "",
+    "year": null,
+    "journal": "",
+    "authors": [],
     "cited_by_count": 765,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.cell.com/cell/fulltext/S0092-8674(22)00003-4",
@@ -25177,16 +25120,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1644237314360749",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2022,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2202.03418",
@@ -26573,14 +26515,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "mpra for gwas variants in autoimmune diseases",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature Genetics",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41588-022-01056-5",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4229063515",
     "institutions": [],
     "cited_by_count": 63,
@@ -26683,16 +26623,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1651962855059919",
     "openalex_url": "https://openalex.org/W4200028151",
-    "title": "Unknown Title",
-    "year": 2021,
-    "journal": "Nature Reviews Genetics",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "title": "",
+    "year": null,
+    "journal": "",
+    "authors": [],
     "cited_by_count": 118,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2205.00403",
@@ -27022,14 +26961,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "Deepstarr is published in nature genetics",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature Genetics",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41588-022-01048-5",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4280563114",
     "institutions": [],
     "cited_by_count": 280,
@@ -27160,14 +27097,12 @@
     "shared_by": "Shushan Toneyan",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature Genetics",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41588-022-01065-4",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4280512834",
     "institutions": [],
     "cited_by_count": 182,
@@ -27270,16 +27205,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1653133182103399",
     "openalex_url": "https://openalex.org/W4281254649",
-    "title": "Unknown Title",
-    "year": 2022,
-    "journal": "Nature",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "title": "",
+    "year": null,
+    "journal": "",
+    "authors": [],
     "cited_by_count": 162,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://biorxiv.org/cgi/content/short/2022.05.20.492818v1",
@@ -28767,14 +28701,12 @@
     "shared_by": "Antonio Majdandzic",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature Machine Intelligence",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s42256-022-00458-8",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4220993274",
     "institutions": [],
     "cited_by_count": 269,
@@ -29450,16 +29382,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1657762039803369",
     "openalex_url": "https://openalex.org/W4285012429",
-    "title": "Unknown Title",
-    "year": 2022,
-    "journal": "Nature Genetics",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "title": "",
+    "year": null,
+    "journal": "",
+    "authors": [],
     "cited_by_count": 1,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.nature.com/articles/s41576-022-00514-4",
@@ -29471,14 +29402,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "Alternative splicing review",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature Reviews Genetics",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41576-022-00514-4",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4285092137",
     "institutions": [],
     "cited_by_count": 438,
@@ -29538,14 +29467,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "tf binding considerations based on chromatin",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature Reviews Genetics",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41576-022-00512-6",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4285091229",
     "institutions": [],
     "cited_by_count": 155,
@@ -29675,14 +29602,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "Review on genomic technologies",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature Reviews Genetics",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41576-022-00509-1",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4285490847",
     "institutions": [],
     "cited_by_count": 243,
@@ -29932,16 +29857,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1658407406498859",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2022,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://www.cell.com/molecular-cell/fulltext/S1097-2765(22)00612-8",
@@ -29996,16 +29920,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1658367817127989",
     "openalex_url": "https://openalex.org/W4286254555",
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Molecular cell",
-    "year": 2022,
+    "title": "",
+    "authors": [],
+    "journal": "",
+    "year": null,
     "cited_by_count": 71,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2206.01254",
@@ -30507,14 +30430,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "ScBasset published in nature methods",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature Methods",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41592-022-01562-8",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4290672942",
     "institutions": [],
     "cited_by_count": 146,
@@ -30911,14 +30832,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "SSL healthcare review",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature Biomedical Engineering",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41551-022-00914-1",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4291023040",
     "institutions": [],
     "cited_by_count": 557,
@@ -31048,14 +30967,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "uncertainty quantification review",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature Reviews Physics",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s42254-022-00498-4",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4292641317",
     "institutions": [],
     "cited_by_count": 34,
@@ -31452,16 +31369,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1662489250175369",
     "openalex_url": "https://openalex.org/W4294724492",
-    "title": "Unknown Title",
-    "year": 2022,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Nature",
+    "title": "",
+    "year": null,
+    "authors": [],
+    "journal": "",
     "engagement": 1,
     "cited_by_count": 3,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.biorxiv.org/content/10.1101/2022.09.09.507333",
@@ -31979,14 +31895,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "New Review on interpretability for dl in genomics",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature Reviews Genetics",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41576-022-00532-2",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4300862723",
     "institutions": [],
     "cited_by_count": 346,
@@ -32603,16 +32517,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1665775336011209",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2022,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2202.10638",
@@ -32836,14 +32749,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "Advice for writing cover letter for manuscript",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature Biomedical Engineering",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41551-022-00957-4",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4306179640",
     "institutions": [],
     "cited_by_count": 3,
@@ -33166,16 +33077,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1666792303434429",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2022,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2210.09298",
@@ -34056,16 +33966,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1668221378752149",
     "openalex_url": "https://openalex.org/W4308792351",
-    "title": "Unknown Title",
-    "year": 2022,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Nature Structural & Molecular Biology",
+    "authors": [],
+    "journal": "",
     "cited_by_count": 28,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.biorxiv.org/content/10.1101/2022.03.05.483136",
@@ -34194,16 +34103,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1669575152276819",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2022,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://openreview.net/forum?id=UPMzi3uCx5p",
@@ -34258,16 +34166,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1669574861110959",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2022,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "http://biorxiv.org/content/early/2022/12/02/2022.12.02.518786?ct",
@@ -34423,14 +34330,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "structural variation can rewire promoter-enhancers",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41586-022-05504-4",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4311677630",
     "institutions": [],
     "cited_by_count": 91,
@@ -34549,14 +34454,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature Structural & Molecular Biology",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41594-022-00896-3",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4312018534",
     "institutions": [],
     "cited_by_count": 82,
@@ -34688,14 +34591,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "Review on how 3d genome influences gene regulation",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Nature Reviews Genetics",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41576-022-00526-0",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4295907576",
     "institutions": [],
     "cited_by_count": 155,
@@ -35103,16 +35004,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1671751631069929",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Cell",
-    "year": 2022,
+    "title": "",
+    "authors": [],
+    "journal": "",
+    "year": null,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://pubmed.ncbi.nlm.nih.gov/34670838",
@@ -35318,16 +35218,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1672074229661929",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2022,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://www.cell.com/cell-systems/fulltext/S2405-4712(21)00202-7",
@@ -35382,16 +35281,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1672165747389859",
     "openalex_url": "https://openalex.org/W3170265427",
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Cell systems",
-    "year": 2021,
+    "title": "",
+    "authors": [],
+    "journal": "",
+    "year": null,
     "engagement": 1,
     "cited_by_count": 124,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2212.14034",
@@ -35765,16 +35663,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1674691105453239",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2023,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://openreview.net/forum?id=nI2HmVA0hvt",
@@ -36783,16 +36680,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1681598815412029",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Cell",
-    "year": 2023,
+    "title": "",
+    "authors": [],
+    "journal": "",
+    "year": null,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2304.03775",
@@ -37014,16 +36910,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1682369805956559",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2023,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2304.12306",
@@ -37318,16 +37213,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1683168527614059",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2023,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2305.01625",
@@ -37632,16 +37526,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1684503069746819",
     "openalex_url": "https://openalex.org/W4377012581",
-    "title": "Unknown Title",
-    "year": 2023,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Nature Reviews Physics",
+    "authors": [],
+    "journal": "",
     "cited_by_count": 74,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.nature.com/articles/s42256-023-00657-x",
@@ -37696,16 +37589,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1684779750242609",
     "openalex_url": "https://openalex.org/W4377226909",
-    "title": "Unknown Title",
-    "year": 2023,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Nature Machine Intelligence",
+    "authors": [],
+    "journal": "",
     "cited_by_count": 375,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2305.18793",
@@ -37829,16 +37721,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1685619022805809",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2023,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2205.00334",
@@ -39313,14 +39204,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2023,
-    "journal": "Nature Medicine",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41591-023-02504-3",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4385948838",
     "institutions": [],
     "cited_by_count": 531,
@@ -40780,14 +40669,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "uncertainty estimation",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2023,
-    "journal": "Nature Machine Intelligence",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s42256-023-00751-0",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4388409550",
     "institutions": [],
     "cited_by_count": 51,
@@ -41409,16 +41296,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1702426587835009",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2023,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/1811.12359",
@@ -41727,14 +41613,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2023,
-    "journal": "Nature",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41586-023-06887-8",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4389991855",
     "institutions": [],
     "cited_by_count": 371,
@@ -42203,16 +42087,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1706407940777039",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2024,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://ieeexplore.ieee.org/abstract/document/10414149",
@@ -42647,16 +42530,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1707787203367769",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2024,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2312.17173",
@@ -43257,14 +43139,12 @@
     "shared_by": "Jakub Kaczmarzyk",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2024,
-    "journal": "Nature Medicine",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41591-024-02857-3",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4392947521",
     "institutions": [],
     "cited_by_count": 944,
@@ -43394,14 +43274,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2024,
-    "journal": "Nature Methods",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41592-024-02233-6",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4393200219",
     "institutions": [],
     "cited_by_count": 129,
@@ -43604,14 +43482,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2023,
-    "journal": "Nature Biomedical Engineering",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41551-023-01056-8",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4382394524",
     "institutions": [],
     "cited_by_count": 511,
@@ -43671,14 +43547,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2024,
-    "journal": "Nature Biomedical Engineering",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41551-024-01193-8",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4393055385",
     "institutions": [],
     "cited_by_count": 26,
@@ -44163,16 +44037,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1713555264330069",
     "openalex_url": "https://openalex.org/W4394976513",
-    "title": "Unknown Title",
-    "year": 2024,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Nature Medicine",
+    "authors": [],
+    "journal": "",
     "cited_by_count": 86,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2404.11534",
@@ -44369,16 +44242,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1714068454967509",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2024,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2404.19756",
@@ -45622,14 +45494,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2024,
-    "journal": "Nature Biomedical Engineering",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41551-024-01223-5",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4399810138",
     "institutions": [],
     "cited_by_count": 42,
@@ -46986,16 +46856,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1723635659688219",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2024,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://aclanthology.org/2024.acl-long.279",
@@ -47050,16 +46919,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1724011670454429",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2024,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2408.10205",
@@ -48053,14 +47921,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2024,
-    "journal": "Nature Computational Science",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s43588-024-00697-2",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4402926983",
     "institutions": [],
     "cited_by_count": 26,
@@ -49045,16 +48911,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1732720084793299",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2024,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2411.04118",
@@ -50352,14 +50217,12 @@
     "ids": {
       "pmid": "35598881"
     },
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2022,
-    "journal": "Journal of Biomedical Informatics",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1016/j.jbi.2022.104095",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4280548574",
     "institutions": [],
     "cited_by_count": 37,
@@ -50464,16 +50327,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C084KFWEVC2/p1733885335550899",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2024,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6932864",
@@ -50530,16 +50392,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C084KFWEVC2/p1733885257095069",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2024,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://bmcsystbiol.biomedcentral.com/articles/10.1186/s12918-017-0451-z",
@@ -50631,14 +50492,12 @@
     "ids": {
       "pmid": "37100502"
     },
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2023,
-    "journal": "Artificial Intelligence in Medicine",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1016/j.artmed.2023.102523",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4322627064",
     "institutions": [],
     "cited_by_count": 24,
@@ -51425,14 +51284,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2024,
-    "journal": "Nature Biomedical Engineering",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41551-024-01324-1",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4405699952",
     "institutions": [],
     "cited_by_count": 3,
@@ -55582,16 +55439,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C011SDT3KKQ/p1741298929323919",
     "openalex_url": "https://openalex.org/W4408244228",
-    "title": "Unknown Title",
-    "year": 2025,
-    "journal": "Nature",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "title": "",
+    "year": null,
+    "journal": "",
+    "authors": [],
     "cited_by_count": 20,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.biorxiv.org/content/10.1101/2024.09.23.614603",
@@ -56244,14 +56100,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "Backprop loss based on natural language",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2025,
-    "journal": "Nature",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41586-025-08661-4",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4408612787",
     "institutions": [],
     "cited_by_count": 40,
@@ -56455,14 +56309,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2025,
-    "journal": "Nature Machine Intelligence",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s42256-024-00942-3",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4406833231",
     "institutions": [],
     "cited_by_count": 14,
@@ -58185,16 +58037,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C011SDT3KKQ/p1744903919232179",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2025,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://www.biorxiv.org/content/10.1101/2025.04.14.648850",
@@ -58560,14 +58411,12 @@
     "shared_by": "Masayuki Nagai",
     "text_snippet": "Energy consumption",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2023,
-    "journal": "Nature Machine Intelligence",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s42256-023-00750-1",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4388565102",
     "institutions": [],
     "cited_by_count": 38,
@@ -58670,16 +58519,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1745847934844119",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2025,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://www.biorxiv.org/content/10.1101/2025.05.03.652001",
@@ -59411,16 +59259,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C08C020L554/p1747331574351039",
     "openalex_url": "https://openalex.org/W4410360677",
-    "title": "Unknown Title",
-    "year": 2025,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Nature",
+    "title": "",
+    "year": null,
+    "authors": [],
+    "journal": "",
     "cited_by_count": 4,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2505.13400",
@@ -62316,16 +62163,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C08C020L554/p1751562938799239",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2025,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://www.medrxiv.org/content/10.1101/2025.01.10.25320181",
@@ -62600,16 +62446,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C084KFWEVC2/p1752033340108679",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2025,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://www.medrxiv.org/content/10.1101/2025.01.17.25320664",
@@ -63804,14 +63649,12 @@
     "shared_by": "Jakub Kaczmarzyk",
     "text_snippet": "https://www.nature.com/articles/s41586-025-09442-9\n\nThe virtual lab paper from Stanford is out in nature",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2025,
-    "journal": "Nature",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41586-025-09442-9",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4412709685",
     "institutions": [],
     "cited_by_count": 67,
@@ -64914,16 +64757,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C011SDT3KKQ/p1755907073371109",
     "openalex_url": "https://openalex.org/W4413257724",
-    "title": "Unknown Title",
-    "year": 2025,
-    "journal": "Cell",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "title": "",
+    "year": null,
+    "journal": "",
+    "authors": [],
     "cited_by_count": 38,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2507.02004",
@@ -67714,14 +67556,12 @@
     "shared_by": "Brian Schilder",
     "text_snippet": "Research paper or resource link",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2025,
-    "journal": "Nature Biotechnology",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41587-025-02836-0",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4414747430",
     "institutions": [],
     "cited_by_count": 9,
@@ -67967,16 +67807,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C084KFWEVC2/p1759698506886539",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2025,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2510.00184",
@@ -68192,14 +68031,12 @@
     "shared_by": "Brian Schilder",
     "text_snippet": "Research paper or resource link",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2020,
-    "journal": "Nature",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41586-020-3021-2",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W3111146891",
     "institutions": [],
     "cited_by_count": 139,
@@ -68816,16 +68653,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C011SDT3KKQ/p1760917690082359",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2025,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2509.05739",
@@ -69027,16 +68863,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1761259675456589",
     "openalex_url": "https://openalex.org/W4415437559",
-    "title": "Unknown Title",
-    "year": 2025,
-    "journal": "Nature",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "title": "",
+    "year": null,
+    "journal": "",
+    "authors": [],
     "cited_by_count": 2,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.nature.com/articles/d41586-025-03363-3",
@@ -69091,16 +68926,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C08C020L554/p1761330710817049",
     "openalex_url": "https://openalex.org/W4415181265",
-    "title": "Unknown Title",
-    "year": 2025,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Nature",
+    "title": "",
+    "year": null,
+    "authors": [],
+    "journal": "",
     "cited_by_count": 4,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2510.15511",
@@ -69786,16 +69620,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C011SDT3KKQ/p1762460994121869",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2025,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2511.02864",
@@ -70103,14 +69936,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "Language models cannot tell difference between I believe and I know. Work by James zou\nhttps://www.nature.com/articles/s42256-025-01113-8",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2025,
-    "journal": "Nature Machine Intelligence",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s42256-025-01113-8",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4415816110",
     "institutions": [],
     "cited_by_count": 4,
@@ -71203,14 +71034,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2025,
-    "journal": "Nature Biotechnology",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41587-025-02650-8",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4409868653",
     "institutions": [],
     "cited_by_count": 16,
@@ -71457,16 +71286,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1765425541530019",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2025,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://www.nature.com/articles/s41591-025-04095-7",
@@ -71478,14 +71306,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "<https://www.nature.com/articles/s41591-025-04095-7|https://www.nature.com/articles/s41591-025-04095-7>",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2025,
-    "journal": "Nature Medicine",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41591-025-04095-7",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W4417116258",
     "institutions": [],
     "cited_by_count": 88,
@@ -71977,16 +71803,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C09U8FW4YJV/p1765853898101109",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2025,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2202.07125",
@@ -73542,16 +73367,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1768450740682879",
     "openalex_url": "https://openalex.org/W7124140759",
-    "title": "Unknown Title",
-    "year": 2026,
-    "journal": "Nature",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "title": "",
+    "year": null,
+    "journal": "",
+    "authors": [],
     "cited_by_count": 18,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established."
+    "abstract": "",
+    "doi": ""
   },
   {
     "url": "https://www.nature.com/articles/s41568-025-00900-0",
@@ -73563,14 +73387,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": ":fire:Review by many leaders in the field :fire:  <https://www.nature.com/articles/s41568-025-00900-0|https://www.nature.com/articles/s41568-025-00900-0>",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2026,
-    "journal": "Nature reviews. Cancer",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41568-025-00900-0",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W7122487524",
     "institutions": [],
     "cited_by_count": 1,
@@ -74747,16 +74569,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1770426786276319",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2026,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2601.20088",
@@ -76837,16 +76658,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1771585391313349",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2026,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://www.biorxiv.org/content/10.64898/2026.02.19.706898",
@@ -76972,16 +76792,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C09U8FW4YJV/p1771962276631029",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "journal": "Cell",
-    "year": 2026,
+    "title": "",
+    "authors": [],
+    "journal": "",
+    "year": null,
     "engagement": 1,
     "institutions": [],
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2501.14654",
@@ -77195,16 +77014,15 @@
     ],
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1772599695915959",
     "openalex_url": "https://openalex.org/W2040100938",
-    "title": "Unknown Title",
-    "year": 2026,
+    "title": "",
+    "year": null,
     "engagement": 1,
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
+    "authors": [],
     "institutions": [],
-    "journal": "Proceedings of SPIE, the International Society for Optical Engineering/Proceedings of SPIE",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "cited_by_count": 88
+    "journal": "",
+    "abstract": "",
+    "cited_by_count": 88,
+    "doi": ""
   },
   {
     "url": "https://arxiv.org/abs/2507.14740",
@@ -78188,14 +78006,12 @@
     "shared_by": "Peter Koo",
     "text_snippet": "",
     "ids": {},
-    "title": "Unknown Title",
-    "authors": [
-      "Jeffrey Uhlmann"
-    ],
-    "year": 2026,
-    "journal": "Nature Biotechnology",
-    "abstract": "In this paper we present a new theoretic framework for combining sensor measurements, state estimates, or any similar type of quantity given only their means and covariances. The key feature of the new framework is that it permits the optimal fusion of estimates that are correlated to an unknown degree. This framework yields a new filtering paradigm that avoids all of the restrictive independence assumptions required by the standard Kalman filter, though at the cost of reduced rates of convergence for cases in which independence can be established.",
-    "doi": "10.1038/s41587-026-03035-1",
+    "title": "",
+    "authors": [],
+    "year": null,
+    "journal": "",
+    "abstract": "",
+    "doi": "",
     "openalex_id": "https://openalex.org/W7131288999",
     "institutions": [],
     "cited_by_count": 1,
