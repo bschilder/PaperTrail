@@ -38,6 +38,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          OPENALEX_EMAIL: ${{ secrets.OPENALEX_EMAIL || format('{0}@users.noreply.github.com', github.actor) }}
         run: |
           if [ "${{ inputs.skip_scrape }}" = "true" ] && [ -f data/papers_final.json ]; then
             echo "Skipping scrape, using existing data"

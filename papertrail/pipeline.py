@@ -140,7 +140,7 @@ def run_pipeline(
     # Fill missing metadata via OpenAlex title search
     from papertrail.enricher import fill_missing_metadata
 
-    email = config.get("openalex_email", "papertrail@example.com")
+    email = os.environ.get("OPENALEX_EMAIL") or config.get("openalex_email", "papertrail@example.com")
     fill_count = fill_missing_metadata(all_papers, email=email)
     logger.info("Enriched %d additional papers via title search", fill_count)
 
