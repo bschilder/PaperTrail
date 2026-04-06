@@ -6575,8 +6575,19 @@
             // Example buttons
             document.querySelectorAll('.chatbot-example-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    input.value = btn.dataset.query;
-                    runChatSearch(btn.dataset.query);
+                    if (!btn.dataset.query) return;
+                    const query = btn.dataset.query;
+                    input.value = '';
+                    let i = 0;
+                    const typeIt = setInterval(() => {
+                        if (i < query.length) {
+                            input.value += query[i];
+                            i++;
+                        } else {
+                            clearInterval(typeIt);
+                            setTimeout(() => runChatSearch(query), 200);
+                        }
+                    }, 30);
                 });
             });
 
@@ -7013,6 +7024,10 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             });
 
             const sorted = Object.entries(buckets).sort((a, b) => a[0].localeCompare(b[0]));
+            // Include recent top papers for display
+            const sixMonthsAgo = new Date(); sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+            const recentPapers = papers.filter(p => p.first_shared && new Date(p.first_shared) > sixMonthsAgo)
+                .sort((a, b) => (b.cited_by_count || 0) - (a.cited_by_count || 0)).slice(0, 10);
             return {
                 periods: sorted.map(([period, data]) => ({
                     period,
@@ -7021,7 +7036,9 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     top_words: Object.entries(data.top_keywords).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([w, c]) => w)
                 })),
                 keywords_tracked: keywords,
-                total_papers: papers.length
+                total_papers: papers.length,
+                recent_top_papers: recentPapers.map(p => ({ title: p.title, year: p.year, cited_by_count: p.cited_by_count, cluster_label: p.cluster_label })),
+                _full_papers: recentPapers
             };
         }
 
