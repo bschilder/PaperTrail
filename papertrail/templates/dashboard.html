@@ -2679,9 +2679,9 @@
                 <div style="font-size:11px;color:#888;margin-bottom:4px;">Model</div>
                 <div style="display:flex;gap:6px;align-items:center;">
                     <select id="modelSelect" class="color-by-select" style="flex:1;font-size:12px;">
-                        <option value="Qwen/Qwen3-8B">Qwen 3 8B (recommended)</option>
+                        <option value="Qwen/Qwen3-8B">Qwen 3 8B (default)</option>
+                        <option value="Qwen/Qwen2.5-72B-Instruct">Qwen 2.5 72B</option>
                         <option value="meta-llama/Llama-3.3-70B-Instruct">Llama 3.3 70B</option>
-                        <option value="Qwen/Qwen3-8B">Qwen 3 8B (fast)</option>
                     </select>
                     <a id="modelInfoLink" href="https://huggingface.co/Qwen/Qwen3-8B" target="_blank" style="color:#64b5f6;font-size:14px;text-decoration:none;" title="View model page">&#x2139;</a>
                 </div>
@@ -6721,7 +6721,7 @@
                     modelSelect.innerHTML = '<option value="gpt-4o">GPT-4o (default)</option><option value="gpt-4o-mini">GPT-4o Mini (fast)</option>';
                     apiInput.placeholder = 'sk-...';
                 } else if (svc === 'huggingface') {
-                    modelSelect.innerHTML = '<option value="Qwen/Qwen3-8B">Qwen 3 8B (recommended)</option><option value="Qwen/Qwen2.5-72B-Instruct">Qwen 2.5 72B</option><option value="meta-llama/Llama-3.3-70B-Instruct">Llama 3.3 70B</option>';
+                    modelSelect.innerHTML = '<option value="Qwen/Qwen3-8B">Qwen 3 8B (default)</option><option value="Qwen/Qwen2.5-72B-Instruct">Qwen 2.5 72B</option><option value="meta-llama/Llama-3.3-70B-Instruct">Llama 3.3 70B</option>';
                     apiInput.placeholder = 'hf_...';
                     document.getElementById('modelInfoLink').href = 'https://huggingface.co/Qwen/Qwen3-8B';
                 } else {
