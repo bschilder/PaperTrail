@@ -6653,7 +6653,9 @@
 
             // Close results when clicking outside
             document.addEventListener('click', (e) => {
-                if (!e.target.closest('.chatbot-bar') && !e.target.closest('.agent-panel') && !e.target.closest('.chatbot-results') && !e.target.closest('.profile-card') && !e.target.closest('#settingsOverlay .profile-card')) {
+                // Don't close results when a modal is open or when clicking inside results/agent
+                const anyModalOpen = document.querySelector('.profile-modal.visible');
+                if (!e.target.closest('.chatbot-bar') && !e.target.closest('.agent-panel') && !e.target.closest('.chatbot-results') && !e.target.closest('.profile-card') && !anyModalOpen) {
                     resultsPanel.classList.remove('visible');
                 }
             });
