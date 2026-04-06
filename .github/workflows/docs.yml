@@ -33,6 +33,16 @@ jobs:
       - name: Build docs
         run: mkdocs build --strict
 
+      - name: Include dashboard if available
+        run: |
+          if [ -f papertrail_dashboard.html ]; then
+            mkdir -p site/dashboard
+            cp papertrail_dashboard.html site/dashboard/index.html
+            echo "Dashboard copied to site/dashboard/"
+          else
+            echo "No dashboard HTML found, skipping"
+          fi
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

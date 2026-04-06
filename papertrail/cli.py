@@ -237,5 +237,23 @@ def releases() -> None:
         click.echo(f"  {r['tag']}  ({r['date']})  {n_assets} assets  {r['description']}")
 
 
+@main.command("run-pipeline")
+@click.option("--config", "-c", default="config.yml", help="Path to config.yml.")
+@click.option("--output-dir", "-o", default="build", help="Output directory.")
+@click.option("--skip-scrape", is_flag=True, help="Skip scraping, use existing data.")
+@click.option("--data-file", default=None, help="Existing papers JSON to use.")
+def run_pipeline(config: str, output_dir: str, skip_scrape: bool, data_file: str | None) -> None:
+    """Run the full pipeline: scrape → enrich → embed → build."""
+    from papertrail.pipeline import run_pipeline as _run
+
+    dashboard = _run(
+        config_path=config,
+        output_dir=output_dir,
+        skip_scrape=skip_scrape,
+        data_file=data_file,
+    )
+    click.echo(f"Pipeline complete → {dashboard}")
+
+
 if __name__ == "__main__":
     main()
