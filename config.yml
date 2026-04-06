@@ -32,7 +32,7 @@ channels:
 # - openai: best quality, requires OPENAI_API_KEY secret
 # - huggingface: free tier available, requires HF_TOKEN secret
 # - tfidf: no API key needed, lightweight fallback
-embedding_backend: tfidf
+embedding_backend: huggingface
 
 # Email for OpenAlex polite pool (10x faster API access)
 openalex_email: "papertrail@example.com"
