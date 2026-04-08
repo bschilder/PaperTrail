@@ -86,10 +86,9 @@ def build_preview(
     else:
         html = html.replace("{{SLACK_WORKSPACE_URL}}", "")
 
-    # Inject HuggingFace token for zero-config AI agent
-    import os
-    hf_token = os.getenv("HF_TOKEN", "")
-    html = html.replace("{{HF_TOKEN}}", hf_token)
+    # HF_TOKEN placeholder — never inject real tokens into static HTML
+    # Users enter their key via the settings modal at runtime
+    html = html.replace("{{HF_TOKEN}}", "")
 
     Path(output_path).write_text(html, encoding="utf-8")
     logger.info("Dashboard written to %s (%d KB)", output_path, len(html) // 1024)

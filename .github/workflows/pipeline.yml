@@ -16,7 +16,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pipeline"
+  group: "pages"
   cancel-in-progress: false
 
 jobs:
@@ -31,7 +31,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install -e ".[all]"
+        run: pip install -e ".[all,dev]"
 
       - name: Run pipeline
         timeout-minutes: 120
@@ -41,6 +41,7 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           OPENALEX_EMAIL: ${{ secrets.OPENALEX_EMAIL || format('{0}@users.noreply.github.com', github.actor) }}
         run: |
+          set -e
           if [ "${{ inputs.skip_scrape }}" = "true" ] && [ -f data/papers_final.json ]; then
             echo "Skipping scrape, using existing data"
             papertrail -v run-pipeline -c config.yml -o build --skip-scrape --data-file data/papers_final.json
@@ -48,24 +49,24 @@ jobs:
             papertrail -v run-pipeline -c config.yml -o build
           fi
 
-      - name: Commit updated data
-        run: |
-          # Copy final data back to data/ for the repo
-          cp build/papers_final.json data/papers_final.json
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/papers_final.json
-          git diff --staged --quiet || git commit -m "Update paper data [pipeline]"
-          git pull --rebase origin main || true
-          git push
-
       - name: Build docs
         run: |
-          pip install mkdocs-material mkdocstrings[python]
           mkdocs build --strict
           # Copy dashboard into docs site
           mkdir -p site/dashboard
           cp build/dashboard.html site/dashboard/index.html
+
+      - name: Commit updated data
+        run: |
+          cp build/papers_final.json data/papers_final.json
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/papers_final.json
+          if ! git diff --staged --quiet; then
+            git commit -m "Update paper data [pipeline]"
+            git pull --rebase origin main
+            git push
+          fi
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

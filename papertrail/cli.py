@@ -63,18 +63,29 @@ def scrape(token: str, channel: str, output: str, engagement: bool) -> None:
 @main.command()
 @click.argument("input_file", type=click.Path(exists=True))
 @click.option("--output", "-o", default="papers_enriched.json", help="Output JSON path.")
-def enrich(input_file: str, output: str) -> None:
+@click.option("--email", default="papertrail@example.com", help="Email for OpenAlex polite pool.")
+def enrich(input_file: str, output: str, email: str) -> None:
     """Enrich scraped papers with metadata from Semantic Scholar & OpenAlex."""
     from tqdm import tqdm
 
-    from papertrail.enricher import enrich_paper
+    from papertrail.enricher import PaperEnricher
 
     with open(input_file) as f:
         papers = json.load(f)
 
+    enricher = PaperEnricher(email=email, openalex_first=True)
     for paper in tqdm(papers, desc="Enriching"):
-        metadata = enrich_paper(paper["url"])
-        paper.update(metadata)
+        url = paper.get("url", "")
+        if not url:
+            continue
+        try:
+            metadata = enricher.enrich_by_url(url)
+            if metadata:
+                for k, v in metadata.__dict__.items():
+                    if v is not None and v != [] and v != "":
+                        paper[k] = v
+        except Exception as e:
+            logger.warning("Failed to enrich %s: %s", url[:60], e)
 
     with open(output, "w") as f:
         json.dump(papers, f, indent=2)

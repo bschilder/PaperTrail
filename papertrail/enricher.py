@@ -112,6 +112,7 @@ class PaperMetadata:
     pmc_id: Optional[str] = None
     openalex_id: Optional[str] = None
     semantic_scholar_id: Optional[str] = None
+    cited_by_count: Optional[int] = None
     institutions: list[str] = None
     keywords: list[str] = None
     url: Optional[str] = None
@@ -344,10 +345,26 @@ class PaperEnricher:
 
         logger.debug(f"Enriching by arXiv ID: {arxiv_id}")
 
+        # Try OpenAlex first if configured (arXiv DOI format)
+        if self.openalex_first:
+            arxiv_doi = f"10.48550/arXiv.{arxiv_id}"
+            metadata = self._enrich_from_openalex(arxiv_doi)
+            if metadata:
+                metadata.arxiv_id = arxiv_id
+                return metadata
+
         metadata = self._enrich_from_semantic_scholar(f"ARXIV:{arxiv_id}")
         if metadata:
             metadata.arxiv_id = arxiv_id
             return metadata
+
+        # Fallback to OpenAlex if not tried yet
+        if not self.openalex_first:
+            arxiv_doi = f"10.48550/arXiv.{arxiv_id}"
+            metadata = self._enrich_from_openalex(arxiv_doi)
+            if metadata:
+                metadata.arxiv_id = arxiv_id
+                return metadata
 
         logger.warning(f"Could not enrich arXiv ID: {arxiv_id}")
         return None
@@ -805,6 +822,7 @@ class PaperEnricher:
             openalex_id=data.get("id"),
             doi=ids.get("doi"),
             pubmed_id=ids.get("pubmed"),
+            cited_by_count=data.get("cited_by_count"),
             institutions=institutions,
         )
 
@@ -1054,9 +1072,11 @@ def fill_missing_metadata(
                     timeout=10,
                 )
             else:
+                from urllib.parse import quote
+                safe_title = quote(title[:100], safe='')
                 resp = requests.get(
                     OPENALEX_API,
-                    params={"filter": f"title.search:{title[:100]}", "per_page": 1},
+                    params={"filter": f"title.search:{safe_title}", "per_page": 1},
                     headers=headers,
                     timeout=10,
                 )
@@ -1092,7 +1112,7 @@ def fill_missing_metadata(
                 if words:
                     p["abstract"] = " ".join(words.get(i, "") for i in range(max(words) + 1))
                     changed = True
-            if "cited_by_count" in fields and not p.get("cited_by_count") and data.get("cited_by_count"):
+            if "cited_by_count" in fields and p.get("cited_by_count") is None and data.get("cited_by_count") is not None:
                 p["cited_by_count"] = data["cited_by_count"]
                 changed = True
             if not p.get("openalex_url") and data.get("id"):

@@ -114,27 +114,20 @@ def run_pipeline(
                 })
             logger.info("  → %d papers from #%s", len(papers), name)
 
-        # Deduplicate by URL
-        seen = set()
+        # Deduplicate by URL with O(1) lookup
+        url_to_paper: dict[str, dict] = {}
         deduped = []
         for p in all_papers:
-            if p["url"] not in seen:
-                seen.add(p["url"])
+            if p["url"] not in url_to_paper:
+                p["channels"] = [p["channel"]] if p.get("channel") else []
+                url_to_paper[p["url"]] = p
                 deduped.append(p)
             else:
-                # Merge channels for duplicates
-                for existing in deduped:
-                    if existing["url"] == p["url"]:
-                        if p["channel"] != existing["channel"]:
-                            existing.setdefault("channels", [existing["channel"]])
-                            if p["channel"] not in existing["channels"]:
-                                existing["channels"].append(p["channel"])
-                        break
+                existing = url_to_paper[p["url"]]
+                ch = p.get("channel", "")
+                if ch and ch not in existing["channels"]:
+                    existing["channels"].append(ch)
         all_papers = deduped
-        # Normalize: ensure every paper has a channels array
-        for p in all_papers:
-            if "channels" not in p:
-                p["channels"] = [p["channel"]] if p.get("channel") else []
         logger.info("Total: %d unique papers after dedup", len(all_papers))
 
         with open(raw_path, "w") as f:
@@ -180,7 +173,7 @@ def run_pipeline(
                 if metadata.journal: paper["journal"] = metadata.journal
                 if metadata.abstract: paper["abstract"] = metadata.abstract
                 if metadata.openalex_id: paper["openalex_link"] = metadata.openalex_id
-                if metadata.cited_by_count: paper["cited_by_count"] = metadata.cited_by_count
+                if metadata.cited_by_count is not None: paper["cited_by_count"] = metadata.cited_by_count
         except Exception as e:
             logger.warning("Failed to enrich %s: %s", paper["url"][:60], e)
         if (i + 1) % 50 == 0:

@@ -222,9 +222,8 @@ class SlackPaperScraper:
         self.rate_limit_delay = rate_limit_delay
         self.use_mcp = use_mcp
 
-        # Merge custom domains with built-in paper domains
-        if custom_domains:
-            PAPER_DOMAINS.update(custom_domains)
+        # Instance-level domain set (don't mutate module-level PAPER_DOMAINS)
+        self._paper_domains = PAPER_DOMAINS | (custom_domains or set())
 
         # Default search queries targeting known paper domains
         self.search_queries = search_queries or self._build_default_queries()
@@ -534,7 +533,7 @@ class SlackPaperScraper:
         domain = parsed.netloc.lstrip("www.")
 
         # Check exact match or subdomain match
-        for paper_domain in PAPER_DOMAINS:
+        for paper_domain in self._paper_domains:
             if domain == paper_domain or domain.endswith(f".{paper_domain}"):
                 return True
 
@@ -585,18 +584,22 @@ class SlackPaperScraper:
             new_query = "&".join(params)
             parsed = parsed._replace(query=new_query)
 
-            # Reconstruct URL and normalize case
+            # Lowercase scheme and host only, preserve path case
+            parsed = parsed._replace(
+                scheme=parsed.scheme.lower(),
+                netloc=parsed.netloc.lower(),
+            )
             normalized = parsed.geturl()
 
             # Remove trailing slash for consistency
             if normalized.endswith("/") and parsed.path != "/":
                 normalized = normalized.rstrip("/")
 
-            return normalized.lower()
+            return normalized
 
         except Exception as e:
             logger.warning(f"Error normalizing URL {url}: {e}")
-            return url.lower()
+            return url
 
     def _get_channel_info(self, channel_id: str) -> dict[str, Any]:
         """

@@ -3127,9 +3127,11 @@
 
             const channels = new Set();
             allPapers.forEach(paper => {
-                if (paper.channels && Array.isArray(paper.channels)) {
-                    paper.channels.forEach(ch => channels.add(ch));
+                // Normalize: ensure every paper has channels array
+                if (!paper.channels || !Array.isArray(paper.channels)) {
+                    paper.channels = paper.channel ? [paper.channel] : [];
                 }
+                paper.channels.forEach(ch => channels.add(ch));
             });
 
             selectedChannels = new Set(channels);

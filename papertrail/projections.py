@@ -41,6 +41,13 @@ def compute_projections(
     n = embeddings.shape[0]
     results = {}
 
+    if n <= 1:
+        logger.warning("Only %d paper(s), returning zero projections", n)
+        results["pca"] = np.zeros((n, 2))
+        results["tsne"] = np.zeros((n, 2))
+        results["umap"] = np.zeros((n, 2))
+        return results
+
     # PCA
     logger.info("Computing PCA...")
     pca = PCA(n_components=2, random_state=seed)
@@ -52,7 +59,7 @@ def compute_projections(
 
     # t-SNE
     logger.info("Computing t-SNE...")
-    perplexity = min(30, n - 1)
+    perplexity = min(30, max(1, n - 1))
     if perplexity < 5:
         logger.warning("t-SNE perplexity is very low (%d). Results may be unreliable with so few samples.", perplexity)
     tsne = TSNE(
@@ -111,6 +118,13 @@ def compute_projections_3d(
     n = embeddings.shape[0]
     results = {}
 
+    if n <= 1:
+        logger.warning("Only %d paper(s), returning zero 3D projections", n)
+        results["pca3d"] = np.zeros((n, 3))
+        results["tsne3d"] = np.zeros((n, 3))
+        results["umap3d"] = np.zeros((n, 3))
+        return results
+
     # PCA-3D
     logger.info("Computing PCA-3D...")
     pca3 = PCA(n_components=3, random_state=seed)
@@ -118,7 +132,7 @@ def compute_projections_3d(
 
     # t-SNE-3D
     logger.info("Computing t-SNE-3D...")
-    perplexity = min(30, n - 1)
+    perplexity = min(30, max(1, n - 1))
     tsne3 = TSNE(
         n_components=3,
         perplexity=perplexity,
@@ -156,6 +170,7 @@ def estimate_n_clusters(embeddings: np.ndarray, min_k: int = 5, max_k: int = 30,
     from sklearn.metrics import silhouette_score
 
     n = embeddings.shape[0]
+    min_k = min(min_k, max(2, n - 1))
     max_k = min(max_k, n - 1)
     if max_k <= min_k:
         return min_k
