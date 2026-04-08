@@ -203,9 +203,14 @@ def run_pipeline(
         compute_projections_3d,
     )
 
+    import re
+    url_pattern = re.compile(r'https?://\S+|<[^>]+>')
+
     texts = []
     for p in all_papers:
-        parts = [p.get("title", ""), p.get("abstract", ""), p.get("text", "")]
+        # Strip URLs from Slack message text
+        msg = url_pattern.sub('', p.get("text", "")).strip()
+        parts = [p.get("title", ""), p.get("abstract", ""), msg]
         texts.append(" ".join(part for part in parts if part))
 
     backend = config.get("embedding_backend", None)

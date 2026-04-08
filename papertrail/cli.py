@@ -113,10 +113,13 @@ def embed(
 
     click.echo(f"Processing {len(papers)} papers...")
 
-    # Build text representations
+    # Build text representations (strip URLs from Slack message text)
+    import re
+    url_pattern = re.compile(r'https?://\S+|<[^>]+>')
     texts = []
     for p in tqdm(papers, desc="Building texts"):
-        parts = [p.get("title", ""), p.get("abstract", ""), p.get("text", "")]
+        msg = url_pattern.sub('', p.get("text", "")).strip()
+        parts = [p.get("title", ""), p.get("abstract", ""), msg]
         texts.append(" ".join(part for part in parts if part))
 
     # Embed
