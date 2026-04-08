@@ -3886,7 +3886,7 @@
                     <div class="lb-section-title"><span class="lb-icon">&#128293;</span> Most Engaged</div>
                     <div class="lb-grid">
                         ${topEngaged.map((p, i) => `
-                            <div class="lb-card" style="cursor:pointer;" onclick="event.stopPropagation(); selectedPapers.clear(); const idx = (paperIndexMap.get(allPapers.find(ap => ap.title === '${esc(p.title).replace(/'/g, "\\'")}')) ?? -1); if (idx >= 0) { selectedPapers.add(idx); document.getElementById('mapToggle').click(); showDetailPanel([allPapers[idx]]); renderMap(); }">
+                            <div class="lb-card" style="cursor:pointer;" data-paper-url="${esc(p.url || '')}" onclick="event.stopPropagation(); const ap = allPapers.find(x => x.url === this.dataset.paperUrl); if (ap) { selectedPapers.clear(); const idx = allPapers.indexOf(ap); selectedPapers.add(idx); document.getElementById('mapToggle').click(); showDetailPanel([ap]); renderMap(); }">
                                 <div class="lb-rank ${rankClass(i)}">${i + 1}</div>
                                 <div class="lb-card-body">
                                     <div class="lb-card-name">${esc(p.title) || 'Untitled'}</div>
@@ -3906,7 +3906,7 @@
                     <div class="lb-section-title"><span class="lb-icon">&#127941;</span> Most Cited Papers</div>
                     <div class="lb-grid">
                         ${topCited.map((p, i) => `
-                            <div class="lb-card" style="cursor:pointer;" onclick="event.stopPropagation(); selectedPapers.clear(); const idx = (paperIndexMap.get(allPapers.find(ap => ap.title === '${esc(p.title).replace(/'/g, "\\'")}')) ?? -1); if (idx >= 0) { selectedPapers.add(idx); document.getElementById('mapToggle').click(); showDetailPanel([allPapers[idx]]); renderMap(); }">
+                            <div class="lb-card" style="cursor:pointer;" data-paper-url="${esc(p.url || '')}" onclick="event.stopPropagation(); const ap = allPapers.find(x => x.url === this.dataset.paperUrl); if (ap) { selectedPapers.clear(); const idx = allPapers.indexOf(ap); selectedPapers.add(idx); document.getElementById('mapToggle').click(); showDetailPanel([ap]); renderMap(); }">
                                 <div class="lb-rank ${rankClass(i)}">${i + 1}</div>
                                 <div class="lb-card-body">
                                     <div class="lb-card-name">${esc(p.title) || 'Untitled'}</div>
