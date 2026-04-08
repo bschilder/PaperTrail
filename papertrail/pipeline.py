@@ -101,6 +101,7 @@ def run_pipeline(
                     "channel": p.channel_name,
                     "shared_by": p.shared_by,
                     "timestamp": p.timestamp,
+                    "first_shared": p.timestamp,
                     "slack_link": p.permalink,
                     "url": p.paper_url,
                     "text": p.message_text,
