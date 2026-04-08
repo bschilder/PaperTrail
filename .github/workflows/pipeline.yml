@@ -16,7 +16,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: "pipeline"
   cancel-in-progress: false
 
 jobs:
