@@ -216,11 +216,18 @@ def run_pipeline(
     projections = compute_projections(embeddings)
     projections_3d = compute_projections_3d(embeddings)
 
-    # Cluster
-    cluster_ids, cluster_labels = cluster_papers(
-        embeddings, texts, n_clusters="auto", papers=all_papers,
-        projections=projections, cluster_on_projections=True,
+    # Hierarchical clustering (3 zoom levels)
+    from papertrail.projections import cluster_papers_hierarchical
+
+    hier_levels = cluster_papers_hierarchical(
+        embeddings, texts, papers=all_papers,
+        projections=projections,
     )
+
+    # Use level 0 (broadest) as the primary cluster
+    primary = hier_levels[0]
+    cluster_ids = primary["cluster_ids"]
+    cluster_labels = primary["labels"]
 
     for i, p in enumerate(all_papers):
         p["projections"] = {
@@ -230,6 +237,14 @@ def run_pipeline(
             p["projections"][k] = [float(v[i, 0]), float(v[i, 1]), float(v[i, 2])]
         p["cluster_id"] = int(cluster_ids[i])
         p["cluster_label"] = cluster_labels[int(cluster_ids[i])]
+        # Store all hierarchy levels
+        p["cluster_levels"] = []
+        for level in hier_levels:
+            cid = int(level["cluster_ids"][i])
+            p["cluster_levels"].append({
+                "id": cid,
+                "label": level["labels"][cid],
+            })
 
     with open(final_path, "w") as f:
         json.dump(all_papers, f, indent=2)

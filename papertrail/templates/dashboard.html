@@ -5368,15 +5368,28 @@
                 }
             }
 
-            // Compute cluster centroids from ALL papers (stable across filter changes)
+            // Compute cluster centroids — use hierarchical level based on zoom
+            // Level 0 (broad) at low zoom, level 1 (medium) at mid zoom, level 2 (fine) at high zoom
+            const hasHierarchy = allPapers[0]?.cluster_levels?.length > 1;
+            const hierLevel = !hasHierarchy ? -1 : zoomLevel > 2.5 ? 2 : zoomLevel > 1.5 ? 1 : 0;
+
             const clusterCentroids = {};
             allPapers.forEach(paper => {
                 const proj = paper.projections && paper.projections[currentProjection];
-                if (!proj || !paper.cluster_label) return;
+                if (!proj) return;
                 const [sx, sy] = dataToScreen(proj[0], proj[1]);
-                const cid = paper.cluster_id || 0;
+                let cid, label;
+                if (hierLevel >= 0 && paper.cluster_levels && paper.cluster_levels[hierLevel]) {
+                    const lvl = paper.cluster_levels[hierLevel];
+                    cid = `L${hierLevel}_${lvl.id}`;
+                    label = lvl.label;
+                } else {
+                    cid = paper.cluster_id || 0;
+                    label = paper.cluster_label || '';
+                }
+                if (!label) return;
                 if (!clusterCentroids[cid]) {
-                    clusterCentroids[cid] = { x: 0, y: 0, count: 0, label: paper.cluster_label };
+                    clusterCentroids[cid] = { x: 0, y: 0, count: 0, label };
                 }
                 clusterCentroids[cid].x += sx;
                 clusterCentroids[cid].y += sy;
@@ -5803,6 +5816,16 @@
                     ctx.roundRect(c.cx - tw/2 - px, c.cy - th/2 - py, tw + px*2, th + py*2, fontSize/3);
                     ctx.fill();
                 }
+
+                // Colored dot before label
+                const LABEL_COLORS = ['#64b5f6','#bb86fc','#66bb6a','#ffa726','#ef5350','#26c6da','#ffca28','#ab47bc','#8d6e63','#78909c','#ec407a','#7e57c2'];
+                const dotColor = LABEL_COLORS[rank % LABEL_COLORS.length];
+                const dotR = Math.max(3, fontSize / 4);
+                ctx.globalAlpha = alpha;
+                ctx.beginPath();
+                ctx.arc(c.cx - tw/2 - dotR - 4, c.cy, dotR, 0, Math.PI * 2);
+                ctx.fillStyle = dotColor;
+                ctx.fill();
 
                 // Text with slight text-shadow effect via double render
                 ctx.globalAlpha = alpha * 0.3;

@@ -268,6 +268,104 @@ def cluster_papers(
     return cluster_ids, labels
 
 
+def cluster_papers_hierarchical(
+    embeddings: np.ndarray,
+    texts: list[str],
+    papers: list[dict] | None = None,
+    projections: dict[str, np.ndarray] | None = None,
+    levels: list[int] | None = None,
+    seed: int = 42,
+) -> list[dict]:
+    """
+    Compute hierarchical clusters at multiple zoom levels.
+
+    Returns a list of level dicts, each with:
+      - cluster_ids: np.ndarray of cluster assignments
+      - labels: dict[int, str] of cluster labels
+      - n_clusters: int
+      - sizes: dict[int, int] of papers per cluster
+      - centroids: dict[int, tuple[float, float]] of 2D centroids
+
+    Parameters
+    ----------
+    levels : list[int], optional
+        Number of clusters at each level. Defaults to [5, 12, 25].
+    """
+    if levels is None:
+        n = embeddings.shape[0]
+        # Scale levels to dataset size
+        levels = [
+            max(3, min(7, n // 200)),     # Level 0: broad topics
+            max(8, min(15, n // 80)),      # Level 1: medium topics
+            max(16, min(35, n // 30)),     # Level 2: fine-grained
+        ]
+    logger.info("Hierarchical clustering with levels: %s", levels)
+
+    # Determine clustering input
+    cluster_input = embeddings
+    proj_key_used = None
+    if projections:
+        for proj_key in ("umap", "tsne", "pca"):
+            if proj_key in projections:
+                cluster_input = projections[proj_key]
+                proj_key_used = proj_key
+                break
+
+    result_levels = []
+    for level_idx, k in enumerate(levels):
+        k = min(k, embeddings.shape[0] - 1)
+        if k < 2:
+            k = 2
+
+        kmeans = KMeans(n_clusters=k, random_state=seed, n_init=10)
+        cluster_ids = kmeans.fit_predict(cluster_input)
+
+        # TF-IDF labels
+        tfidf = TfidfVectorizer(max_features=500, stop_words="english")
+        tfidf_matrix = tfidf.fit_transform(texts)
+        feature_names = tfidf.get_feature_names_out()
+
+        labels: dict[int, str] = {}
+        for cid in range(k):
+            mask = cluster_ids == cid
+            if mask.sum() == 0:
+                labels[cid] = f"Cluster {cid}"
+                continue
+            mean_tfidf = tfidf_matrix[mask].mean(axis=0).A1
+            top_idx = mean_tfidf.argsort()[-3:][::-1]
+            top_terms = [feature_names[i] for i in top_idx if mean_tfidf[i] > 0]
+            labels[cid] = " / ".join(t.title() for t in top_terms) or f"Cluster {cid}"
+
+        # LLM refinement
+        refined = refine_cluster_labels_llm(cluster_ids, labels, texts, papers=papers)
+        if refined:
+            labels = refined
+
+        # Compute 2D centroids for label placement
+        centroids = {}
+        proj_2d = projections.get(proj_key_used) if projections and proj_key_used else None
+        if proj_2d is not None:
+            for cid in range(k):
+                mask = cluster_ids == cid
+                if mask.sum() > 0:
+                    cx = float(proj_2d[mask, 0].mean())
+                    cy = float(proj_2d[mask, 1].mean())
+                    centroids[cid] = (cx, cy)
+
+        sizes = {cid: int((cluster_ids == cid).sum()) for cid in range(k)}
+
+        result_levels.append({
+            "cluster_ids": cluster_ids,
+            "labels": labels,
+            "n_clusters": k,
+            "sizes": sizes,
+            "centroids": centroids,
+        })
+        logger.info("Level %d: %d clusters — %s", level_idx, k, labels)
+
+    return result_levels
+
+
 def refine_cluster_labels_llm(
     cluster_ids: np.ndarray,
     tfidf_labels: dict[int, str],
