@@ -35,12 +35,12 @@ jobs:
 
       - name: Include dashboard if available
         run: |
+          mkdir -p site/dashboard
           # Build fresh dashboard from data if available
           if [ -f data/papers_final.json ]; then
             papertrail build data/papers_final.json -o site/dashboard/index.html
             echo "Dashboard built from data/papers_final.json"
           elif [ -f papertrail_dashboard.html ]; then
-            mkdir -p site/dashboard
             cp papertrail_dashboard.html site/dashboard/index.html
             echo "Dashboard copied from repo root"
           else

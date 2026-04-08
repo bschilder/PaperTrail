@@ -195,6 +195,8 @@ def cluster_papers(
     n_clusters: int | str = "auto",
     seed: int = 42,
     papers: list[dict] | None = None,
+    projections: dict[str, np.ndarray] | None = None,
+    cluster_on_projections: bool = True,
 ) -> tuple[np.ndarray, dict[int, str]]:
     """
     Cluster papers and generate labels from TF-IDF top terms.
@@ -209,20 +211,38 @@ def cluster_papers(
         Number of clusters. "auto" uses silhouette-based estimation.
     seed : int
         Random seed.
+    papers : list[dict], optional
+        Paper dicts for LLM label generation.
+    projections : dict[str, np.ndarray], optional
+        2D projection arrays (e.g. {"umap": array, "tsne": array}).
+    cluster_on_projections : bool
+        If True and projections are available, cluster on the 2D
+        projection (default: UMAP) instead of high-dimensional
+        embeddings. This makes clusters align visually with the map.
 
     Returns
     -------
     tuple[np.ndarray, dict[int, str]]
         Cluster IDs array and {cluster_id: label} dict.
     """
+    # Choose clustering input
+    cluster_input = embeddings
+    if cluster_on_projections and projections:
+        # Prefer UMAP, fall back to t-SNE, then PCA
+        for proj_key in ("umap", "tsne", "pca"):
+            if proj_key in projections:
+                cluster_input = projections[proj_key]
+                logger.info("Clustering on %s projections (%d dims)", proj_key, cluster_input.shape[1])
+                break
+
     if n_clusters == "auto":
-        n_clusters = estimate_n_clusters(embeddings, seed=seed)
+        n_clusters = estimate_n_clusters(cluster_input, seed=seed)
         logger.info("Auto-detected %d clusters", n_clusters)
     else:
         n_clusters = int(n_clusters)
 
     kmeans = KMeans(n_clusters=n_clusters, random_state=seed, n_init=10)
-    cluster_ids = kmeans.fit_predict(embeddings)
+    cluster_ids = kmeans.fit_predict(cluster_input)
 
     # Generate labels from TF-IDF
     tfidf = TfidfVectorizer(max_features=500, stop_words="english")

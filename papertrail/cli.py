@@ -143,7 +143,8 @@ def embed(
 
     # Cluster
     cluster_ids, cluster_labels = cluster_papers(
-        embeddings, texts, n_clusters=n_clusters, papers=papers
+        embeddings, texts, n_clusters=n_clusters, papers=papers,
+        projections=projections, cluster_on_projections=True,
     )
 
     # Update papers

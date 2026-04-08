@@ -568,6 +568,10 @@ class SlackPaperScraper:
         to ensure papers shared from different sources are deduplicated.
         """
         try:
+            # Strip pipe-concatenated labels from Slack <url|label> format
+            if '|' in url:
+                url = url.split('|')[0]
+
             parsed = urlparse(url)
 
             # Remove fragment

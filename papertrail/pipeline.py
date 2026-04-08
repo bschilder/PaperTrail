@@ -217,7 +217,10 @@ def run_pipeline(
     projections_3d = compute_projections_3d(embeddings)
 
     # Cluster
-    cluster_ids, cluster_labels = cluster_papers(embeddings, texts, n_clusters="auto", papers=all_papers)
+    cluster_ids, cluster_labels = cluster_papers(
+        embeddings, texts, n_clusters="auto", papers=all_papers,
+        projections=projections, cluster_on_projections=True,
+    )
 
     for i, p in enumerate(all_papers):
         p["projections"] = {
