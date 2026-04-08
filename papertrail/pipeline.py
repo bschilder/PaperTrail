@@ -127,6 +127,10 @@ def run_pipeline(
                                 existing["channels"].append(p["channel"])
                         break
         all_papers = deduped
+        # Normalize: ensure every paper has a channels array
+        for p in all_papers:
+            if "channels" not in p:
+                p["channels"] = [p["channel"]] if p.get("channel") else []
         logger.info("Total: %d unique papers after dedup", len(all_papers))
 
         with open(raw_path, "w") as f:
