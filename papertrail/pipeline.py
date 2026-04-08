@@ -155,29 +155,37 @@ def run_pipeline(
             merged += 1
     logger.info("Merged metadata for %d papers from existing data", merged)
 
-    # Only enrich papers that still lack metadata
-    from papertrail.enricher import PaperEnricher
+    # Enrich papers using multi-strategy cascade
+    from papertrail.enrich_cascade import enrich_papers_cascade
 
     email = os.environ.get("OPENALEX_EMAIL") or config.get("openalex_email", "papertrail@example.com")
-    to_enrich = [p for p in all_papers if not p.get("title") or p["title"] == "Unknown Title"]
-    logger.info("Enriching %d new papers (skipping %d already known)...", len(to_enrich), len(all_papers) - len(to_enrich))
+    enrich_count = enrich_papers_cascade(all_papers, email=email, delay=0.1)
 
-    enricher = PaperEnricher(email=email, openalex_first=True)
-    for i, paper in enumerate(to_enrich):
-        try:
-            metadata = enricher.enrich_by_url(paper["url"])
-            if metadata and metadata.title:
-                paper["title"] = metadata.title
-                if metadata.authors: paper["authors"] = metadata.authors
-                if metadata.year: paper["year"] = metadata.year
-                if metadata.journal: paper["journal"] = metadata.journal
-                if metadata.abstract: paper["abstract"] = metadata.abstract
-                if metadata.openalex_id: paper["openalex_link"] = metadata.openalex_id
-                if metadata.cited_by_count is not None: paper["cited_by_count"] = metadata.cited_by_count
-        except Exception as e:
-            logger.warning("Failed to enrich %s: %s", paper["url"][:60], e)
-        if (i + 1) % 50 == 0:
-            logger.info("  Enriched %d / %d", i + 1, len(to_enrich))
+    # Second dedup pass: by title (case-insensitive) — catches same paper via different URLs
+    title_map: dict[str, dict] = {}
+    title_deduped = []
+    title_dupes = 0
+    for p in all_papers:
+        t = (p.get("title") or "").strip().lower()
+        if not t or t in ("untitled", "unknown title"):
+            title_deduped.append(p)
+            continue
+        if t not in title_map:
+            title_map[t] = p
+            title_deduped.append(p)
+        else:
+            # Merge channels and keep better metadata
+            existing = title_map[t]
+            for ch in p.get("channels", []):
+                if ch not in existing.get("channels", []):
+                    existing.setdefault("channels", []).append(ch)
+            # Keep higher citation count
+            if (p.get("cited_by_count") or 0) > (existing.get("cited_by_count") or 0):
+                existing["cited_by_count"] = p["cited_by_count"]
+            title_dupes += 1
+    all_papers = title_deduped
+    if title_dupes:
+        logger.info("Removed %d title-based duplicates → %d papers", title_dupes, len(all_papers))
 
     # Fill missing metadata via OpenAlex title search
     from papertrail.enricher import fill_missing_metadata
