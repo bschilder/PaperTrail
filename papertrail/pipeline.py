@@ -97,12 +97,15 @@ def run_pipeline(
                 logger.error("Error scraping #%s: %s — skipping", name, e)
                 continue
             for p in papers:
+                # Construct Slack permalink from channel ID + message timestamp
+                slack_ts = getattr(p, 'message_ts', '') or ''
+                slack_url = f"{config.get('slack_workspace_url', '')}/archives/{channel_id}/p{slack_ts.replace('.', '')}" if slack_ts else ""
                 all_papers.append({
                     "channel": p.channel_name,
                     "shared_by": p.shared_by,
                     "timestamp": p.timestamp,
                     "first_shared": p.timestamp,
-                    "slack_link": p.permalink,
+                    "slack_url": slack_url,
                     "url": p.paper_url,
                     "text": p.message_text,
                     "reactions_count": p.reactions_count,
