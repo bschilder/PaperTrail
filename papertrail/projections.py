@@ -179,6 +179,7 @@ def cluster_papers(
     texts: list[str],
     n_clusters: int | str = "auto",
     seed: int = 42,
+    papers: list[dict] | None = None,
 ) -> tuple[np.ndarray, dict[int, str]]:
     """
     Cluster papers and generate labels from TF-IDF top terms.
@@ -225,7 +226,7 @@ def cluster_papers(
         labels[cid] = " / ".join(t.title() for t in top_terms) or f"Cluster {cid}"
 
     # Try LLM-based label refinement
-    refined = refine_cluster_labels_llm(cluster_ids, labels, texts)
+    refined = refine_cluster_labels_llm(cluster_ids, labels, texts, papers=papers)
     if refined:
         labels = refined
 
@@ -236,6 +237,7 @@ def refine_cluster_labels_llm(
     cluster_ids: np.ndarray,
     tfidf_labels: dict[int, str],
     texts: list[str],
+    papers: list[dict] | None = None,
 ) -> dict[int, str] | None:
     """
     Use an LLM to generate better cluster labels from sample titles.
@@ -253,16 +255,29 @@ def refine_cluster_labels_llm(
         return None
 
     # Build prompt with sample titles per cluster
+    # Prefer actual paper titles over raw text (which may be just URLs)
     cluster_info = []
     for cid, label in sorted(tfidf_labels.items()):
         mask = cluster_ids == cid
         indices = np.where(mask)[0]
-        # Get up to 8 sample titles from the texts
         samples = []
-        for idx in indices[:8]:
-            title = texts[idx].split(".")[0].strip()[:100]
-            if title and len(title) > 10:
+        for idx in indices:
+            if len(samples) >= 8:
+                break
+            # Try paper title first, fall back to text
+            title = None
+            if papers and idx < len(papers):
+                t = papers[idx].get("title", "")
+                if t and t != "Unknown Title" and len(t) > 10:
+                    title = t[:120]
+            if not title:
+                t = texts[idx].split(".")[0].strip()[:100]
+                if t and len(t) > 10 and not t.startswith("http"):
+                    title = t
+            if title:
                 samples.append(title)
+        if not samples:
+            samples = ["(no titled papers in this cluster)"]
         cluster_info.append(f"Cluster {cid} ({int(mask.sum())} papers, TF-IDF: \"{label}\"):\n  " + "\n  ".join(samples[:6]))
 
     prompt = (
