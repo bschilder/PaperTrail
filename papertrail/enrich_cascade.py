@@ -20,6 +20,23 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+# Domain → journal mapping for fallback
+DOMAIN_JOURNALS = {
+    'arxiv.org': 'arXiv', 'www.arxiv.org': 'arXiv',
+    'www.biorxiv.org': 'bioRxiv', 'biorxiv.org': 'bioRxiv',
+    'www.medrxiv.org': 'medRxiv',
+    'elifesciences.org': 'eLife', 'www.pnas.org': 'PNAS',
+    'www.science.org': 'Science', 'link.springer.com': 'Springer',
+}
+NATURE_JOURNALS = {
+    's41586': 'Nature', 's41587': 'Nature Biotechnology',
+    's41588': 'Nature Genetics', 's41591': 'Nature Medicine',
+    's41592': 'Nature Methods', 's42256': 'Nature Machine Intelligence',
+    's43588': 'Nature Computational Science', 's41576': 'Nature Reviews Genetics',
+    's41551': 'Nature Biomedical Engineering', 's41467': 'Nature Communications',
+    's41568': 'Nature Reviews Cancer', 's42003': 'Communications Biology',
+}
+
 HEADERS = {"User-Agent": "PaperTrail/1.0 (https://github.com/bschilder/PaperTrail)"}
 
 
@@ -99,7 +116,33 @@ def enrich_url(url: str, email: str = "papertrail@example.com") -> dict[str, Any
                 result = {**result, **{k: v for k, v in oa.items() if v and not result.get(k)}}
                 logger.debug("Enriched via Google→OpenAlex: %s", url[:60])
 
+    # Final fallback: infer journal from URL domain
+    if not result.get("journal"):
+        result["journal"] = _infer_journal_from_url(url)
+
     return result
+
+
+def _infer_journal_from_url(url: str) -> str:
+    """Infer journal name from URL domain."""
+    try:
+        domain = urlparse(url).netloc.lower()
+    except:
+        return ""
+    if domain in DOMAIN_JOURNALS:
+        return DOMAIN_JOURNALS[domain]
+    if 'nature.com' in domain:
+        m = re.search(r'/articles/(s\d{5})', url)
+        if m:
+            return NATURE_JOURNALS.get(m.group(1), 'Nature')
+        return 'Nature'
+    if 'cell.com' in domain:
+        return 'Cell Press'
+    if 'oup.com' in domain:
+        return 'Oxford Academic'
+    if 'openreview.net' in domain:
+        return 'OpenReview'
+    return ""
 
 
 # ── Strategy 1: Direct page scrape ──────────────────────────────
