@@ -205,7 +205,7 @@ def _scrape_page_metadata(url: str) -> dict[str, Any]:
             m = re.search(r'<meta\s+(?:property|name)=["\'](?:og:)?description["\']\s+content=["\']([^"\']+)', html, re.I)
         if m:
             abstract = m.group(1).strip()
-            if len(abstract) > 50:
+            if len(abstract) > 50 and not _is_boilerplate(abstract):
                 result["abstract"] = abstract
 
         return result
@@ -473,6 +473,44 @@ def _parse_openalex(data: dict) -> dict[str, Any]:
         "cited_by_count": data.get("cited_by_count"),
         "openalex_url": data.get("id"),
     }
+
+
+BOILERPLATE_PHRASES = [
+    'biorxiv', 'medrxiv', 'openrxiv', 'preprint server', 'operated by',
+    'cold spring harbor', 'arxiv.org e-print', 'the international journal',
+    'this is an open access', 'creative commons', 'all rights reserved',
+]
+
+
+def _is_boilerplate(text: str) -> bool:
+    """Check if text is a site boilerplate, not a real abstract."""
+    lower = text.lower()
+    return any(bp in lower for bp in BOILERPLATE_PHRASES)
+
+
+def clean_text_for_clustering(title: str, abstract: str, message: str) -> str:
+    """
+    Build clean text for embedding/clustering.
+    Strips URLs, journal names, and boilerplate from inputs.
+    """
+    url_pattern = re.compile(r'https?://\S+|<[^>]+>')
+    msg = url_pattern.sub('', message).strip()
+
+    # Strip journal/server name fragments that pollute topic modeling
+    noise = re.compile(
+        r'\b(?:biorxiv|medrxiv|openrxiv|arxiv|doi\.org|nature\.com|'
+        r'sciencedirect|springer|wiley|elsevier|pubmed|pmc|'
+        r'preprint|server|nonprofit|operated)\b',
+        re.I,
+    )
+    parts = []
+    for text in [title, abstract, msg]:
+        if text and not _is_boilerplate(text):
+            cleaned = noise.sub('', text).strip()
+            cleaned = re.sub(r'\s+', ' ', cleaned)
+            if len(cleaned) > 5:
+                parts.append(cleaned)
+    return ' '.join(parts)
 
 
 def _clean_title(title: str) -> str:

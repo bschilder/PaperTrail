@@ -207,15 +207,12 @@ def run_pipeline(
         compute_projections_3d,
     )
 
-    import re
-    url_pattern = re.compile(r'https?://\S+|<[^>]+>')
+    from papertrail.enrich_cascade import clean_text_for_clustering
 
-    texts = []
-    for p in all_papers:
-        # Strip URLs from Slack message text
-        msg = url_pattern.sub('', p.get("text", "")).strip()
-        parts = [p.get("title", ""), p.get("abstract", ""), msg]
-        texts.append(" ".join(part for part in parts if part))
+    texts = [
+        clean_text_for_clustering(p.get("title", ""), p.get("abstract", ""), p.get("text", ""))
+        for p in all_papers
+    ]
 
     backend = config.get("embedding_backend", None)
     embeddings = embed_texts(texts, backend=backend)
