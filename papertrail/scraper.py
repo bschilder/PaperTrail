@@ -517,8 +517,7 @@ class SlackPaperScraper:
 
         return sorted(list(all_urls))
 
-    @staticmethod
-    def is_paper_url(url: str) -> bool:
+    def is_paper_url(self, url: str) -> bool:
         """
         Check if a URL points to a paper or academic resource.
 
