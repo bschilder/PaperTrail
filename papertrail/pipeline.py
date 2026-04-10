@@ -190,9 +190,14 @@ def run_pipeline(
     # Fill missing metadata via OpenAlex title search
     from papertrail.enricher import fill_missing_metadata
 
-    email = os.environ.get("OPENALEX_EMAIL") or config.get("openalex_email", "papertrail@example.com")
     fill_count = fill_missing_metadata(all_papers, email=email)
     logger.info("Enriched %d additional papers via title search", fill_count)
+
+    # Remove dead links (untitled papers with 404/error pages)
+    from papertrail.enrich_cascade import remove_dead_links
+    dead_count = remove_dead_links(all_papers)
+    if dead_count:
+        logger.info("Removed %d dead links → %d papers", dead_count, len(all_papers))
 
     with open(enriched_path, "w") as f:
         json.dump(all_papers, f, indent=2)

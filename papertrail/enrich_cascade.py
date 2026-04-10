@@ -524,6 +524,45 @@ def _clean_title(title: str) -> str:
 
 # ── Batch enrichment ────────────────────────────────────────────
 
+def is_dead_link(url: str) -> bool:
+    """Check if a URL returns a 404 or error page."""
+    try:
+        resp = requests.get(url, timeout=10, allow_redirects=True,
+                           headers={**HEADERS, "User-Agent": "Mozilla/5.0 (PaperTrail/1.0)"})
+        if resp.status_code >= 400:
+            return True
+        body = resp.text[:3000].lower()
+        if any(s in body for s in ['page not found', 'error 404', 'does not exist',
+                                    'no forum found', 'this page isn', 'we can\'t find']):
+            return True
+    except:
+        return True
+    return False
+
+
+def remove_dead_links(papers: list[dict]) -> int:
+    """
+    Remove papers with dead URLs from the list (in-place).
+    Only checks papers that are untitled (no point checking papers with metadata).
+    Returns number removed.
+    """
+    untitled = [p for p in papers if not p.get("title") or p["title"] in ("", "Untitled", "Unknown Title")]
+    logger.info("Checking %d untitled papers for dead links...", len(untitled))
+
+    dead_urls = set()
+    for i, p in enumerate(untitled):
+        if is_dead_link(p["url"]):
+            dead_urls.add(p["url"])
+        if (i + 1) % 25 == 0:
+            logger.info("  %d/%d checked, %d dead", i + 1, len(untitled), len(dead_urls))
+
+    before = len(papers)
+    papers[:] = [p for p in papers if p["url"] not in dead_urls]
+    removed = before - len(papers)
+    logger.info("Removed %d dead links", removed)
+    return removed
+
+
 def enrich_papers_cascade(
     papers: list[dict],
     email: str = "papertrail@example.com",
