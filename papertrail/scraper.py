@@ -424,6 +424,12 @@ class SlackPaperScraper:
                         user_id = msg.get("user", "") or msg.get("username", "")
                         ts = msg.get("ts", "")
 
+                        # Extract reactions directly from message (no extra API call)
+                        msg_reactions = msg.get("reactions", [])
+                        reactions_count = sum(r.get("count", 0) for r in msg_reactions)
+                        reaction_details = {r["name"]: r.get("count", 0) for r in msg_reactions if r.get("name")}
+                        reply_count = msg.get("reply_count", 0)
+
                         paper = SlackPaper(
                             channel_id=channel_id,
                             channel_name=channel_name,
@@ -434,9 +440,12 @@ class SlackPaperScraper:
                             permalink=msg.get("permalink", ""),
                             message_text=self._clean_slack_text(text),
                             paper_url=normalized_url,
+                            reactions_count=reactions_count,
+                            reply_count=reply_count,
+                            reaction_details=reaction_details,
                         )
 
-                        # Optionally fetch engagement metrics
+                        # Optionally fetch detailed thread replies (extra API call per message)
                         if include_replies:
                             engagement = self._get_engagement(channel_id, ts)
                             paper.reactions_count = engagement["reactions_count"]
