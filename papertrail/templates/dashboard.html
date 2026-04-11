@@ -3567,8 +3567,11 @@
         // ===== TOPIC ACTIONS =====
         let currentTopicLabel = null;
 
-        function showTopicActions(label, event) {
+        let currentTopicHierLevel, currentTopicCid;
+        function showTopicActions(label, event, hierLevel, cid) {
             currentTopicLabel = label;
+            currentTopicHierLevel = hierLevel;
+            currentTopicCid = cid;
             const popup = document.getElementById('topicActionPopup');
             // Position above the click point so cursor doesn't cover it
             const popupHeight = 80; // approximate
@@ -3608,19 +3611,41 @@
             renderMap();
         }
 
-        function showTopicInfo(label) {
+        function showTopicInfo(label, hierLevel, cid) {
             pushModalHistory();
             document.getElementById('topicActionPopup').classList.remove('visible');
             const lbl = label.toLowerCase();
-            const papers = allPapers.filter(p => {
-                // Check level-0 label
-                if ((p.cluster_label || '').toLowerCase().includes(lbl)) return true;
-                // Check all hierarchy levels
-                if (p.cluster_levels) {
-                    return p.cluster_levels.some(l => (l.label || '').toLowerCase().includes(lbl));
-                }
-                return false;
-            });
+
+            // If we have hierarchy info, match exactly by level and ID
+            let papers;
+            if (hierLevel !== undefined && cid !== undefined && typeof cid === 'string' && cid.includes('_')) {
+                const [lvlStr, idStr] = cid.replace(/^L/, '').split('_');
+                const lvl = parseInt(lvlStr);
+                const id = parseInt(idStr);
+                papers = allPapers.filter(p => p.cluster_levels && p.cluster_levels[lvl] && p.cluster_levels[lvl].id === id);
+            } else {
+                // Fallback: match by label across all levels
+                papers = allPapers.filter(p => {
+                    if ((p.cluster_label || '').toLowerCase() === lbl) return true;
+                    if (p.cluster_levels) {
+                        return p.cluster_levels.some(l => (l.label || '').toLowerCase() === lbl);
+                    }
+                    return false;
+                });
+            }
+
+            // Determine if this is a topic or subtopic
+            const isSubtopic = hierLevel !== undefined && hierLevel > 0;
+            let parentLabel = '';
+            if (isSubtopic && papers.length > 0 && papers[0].cluster_levels && papers[0].cluster_levels[0]) {
+                parentLabel = papers[0].cluster_levels[0].label;
+            }
+            const nSubtopics = isSubtopic ? 0 : (() => {
+                if (!papers.length || !papers[0].cluster_levels || papers[0].cluster_levels.length < 2) return 0;
+                const l1ids = new Set();
+                papers.forEach(p => { if (p.cluster_levels && p.cluster_levels[1]) l1ids.add(p.cluster_levels[1].id); });
+                return l1ids.size;
+            })();
             const modal = document.getElementById('topicModal');
             const header = document.getElementById('topicHeader');
             const body = document.getElementById('topicBody');
@@ -3642,8 +3667,11 @@
             papers.forEach(p => { if (p.year) byYear[p.year] = (byYear[p.year] || 0) + 1; });
             const yearEntries = Object.entries(byYear).sort((a, b) => a[0] - b[0]);
 
+            const topicTypeLabel = isSubtopic
+                ? `&#x1F9E0; Subtopic of <span class="card-tag" style="background:${getClusterColorById(papers[0]?.cluster_levels?.[0]?.id || 0, 0)}33;color:${getClusterColorById(papers[0]?.cluster_levels?.[0]?.id || 0, 0)};cursor:pointer;" onclick="showTopicInfo('${esc(parentLabel).replace(/'/g, "\\'")}', 0)">${esc(parentLabel)}</span>`
+                : `&#x1F9E0; Topic${nSubtopics > 0 ? ' (' + nSubtopics + ' subtopics)' : ''}`;
             header.innerHTML = `
-                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#64b5f6;margin-bottom:4px;">&#x1F9E0; Topic</div>
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#64b5f6;margin-bottom:4px;">${topicTypeLabel}</div>
                 <div class="profile-name">${esc(label)}</div>
                 <div class="profile-subtitle">${Array.from(channels).map(ch => `<a href="${slackChannelUrl(ch)}" target="_blank" class="card-tag channel-tag" style="text-decoration:none;cursor:pointer;">${channelDisplayName(ch)}</a>`).join(' ')}</div>
                 <div class="profile-stats">
@@ -5877,7 +5905,7 @@
                 if (overlaps && !isMajor) return; // Skip non-major overlapping labels
 
                 placed.push(bbox);
-                renderedLabels.push({ ...bbox, label: c.label });
+                renderedLabels.push({ ...bbox, label: c.label, cid: c.cid, hierLevel: hierLevel >= 0 ? hierLevel : 0 });
 
                 // Background: subtle frosted pill for readability
                 if (isMajor || isClusterMode) {
@@ -6204,7 +6232,7 @@
                     if (clickedLabel) {
                         // Hide tooltip so it doesn't cover the action popup
                         document.getElementById('tooltip').classList.remove('visible');
-                        showTopicActions(clickedLabel.label, e);
+                        showTopicActions(clickedLabel.label, e, clickedLabel.hierLevel, clickedLabel.cid);
                         return;
                     }
 
@@ -8978,7 +9006,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 if (currentTopicLabel) selectTopicOnMap(currentTopicLabel);
             });
             document.getElementById('topicInfoBtn').addEventListener('click', () => {
-                if (currentTopicLabel) showTopicInfo(currentTopicLabel);
+                if (currentTopicLabel) showTopicInfo(currentTopicLabel, currentTopicHierLevel, currentTopicCid);
             });
 
             // 3D toolbar buttons
