@@ -133,12 +133,35 @@ def enrich_url(url: str, email: str = "papertrail@example.com") -> dict[str, Any
     if not result.get("journal"):
         result["journal"] = _infer_journal_from_url(url)
 
-    # Reject erratum/corrigendum/retraction titles — these are not real papers
-    title = (result.get("title") or "").lower().strip()
-    if title in ("erratum", "corrigendum", "retraction", "correction", "publisher correction"):
+    # Reject junk titles — article types, site boilerplate, not real papers
+    if result.get("title") and _is_junk_title(result["title"]):
         result["title"] = ""
 
     return result
+
+
+# Titles that are article types or site boilerplate, not real paper titles
+JUNK_TITLES = {
+    'erratum', 'corrigendum', 'retraction', 'correction', 'publisher correction',
+    'author correction', 'correspondence', 'letter', 'reply', 'comment',
+    'editorial', 'news', 'research highlight', 'in brief', 'addendum',
+    'contents', 'cover image', 'cover story', 'table of contents',
+    'just a moment', 'access denied', 'page not found', '404', 'not found',
+    'nature', 'science', 'cell', 'pnas', 'the lancet',
+    'subscribe', 'sign in', 'log in', 'cookie policy',
+}
+
+
+def _is_junk_title(title: str) -> bool:
+    """Check if a title is a generic article type or site boilerplate."""
+    t = title.strip().lower()
+    # Exact match against known junk
+    if t in JUNK_TITLES:
+        return True
+    # Too short to be a real paper title (unless it's an acronym like "DINOv3")
+    if len(t) < 8 and not any(c.isupper() for c in t[1:]):
+        return True
+    return False
 
 
 def _infer_journal_from_url(url: str) -> str:
