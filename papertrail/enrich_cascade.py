@@ -40,6 +40,17 @@ NATURE_JOURNALS = {
 HEADERS = {"User-Agent": "PaperTrail/1.0 (https://github.com/bschilder/PaperTrail)"}
 
 
+def _normalize_pdf_url(url: str) -> str:
+    """Convert PDF URLs to their landing page equivalents."""
+    # arxiv.org/pdf/XXXX.pdf → arxiv.org/abs/XXXX
+    url = re.sub(r'(arxiv\.org)/pdf/(\d+\.\d+)(\.pdf)?$', r'\1/abs/\2', url)
+    # biorxiv/medrxiv .full.pdf → remove suffix
+    url = re.sub(r'(biorxiv\.org/content/.+?)\.full\.pdf$', r'\1', url)
+    url = re.sub(r'(biorxiv\.org/content/.+?)\.full$', r'\1', url)
+    url = re.sub(r'(medrxiv\.org/content/.+?)\.full\.pdf$', r'\1', url)
+    return url
+
+
 def enrich_url(url: str, email: str = "papertrail@example.com") -> dict[str, Any]:
     """
     Enrich a paper URL using a multi-strategy cascade.
@@ -47,6 +58,8 @@ def enrich_url(url: str, email: str = "papertrail@example.com") -> dict[str, Any
     Returns a dict with: title, authors, year, journal, abstract,
     doi, cited_by_count (any field may be None).
     """
+    # Normalize PDF URLs to landing pages first
+    url = _normalize_pdf_url(url)
     result = {}
 
     # Strategy 1: Direct page scrape

@@ -3999,7 +3999,7 @@
     "timestamp": "2025-11-13T16:14:40.187859+00:00",
     "first_shared": "2025-11-13T16:14:40.187859+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1763050480187859",
-    "url": "https://arxiv.org/pdf/2511.08923",
+    "url": "https://arxiv.org/abs/2511.08923",
     "text": "TiDAR: Think in Diffusion, Talk in Autoregression by NVIDIA",
     "reactions_count": 4,
     "reply_count": 0,
@@ -4077,7 +4077,7 @@
     "timestamp": "2025-11-10T15:38:05.832589+00:00",
     "first_shared": "2025-11-10T15:38:05.832589+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1762789085832589",
-    "url": "https://arxiv.org/pdf/2502.06079",
+    "url": "https://arxiv.org/abs/2502.06079",
     "text": "Better sample generation with debiasing guidance for discrete diffusion",
     "reactions_count": 0,
     "reply_count": 0,
@@ -4151,7 +4151,7 @@
     "timestamp": "2025-11-10T15:36:02.605959+00:00",
     "first_shared": "2025-11-10T15:36:02.605959+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1762788962605959",
-    "url": "https://arxiv.org/pdf/2505.22524",
+    "url": "https://arxiv.org/abs/2505.22524",
     "text": "Inference-time scaling for discrete diffusion",
     "reactions_count": 2,
     "reply_count": 0,
@@ -4513,7 +4513,7 @@
     "timestamp": "2025-10-28T14:43:33.244649+00:00",
     "first_shared": "2025-10-28T14:43:33.244649+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1761662613244649",
-    "url": "https://arxiv.org/pdf/2505.23614",
+    "url": "https://arxiv.org/abs/2505.23614",
     "text": "Another paper for inference-time scaling (co-authored by James Zou)",
     "reactions_count": 1,
     "reply_count": 0,
@@ -4588,7 +4588,7 @@
     "timestamp": "2025-10-27T20:11:49.818439+00:00",
     "first_shared": "2025-10-27T20:11:49.818439+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1761595909818439",
-    "url": "https://www.arxiv.org/pdf/2510.15511",
+    "url": "https://www.arxiv.org/abs/2510.15511",
     "text": "decoder-only transformer language models map different prompts uniquely to different latent states (i.e. given a latent state, you could get the exact input text\u2026 privacy where?)",
     "reactions_count": 2,
     "reply_count": 2,
@@ -4728,7 +4728,7 @@
     "timestamp": "2025-10-17T20:43:05.777609+00:00",
     "first_shared": "2025-10-17T20:43:05.777609+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1760733785777609",
-    "url": "https://arxiv.org/pdf/2510.01478",
+    "url": "https://arxiv.org/abs/2510.01478",
     "text": "hybrid approach to (variational) flow matching",
     "reactions_count": 1,
     "reply_count": 0,
@@ -5185,7 +5185,7 @@
     "timestamp": "2025-09-29T21:53:59.035939+00:00",
     "first_shared": "2025-09-29T21:53:59.035939+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1759182839035939",
-    "url": "https://arxiv.org/pdf/2505.18875",
+    "url": "https://arxiv.org/abs/2505.18875",
     "text": "Didn't fully read this paper but thought it could be an interesting way to speed up the D3 model and would be curious if the concepts could translate to genomics.",
     "reactions_count": 2,
     "reply_count": 2,
@@ -8224,7 +8224,7 @@
     "timestamp": "2025-04-18T19:31:38.889779+00:00",
     "first_shared": "2025-04-18T19:31:38.889779+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1745004698889779",
-    "url": "https://www.biorxiv.org/content/10.1101/2024.10.25.620272v1.full",
+    "url": "https://www.biorxiv.org/content/10.1101/2024.10.25.620272v1",
     "text": "",
     "reactions_count": 0,
     "reply_count": 0,
@@ -10553,7 +10553,7 @@
     "timestamp": "2024-12-21T23:22:45.851779+00:00",
     "first_shared": "2024-12-21T23:22:45.851779+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1734823365851779",
-    "url": "https://arxiv.org/pdf/2406.01572",
+    "url": "https://arxiv.org/abs/2406.01572",
     "text": "Recent work from Listgarten lab (she talked about the work at AIDrugX@NeurIPS\u201924 workshop), where the guidance is applied to the rate matrices.",
     "reactions_count": 2,
     "reply_count": 0,
@@ -13719,7 +13719,7 @@
     "timestamp": "2024-08-01T18:42:38.971359+00:00",
     "first_shared": "2024-08-01T18:42:38.971359+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1722537758971359",
-    "url": "https://arxiv.org/pdf/2211.17091",
+    "url": "https://arxiv.org/abs/2211.17091",
     "text": "Btw here is the ICML paper the lecturer referred to about the diffusion-based model guided by the discriminator: and talk: . It seems like it might be able to avoid that oscillation/lack of convergence present in GANs by training the discriminator separately from the diffusion model. Didn't read it completely yet but looks cool.",
     "reactions_count": 1,
     "reply_count": 0,
@@ -18819,7 +18819,7 @@
     "timestamp": "2023-12-19T20:39:34.000309+00:00",
     "first_shared": "2023-12-19T20:39:34.000309+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1703018374000309",
-    "url": "https://www.biorxiv.org/content/10.1101/2023.12.12.571389v1.full",
+    "url": "https://www.biorxiv.org/content/10.1101/2023.12.12.571389v1",
     "text": "Active learning for perturb-seq:",
     "reactions_count": 0,
     "reply_count": 0,
@@ -21328,7 +21328,7 @@
     "timestamp": "2023-07-20T13:02:07.652869+00:00",
     "first_shared": "2023-07-20T13:02:07.652869+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1689858127652869",
-    "url": "https://arxiv.org/pdf/2106.01836.pdf",
+    "url": "https://arxiv.org/abs/2106.01836",
     "text": "Anybody interested in Graph Neural Networks?",
     "reactions_count": 3,
     "reply_count": 0,
@@ -26920,7 +26920,7 @@
     "timestamp": "2022-05-09T22:00:04.864549+00:00",
     "first_shared": "2022-05-09T22:00:04.864549+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1652133604864549",
-    "url": "https://arxiv.org/pdf/2205.00403.pdf",
+    "url": "https://arxiv.org/abs/2205.00403",
     "text": "A paper on modeling uncertainty in DNNs by using spectral norm regularization and Gaussian processes.",
     "reactions_count": 0,
     "reply_count": 0,
@@ -27895,7 +27895,7 @@
     "timestamp": "2022-01-06T08:55:48.000300+00:00",
     "first_shared": "2022-01-06T08:55:48.000300+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1641459348000300",
-    "url": "https://arxiv.org/pdf/2012.14261.pdf",
+    "url": "https://arxiv.org/abs/2012.14261",
     "text": "A Survey on Neural Network Interpretability",
     "reactions_count": 0,
     "reply_count": 0,
@@ -27947,7 +27947,16 @@
         "id": 6,
         "label": "Feature Explanations"
       }
-    ]
+    ],
+    "title": "A Survey on Neural Network Interpretability",
+    "authors": [
+      "Zhang, Yu",
+      "Ti\u0148o, Peter",
+      "Leonardis, Ale\u0161",
+      "Tang, Ke"
+    ],
+    "doi": "10.1109/TETCI.2021.3100641",
+    "abstract": "Along with the great success of deep neural networks, there is also growing concern about their black-box nature. The interpretability issue affects people&#39;s trust on deep learning systems. It is also related to many ethical problems, e.g., algorithmic discrimination. Moreover, interpretability is a desired property for deep networks to become powerful tools in other research fields, e.g., drug discovery and genomics. In this survey, we conduct a comprehensive review of the neural network interpretability research. We first clarify the definition of interpretability as it has been used in many different contexts. Then we elaborate on the importance of interpretability and propose a novel taxonomy organized along three dimensions: type of engagement (passive vs. active interpretation approaches), the type of explanation, and the focus (from local to global interpretability). This taxonomy provides a meaningful 3D view of distribution of papers from the relevant literature as two of the dimensions are not simply categorical but allow ordinal subcategories. Finally, we summarize the existing interpretability evaluation methods and suggest possible research directions inspired by our new taxonomy."
   },
   {
     "channel": "papers-dl",
@@ -31373,7 +31382,7 @@
     "timestamp": "2021-04-28T13:21:26.015400+00:00",
     "first_shared": "2021-04-28T13:21:26.015400+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1619616086015400",
-    "url": "https://arxiv.org/pdf/1908.10763.pdf",
+    "url": "https://arxiv.org/abs/1908.10763",
     "text": "https://arxiv.org/pdf/1908.10763.pdf",
     "reactions_count": 0,
     "reply_count": 0,
@@ -33752,7 +33761,7 @@
     "timestamp": "2021-02-27T13:20:25.012800+00:00",
     "first_shared": "2021-02-27T13:20:25.012800+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1614432025012800",
-    "url": "https://arxiv.org/pdf/2102.00951.pdf",
+    "url": "https://arxiv.org/abs/2102.00951",
     "text": "https://arxiv.org/pdf/2102.00951.pdf",
     "reactions_count": 0,
     "reply_count": 0,
@@ -35904,7 +35913,7 @@
     "timestamp": "2020-12-10T20:14:04.014900+00:00",
     "first_shared": "2020-12-10T20:14:04.014900+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1607631244014900",
-    "url": "https://arxiv.org/pdf/2003.04887.pdf",
+    "url": "https://arxiv.org/abs/2003.04887",
     "text": "Really simple idea to scale residual blocks with learnable parameter alpha and initialize with zero:",
     "reactions_count": 0,
     "reply_count": 0,
@@ -36483,7 +36492,7 @@
     "timestamp": "2020-11-22T23:49:46.010600+00:00",
     "first_shared": "2020-11-22T23:49:46.010600+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1606088986010600",
-    "url": "https://arxiv.org/pdf/1703.01365.pdf",
+    "url": "https://arxiv.org/abs/1703.01365",
     "text": "Reading this classic:",
     "reactions_count": 1,
     "reply_count": 0,
@@ -36557,7 +36566,7 @@
     "timestamp": "2020-11-12T17:17:55.010200+00:00",
     "first_shared": "2020-11-12T17:17:55.010200+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1605201475010200",
-    "url": "https://arxiv.org/pdf/2011.04640.pdf",
+    "url": "https://arxiv.org/abs/2011.04640",
     "text": "",
     "reactions_count": 0,
     "reply_count": 0,
@@ -36609,7 +36618,13 @@
         "id": 24,
         "label": "AI Learning"
       }
-    ]
+    ],
+    "title": "Scaling Hidden Markov Language Models",
+    "authors": [
+      "Chiu, Justin T.",
+      "Rush, Alexander M."
+    ],
+    "abstract": "The hidden Markov model (HMM) is a fundamental tool for sequence modeling that cleanly separates the hidden state from the emission structure. However, this separation makes it difficult to fit HMMs to large datasets in modern NLP, and they have fallen out of use due to very poor performance compared to fully observed models. This work revisits the challenge of scaling HMMs to language modeling datasets, taking ideas from recent approaches to neural modeling. We propose methods for scaling HMMs to massive state spaces while maintaining efficient exact inference, a compact parameterization, and effective regularization. Experiments show that this approach leads to models that are more accurate than previous HMM and n-gram-based methods, making progress towards the performance of state-of-the-art neural models."
   },
   {
     "channel": "papers-dl",
@@ -36617,7 +36632,7 @@
     "timestamp": "2020-10-27T11:44:31.010000+00:00",
     "first_shared": "2020-10-27T11:44:31.010000+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1603799071010000",
-    "url": "https://arxiv.org/pdf/2010.10596.pdf",
+    "url": "https://arxiv.org/abs/2010.10596",
     "text": "https://arxiv.org/pdf/2010.10596.pdf",
     "reactions_count": 0,
     "reply_count": 0,
@@ -36764,7 +36779,7 @@
     "timestamp": "2020-10-23T14:37:05.009500+00:00",
     "first_shared": "2020-10-23T14:37:05.009500+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1603463825009500",
-    "url": "https://arxiv.org/pdf/2010.11882.pdf",
+    "url": "https://arxiv.org/abs/2010.11882",
     "text": "Capturing invariances in NNs without hard-coding constraints.",
     "reactions_count": 0,
     "reply_count": 0,
@@ -36909,7 +36924,7 @@
     "timestamp": "2020-10-21T22:54:24.008000+00:00",
     "first_shared": "2020-10-21T22:54:24.008000+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1603320864008000",
-    "url": "https://arxiv.org/pdf/2010.10504.pdf",
+    "url": "https://arxiv.org/abs/2010.10504",
     "text": "Interesting architecture that may be interesting to explore: https://arxiv.org/pdf/2010.10504.pdf",
     "reactions_count": 0,
     "reply_count": 0,
@@ -37484,7 +37499,7 @@
     "timestamp": "2020-10-02T11:41:59.000900+00:00",
     "first_shared": "2020-10-02T11:41:59.000900+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1601638919000900",
-    "url": "https://arxiv.org/pdf/2002.07217",
+    "url": "https://arxiv.org/abs/2002.07217",
     "text": "https://arxiv.org/pdf/2002.07217",
     "reactions_count": 0,
     "reply_count": 0,
@@ -37706,7 +37721,7 @@
     "timestamp": "2020-09-22T01:59:51.000600+00:00",
     "first_shared": "2020-09-22T01:59:51.000600+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1600739991000600",
-    "url": "https://arxiv.org/pdf/1909.12434.pdf",
+    "url": "https://arxiv.org/abs/1909.12434",
     "text": "Learning the Difference that Makes a Difference with Counterfactually-Augmented Data https://arxiv.org/pdf/1909.12434.pdf",
     "reactions_count": 0,
     "reply_count": 0,
@@ -37778,7 +37793,7 @@
     "timestamp": "2020-09-21T16:40:32.000200+00:00",
     "first_shared": "2020-09-21T16:40:32.000200+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1600706432000200",
-    "url": "https://arxiv.org/pdf/1908.11775.pdf",
+    "url": "https://arxiv.org/abs/1908.11775",
     "text": "Transformer Dissection: A Unified Understanding of Transformer\u2019s Attention via the Lens of Kernel",
     "reactions_count": 0,
     "reply_count": 0,
@@ -37830,7 +37845,16 @@
         "id": 0,
         "label": "Attention Mechanisms"
       }
-    ]
+    ],
+    "title": "Transformer Dissection: A Unified Understanding of Transformer's Attention via the Lens of Kernel",
+    "authors": [
+      "Tsai, Yao-Hung Hubert",
+      "Bai, Shaojie",
+      "Yamada, Makoto",
+      "Morency, Louis-Philippe",
+      "Salakhutdinov, Ruslan"
+    ],
+    "abstract": "Transformer is a powerful architecture that achieves superior performance on various sequence learning tasks, including neural machine translation, language understanding, and sequence prediction. At the core of the Transformer is the attention mechanism, which concurrently processes all inputs in the streams. In this paper, we present a new formulation of attention via the lens of the kernel. To be more precise, we realize that the attention can be seen as applying kernel smoother over the inputs with the kernel scores being the similarities between inputs. This new formulation gives us a better way to understand individual components of the Transformer&#39;s attention, such as the better way to integrate the positional embedding. Another important advantage of our kernel-based formulation is that it paves the way to a larger space of composing Transformer&#39;s attention. As an example, we propose a new variant of Transformer&#39;s attention which models the input as a product of symmetric kernels. This approach achieves competitive performance to the current state of the art model with less computation. In our experiments, we empirically study different kernel construction strategies on two widely used tasks: neural machine translation and sequence prediction."
   },
   {
     "channel": "papers-dl",
@@ -38344,7 +38368,7 @@
     "timestamp": "2020-04-26T02:10:39.000400+00:00",
     "first_shared": "2020-04-26T02:10:39.000400+00:00",
     "slack_url": "https://koolab.slack.com/archives/C0123Q7PGGP/p1587867039000400",
-    "url": "https://arxiv.org/pdf/2003.01908",
+    "url": "https://arxiv.org/abs/2003.01908",
     "text": "Black-box Smoothing: A Provable Defense for Pretrained Classifiers: https://arxiv.org/pdf/2003.01908",
     "reactions_count": 0,
     "reply_count": 0,
@@ -40456,7 +40480,7 @@
     "timestamp": "2026-02-10T12:35:56.831089+00:00",
     "first_shared": "2026-02-10T12:35:56.831089+00:00",
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1770726956831089",
-    "url": "https://arxiv.org/pdf/2601.03019",
+    "url": "https://arxiv.org/abs/2601.03019",
     "text": "DNAChunker: Learnable Tokenization for DNA Language Models - , learnable adaptive segmentation module to produce context-dependent, variable-length units to allocate finer granularity to functionally enriched regions while compressing repetitive or redundant sequence.",
     "reactions_count": 1,
     "reply_count": 0,
@@ -41873,7 +41897,7 @@
     "timestamp": "2026-01-18T04:11:31.875119+00:00",
     "first_shared": "2026-01-18T04:11:31.875119+00:00",
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1768709491875119",
-    "url": "https://www.biorxiv.org/content/biorxiv/early/2026/01/14/2026.01.14.699402.full.pdf",
+    "url": "https://www.biorxiv.org/content/biorxiv/early/2026/01/14/2026.01.14.699402",
     "text": "TF-Mindi\u2014 Steins version of tfmodisco. Instead of hard clustering, embed in low dimensional space. Was a visiting grad student\u2019s project 2 years ago, but that fizzled out quickly\u2026 https://www.biorxiv.org/content/biorxiv/early/2026/01/14/2026.01.14.699402.full.pdf",
     "reactions_count": 0,
     "reply_count": 0,
@@ -41925,7 +41949,20 @@
         "id": 7,
         "label": "Transcription Factors"
       }
-    ]
+    ],
+    "title": "System-wide extraction of cis-regulatory rules from sequence-to-function models in human neural development",
+    "authors": [
+      "Seppe De Winter",
+      "Camiel Mannens",
+      "Valerie Christiaens",
+      "Roel Vandepoel",
+      "Lijuan Hu",
+      "Sten Linnarsson",
+      "Stein Aerts"
+    ],
+    "year": 2026,
+    "journal": "bioRxiv",
+    "doi": "10.64898/2026.01.14.699402"
   },
   {
     "channel": "papers-genomics",
@@ -43378,66 +43415,6 @@
       {
         "id": 19,
         "label": "Disease Risk"
-      }
-    ]
-  },
-  {
-    "channel": "papers-genomics",
-    "shared_by": "Masayuki Nagai",
-    "timestamp": "2025-12-22T18:16:18.130339+00:00",
-    "first_shared": "2025-12-22T18:16:18.130339+00:00",
-    "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1766427378130339",
-    "url": "https://www.nature.com/nmeth/articles?type=method-to-watch",
-    "text": "Here is a list of methods to watch from Nat Method this year",
-    "reactions_count": 0,
-    "reply_count": 1,
-    "reaction_details": {},
-    "channels": [
-      "papers-genomics"
-    ],
-    "projections": {
-      "pca": [
-        -0.011917650699615479,
-        -0.06191530451178551
-      ],
-      "tsne": [
-        -11.32432746887207,
-        28.03645133972168
-      ],
-      "umap": [
-        5.837913990020752,
-        -0.8270964026451111
-      ],
-      "pca3d": [
-        -0.011917650699615479,
-        -0.06191530451178551,
-        -0.008043937385082245
-      ],
-      "tsne3d": [
-        3.6011040210723877,
-        4.605252742767334,
-        10.985149383544922
-      ],
-      "umap3d": [
-        9.843067169189453,
-        -1.9087283611297607,
-        -0.8063969016075134
-      ]
-    },
-    "cluster_id": 1,
-    "cluster_label": "Model Training",
-    "cluster_levels": [
-      {
-        "id": 1,
-        "label": "Model Training"
-      },
-      {
-        "id": 1,
-        "label": "Neural Training"
-      },
-      {
-        "id": 6,
-        "label": "Feature Explanations"
       }
     ]
   },
@@ -47546,7 +47523,7 @@
     "timestamp": "2025-10-09T01:08:06.241509+00:00",
     "first_shared": "2025-10-09T01:08:06.241509+00:00",
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1759972086241509",
-    "url": "https://www.biorxiv.org/content/10.1101/2025.10.07.681052v1.full",
+    "url": "https://www.biorxiv.org/content/10.1101/2025.10.07.681052v1",
     "text": "Happy to get this out \u2013 thank you to everyone involved!!",
     "reactions_count": 13,
     "reply_count": 4,
@@ -54540,7 +54517,7 @@
     "timestamp": "2025-05-04T11:56:17.018499+00:00",
     "first_shared": "2025-05-04T11:56:17.018499+00:00",
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1746359777018499",
-    "url": "https://www.biorxiv.org/content/biorxiv/early/2025/04/30/2025.04.27.650894.full.pdf",
+    "url": "https://www.biorxiv.org/content/biorxiv/early/2025/04/30/2025.04.27.650894",
     "text": "Not ground breaking but some neat ideas for long-range CRE interactions https://www.biorxiv.org/content/biorxiv/early/2025/04/30/2025.04.27.650894.full.pdf",
     "reactions_count": 0,
     "reply_count": 0,
@@ -54592,7 +54569,25 @@
         "id": 27,
         "label": "Regulatory DNA"
       }
-    ]
+    ],
+    "title": "SCRIPT: predicting single-cell long-range cis-regulation based on pretrained graph attention networks",
+    "authors": [
+      "Yu Zhang",
+      "Yifeng Jiao",
+      "Yuchen Liu",
+      "Xin Guo",
+      "Yushuai Wu",
+      "Jiyang Li",
+      "Limei Han",
+      "Yinghui Xu",
+      "Xin Gao",
+      "Yuan Qi",
+      "Yuan Cheng",
+      "Ying He"
+    ],
+    "year": 2025,
+    "journal": "bioRxiv",
+    "doi": "10.1101/2025.04.27.650894"
   },
   {
     "channel": "papers-genomics",
@@ -60772,7 +60767,7 @@
     "timestamp": "2024-12-19T12:09:17.365269+00:00",
     "first_shared": "2024-12-19T12:09:17.365269+00:00",
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1734610157365269",
-    "url": "https://arxiv.org/pdf/2412.10347",
+    "url": "https://arxiv.org/abs/2412.10347",
     "text": "Mulitomics LLM benchmark\u2014 not terrible choices for tasks but also not best baselines https://arxiv.org/pdf/2412.10347",
     "reactions_count": 0,
     "reply_count": 0,
@@ -60824,7 +60819,27 @@
         "id": 15,
         "label": "Language Models"
       }
-    ]
+    ],
+    "title": "COMET: Benchmark for Comprehensive Biological Multi-omics Evaluation Tasks and Language Models",
+    "authors": [
+      "Ren, Yuchen",
+      "Han, Wenwei",
+      "Zhang, Qianyuan",
+      "Tang, Yining",
+      "Bai, Weiqiang",
+      "Cai, Yuchen",
+      "Qiao, Lifeng",
+      "Jiang, Hao",
+      "Yuan, Dong",
+      "Chen, Tao",
+      "Sun, Siqi",
+      "Tan, Pan",
+      "Ouyang, Wanli",
+      "Dong, Nanqing",
+      "Ma, Xinzhu",
+      "Ye, Peng"
+    ],
+    "abstract": "As key elements within the central dogma, DNA, RNA, and proteins play crucial roles in maintaining life by guaranteeing accurate genetic expression and implementation. Although research on these molecules has profoundly impacted fields like medicine, agriculture, and industry, the diversity of machine learning approaches-from traditional statistical methods to deep learning models and large language models-poses challenges for researchers in choosing the most suitable models for specific tasks, especially for cross-omics and multi-omics tasks due to the lack of comprehensive benchmarks. To address this, we introduce the first comprehensive multi-omics benchmark COMET (Benchmark for Biological COmprehensive Multi-omics Evaluation Tasks and Language Models), designed to evaluate models across single-omics, cross-omics, and multi-omics tasks. First, we curate and develop a diverse collection of downstream tasks and datasets covering key structural and functional aspects in DNA, RNA, and proteins, including tasks that span multiple omics levels. Then, we evaluate existing foundational language models for DNA, RNA, and proteins, as well as the newly proposed multi-omics method, offering valuable insights into their performance in integrating and analyzing data from different biological modalities. This benchmark aims to define critical issues in multi-omics research and guide future directions, ultimately promoting advancements in understanding biological processes through integrated and different omics data analysis."
   },
   {
     "channel": "papers-genomics",
@@ -66229,7 +66244,7 @@
     "timestamp": "2024-10-10T13:05:56.965849+00:00",
     "first_shared": "2024-10-10T13:05:56.965849+00:00",
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1728565556965849",
-    "url": "https://arxiv.org/pdf/2410.01858",
+    "url": "https://arxiv.org/abs/2410.01858",
     "text": "https://arxiv.org/pdf/2410.01858",
     "reactions_count": 0,
     "reply_count": 0,
@@ -81865,66 +81880,6 @@
   {
     "channel": "papers-genomics",
     "shared_by": "Peter Koo",
-    "timestamp": "2023-03-22T21:12:18.742269+00:00",
-    "first_shared": "2023-03-22T21:12:18.742269+00:00",
-    "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1679519538742269",
-    "url": "https://genomebiology.biomedcentral.com/counter/pdf/10.1186/s13059-023-02885-1.pdf",
-    "text": "https://genomebiology.biomedcentral.com/counter/pdf/10.1186/s13059-023-02885-1.pdf",
-    "reactions_count": 0,
-    "reply_count": 0,
-    "reaction_details": {},
-    "channels": [
-      "papers-genomics"
-    ],
-    "projections": {
-      "pca": [
-        0.014240821823477745,
-        -0.03720000758767128
-      ],
-      "tsne": [
-        23.285795211791992,
-        -69.62405395507812
-      ],
-      "umap": [
-        5.2617411613464355,
-        3.8650758266448975
-      ],
-      "pca3d": [
-        0.014240821823477745,
-        -0.03720000758767128,
-        -0.03920438885688782
-      ],
-      "tsne3d": [
-        -3.253241777420044,
-        -21.986738204956055,
-        -22.55597686767578
-      ],
-      "umap3d": [
-        12.63624382019043,
-        -2.4551620483398438,
-        -0.05516887456178665
-      ]
-    },
-    "cluster_id": 6,
-    "cluster_label": "AI Research Agents",
-    "cluster_levels": [
-      {
-        "id": 6,
-        "label": "AI Research Agents"
-      },
-      {
-        "id": 4,
-        "label": "AI Agents"
-      },
-      {
-        "id": 24,
-        "label": "AI Learning"
-      }
-    ]
-  },
-  {
-    "channel": "papers-genomics",
-    "shared_by": "Peter Koo",
     "timestamp": "2023-03-19T03:24:41.931789+00:00",
     "first_shared": "2023-03-19T03:24:41.931789+00:00",
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1679196281931789",
@@ -91694,7 +91649,7 @@
     "timestamp": "2021-10-30T12:26:37.011400+00:00",
     "first_shared": "2021-10-30T12:26:37.011400+00:00",
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1635596797011400",
-    "url": "https://www.biorxiv.org/content/10.1101/2021.10.28.466307v1.full.pdf",
+    "url": "https://www.biorxiv.org/content/10.1101/2021.10.28.466307v1",
     "text": "https://www.biorxiv.org/content/10.1101/2021.10.28.466307v1.full.pdf",
     "reactions_count": 0,
     "reply_count": 0,
@@ -91746,7 +91701,20 @@
         "id": 24,
         "label": "AI Learning"
       }
-    ]
+    ],
+    "title": "Optimal Design of Stochastic DNA Synthesis Protocols based on Generative Sequence Models",
+    "authors": [
+      "Weinstein, E. N.",
+      "Amin, A. N.",
+      "Grathwohl, W.",
+      "Kassler, D.",
+      "Disset, J.",
+      "Marks, D."
+    ],
+    "year": 2021,
+    "journal": "Biorxiv",
+    "doi": "10.1101/2021.10.28.466307",
+    "abstract": "Generative probabilistic models of biological sequences have widespread existing and potential applications in analyzing, predicting and designing proteins, RNA and genomes. To test the predictions of such a model experimentally, the standard approach is to draw samples, and then synthesize each sample individually in the laboratory. However, often orders of magnitude more sequences can be experimentally assayed than can affordably be synthesized individually. In this article, we propose instead to use stochastic synthesis methods, such as mixed nucleotides or trimers. We describe a black-box algorithm for optimizing stochastic synthesis protocols to produce approximate samples from any target generative model. We establish theoretical bounds on the methods performance, and validate it in simulation using held-out sequence-to-function predictors trained on real experimental data. We show that using optimized stochastic synthesis protocols in place of individual synthesis can increase the number of hits in protein engineering efforts by orders of magnitude, e.g. from zero to a thousand."
   },
   {
     "channel": "papers-genomics",
@@ -92238,7 +92206,7 @@
     "timestamp": "2021-10-16T23:54:41.037600+00:00",
     "first_shared": "2021-10-16T23:54:41.037600+00:00",
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1634428481037600",
-    "url": "https://www.biorxiv.org/content/10.1101/2021.04.27.441365v1.full",
+    "url": "https://www.biorxiv.org/content/10.1101/2021.04.27.441365v1",
     "text": "",
     "reactions_count": 0,
     "reply_count": 0,
@@ -97947,7 +97915,7 @@
     "timestamp": "2021-03-10T00:31:04.007500+00:00",
     "first_shared": "2021-03-10T00:31:04.007500+00:00",
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1615336264007500",
-    "url": "https://www.biorxiv.org/content/10.1101/2021.03.08.434469v1.full",
+    "url": "https://www.biorxiv.org/content/10.1101/2021.03.08.434469v1",
     "text": "Looks like a must read paper for genomics: https://www.biorxiv.org/content/10.1101/2021.03.08.434469v1.full",
     "reactions_count": 0,
     "reply_count": 0,
@@ -99727,7 +99695,7 @@
     "timestamp": "2020-12-23T03:02:03.010500+00:00",
     "first_shared": "2020-12-23T03:02:03.010500+00:00",
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1608692523010500",
-    "url": "https://www.biorxiv.org/content/10.1101/2020.12.21.423873v1.full.pdf",
+    "url": "https://www.biorxiv.org/content/10.1101/2020.12.21.423873v1",
     "text": "Transfer learning for TF binding: https://www.biorxiv.org/content/10.1101/2020.12.21.423873v1.full.pdf",
     "reactions_count": 0,
     "reply_count": 0,
@@ -99779,7 +99747,19 @@
         "id": 7,
         "label": "Transcription Factors"
       }
-    ]
+    ],
+    "title": "Biologically-relevant transfer learning improves transcription factor binding prediction",
+    "authors": [
+      "Novakovsky, G.",
+      "Saraswat, M.",
+      "Fornes, O.",
+      "Mostafavi, S.",
+      "Wasserman, W. W."
+    ],
+    "year": 2020,
+    "journal": "Biorxiv",
+    "doi": "10.1101/2020.12.21.423873",
+    "abstract": "BackgroundDeep learning has proven to be a powerful technique for transcription factor (TF) binding prediction, but requires large training datasets. Transfer learning can reduce the amount of data required for deep learning, while improving overall model performance, compared to training a separate model for each new task.\n\nResultsWe assess a transfer learning strategy for TF binding prediction consisting of a pre-training step, wherein we train a multi-task model with multiple TFs, and a fine-tuning step, wherein we initialize single-task models for individual TFs with the weights learned by the multi-task model, after which the single-task models are trained at a lower learning rate. We corroborate that transfer learning improves model performance, especially if in the pre-training step the multi-task model is trained with biologically-relevant TFs. We show the effectiveness of transfer learning for TFs with [~]500 ChIP-seq peak regions. Using model interpretation techniques, we demonstrate that the features learned in the pre-training step are refined in the fine-tuning step to resemble the binding motif of the target TF (i.e. the recipient of transfer learning in the fine-tuning step). Moreover, pre-training with biologically-relevant TFs allows single-task models in the fine-tuning step to learn features other than the motif of the target TF.\n\nConclusionsOur results confirm that transfer learning is a powerful technique for TF binding prediction."
   },
   {
     "channel": "papers-genomics",
@@ -100125,7 +100105,7 @@
     "timestamp": "2020-10-18T23:09:01.005600+00:00",
     "first_shared": "2020-10-18T23:09:01.005600+00:00",
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1603062541005600",
-    "url": "https://www.biorxiv.org/content/10.1101/2020.08.27.270967v1.full.pdf",
+    "url": "https://www.biorxiv.org/content/10.1101/2020.08.27.270967v1",
     "text": "https://www.biorxiv.org/content/10.1101/2020.08.27.270967v1.full.pdf",
     "reactions_count": 0,
     "reply_count": 0,
@@ -100177,7 +100157,19 @@
         "id": 24,
         "label": "AI Learning"
       }
-    ]
+    ],
+    "title": "Learning distance-dependent motif interactions: an interpretable CNN model of genomic events",
+    "authors": [
+      "Quinn, T. P.",
+      "Nguyen, D.",
+      "Nguyen, P.",
+      "Gupta, S.",
+      "Venkatesh, S."
+    ],
+    "year": 2020,
+    "journal": "Biorxiv",
+    "doi": "10.1101/2020.08.27.270967",
+    "abstract": "In many biological studies, prediction is used primarily to validate the model; the real quest is to understand the underlying phenomenon. Therefore, interpretable deep models for biological studies are required. Here, we propose the Hyper-parameter eXplainable Motif Pair framework (HyperXPair) to model biological motifs and their distance-dependent context through explicitly interpretable parameters. This makes HyperXPair more than a decision-support tool; it is also a hypothesis-generating tool designed to advance knowledge in the field. We demonstrate the utility of our model by learning distance-dependent motif interactions for two biological problems: transcription initiation and RNA splicing."
   },
   {
     "channel": "papers-genomics",
@@ -100517,7 +100509,7 @@
     "timestamp": "2020-09-21T12:12:51.002500+00:00",
     "first_shared": "2020-09-21T12:12:51.002500+00:00",
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1600690371002500",
-    "url": "https://www.biorxiv.org/content/10.1101/2020.09.17.301879v1.full.pdf",
+    "url": "https://www.biorxiv.org/content/10.1101/2020.09.17.301879v1",
     "text": "DNABERT\u2014 they train their model for over 20 days on 8 GPUs on regulatory DNA! https://www.biorxiv.org/content/10.1101/2020.09.17.301879v1.full.pdf",
     "reactions_count": 1,
     "reply_count": 0,
@@ -100571,7 +100563,18 @@
         "id": 27,
         "label": "Regulatory DNA"
       }
-    ]
+    ],
+    "title": "DNABERT: pre-trained Bidirectional Encoder Representations from Transformers model for DNA-language in genome",
+    "authors": [
+      "Ji, Y.",
+      "Zhou, Z.",
+      "Liu, H.",
+      "Davuluri, R."
+    ],
+    "year": 2020,
+    "journal": "Biorxiv",
+    "doi": "10.1101/2020.09.17.301879",
+    "abstract": "Deciphering the language of non-coding DNA is one of the fundamental problems in genome research. Gene regulatory code is highly complex due to the existence of polysemy and distant semantic relationship, which previous informatics methods often fail to capture especially in data-scarce scenarios. To address this challenge, we developed a novel pre-trained bidirectional encoder representation, named DNABERT, that forms global and transferrable understanding of genomic DNA sequences based on up and downstream nucleotide contexts. We show that the single pre-trained transformers model can simultaneously achieve state-of-the-art performance on many sequence predictions tasks, after easy fine-tuning using small task-specific data. Further, DNABERT enables direct visualization of nucleotide-level importance and semantic relationship within input sequences for better interpretability and accurate identification of conserved sequence motifs and functional genetic variants. Finally, we demonstrate that pre-trained DNABERT with human genome can even be readily applied to other organisms with exceptional performance."
   },
   {
     "channel": "papers-genomics",
@@ -101218,7 +101221,7 @@
     "timestamp": "2020-06-20T20:30:23.001000+00:00",
     "first_shared": "2020-06-20T20:30:23.001000+00:00",
     "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1592685023001000",
-    "url": "https://www.biorxiv.org/content/biorxiv/early/2019/04/11/364976.full.pdf",
+    "url": "https://www.biorxiv.org/content/biorxiv/early/2019/04/11/364976",
     "text": "https://www.biorxiv.org/content/biorxiv/early/2019/04/11/364976.full.pdf",
     "reactions_count": 0,
     "reply_count": 0,
@@ -101513,7 +101516,7 @@
     "timestamp": "2025-11-19T12:49:13.175529+00:00",
     "first_shared": "2025-11-19T12:49:13.175529+00:00",
     "slack_url": "https://koolab.slack.com/archives/C011SDT3KKQ/p1763556553175529",
-    "url": "https://www.biorxiv.org/content/10.1101/2025.11.12.688095v1.full",
+    "url": "https://www.biorxiv.org/content/10.1101/2025.11.12.688095v1",
     "text": "Sam Stanton\u2019s guided discrete diffusion for antibody design. https://www.biorxiv.org/content/10.1101/2025.11.12.688095v1.full",
     "reactions_count": 0,
     "reply_count": 0,
@@ -112760,7 +112763,7 @@
     "timestamp": "2023-06-03T23:27:33.915729+00:00",
     "first_shared": "2023-06-03T23:27:33.915729+00:00",
     "slack_url": "https://koolab.slack.com/archives/C011SDT3KKQ/p1685834853915729",
-    "url": "https://arxiv.org/pdf/2106.05466",
+    "url": "https://arxiv.org/abs/2106.05466",
     "text": "Adaptive machine learning for protein design. Similar concept for genomics. https://arxiv.org/pdf/2106.05466",
     "reactions_count": 1,
     "reply_count": 0,
@@ -112814,7 +112817,13 @@
         "id": 2,
         "label": "Biological Sequences"
       }
-    ]
+    ],
+    "title": "Adaptive machine learning for protein engineering",
+    "authors": [
+      "Hie, Brian L.",
+      "Yang, Kevin K."
+    ],
+    "abstract": "Machine-learning models that learn from data to predict how protein sequence encodes function are emerging as a useful protein engineering tool. However, when using these models to suggest new protein designs, one must deal with the vast combinatorial complexity of protein sequences. Here, we review how to use a sequence-to-function machine-learning surrogate model to select sequences for experimental measurement. First, we discuss how to select sequences through a single round of machine-learning optimization. Then, we discuss sequential optimization, where the goal is to discover optimized sequences and improve the model across multiple rounds of training, optimization, and experimental measurement."
   },
   {
     "channel": "papers-protein",
@@ -118313,7 +118322,7 @@
     "timestamp": "2021-02-14T12:07:03.003300+00:00",
     "first_shared": "2021-02-14T12:07:03.003300+00:00",
     "slack_url": "https://koolab.slack.com/archives/C011SDT3KKQ/p1613304423003300",
-    "url": "https://www.biorxiv.org/content/10.1101/2021.02.12.430858v1.full",
+    "url": "https://www.biorxiv.org/content/10.1101/2021.02.12.430858v1",
     "text": "Ground breaking and transparent work with MSAs and transformers. Work that tried to replicate the first \u201ctrunk\u201d of alphafold2: https://www.biorxiv.org/content/10.1101/2021.02.12.430858v1.full",
     "reactions_count": 0,
     "reply_count": 0,
@@ -119059,7 +119068,7 @@
     "timestamp": "2020-06-17T01:33:29.001100+00:00",
     "first_shared": "2020-06-17T01:33:29.001100+00:00",
     "slack_url": "https://koolab.slack.com/archives/C011SDT3KKQ/p1592357609001100",
-    "url": "https://www.biorxiv.org/content/10.1101/2020.06.15.153643v1.full.pdf",
+    "url": "https://www.biorxiv.org/content/10.1101/2020.06.15.153643v1",
     "text": "",
     "reactions_count": 0,
     "reply_count": 0,
@@ -119111,7 +119120,20 @@
         "id": 24,
         "label": "AI Learning"
       }
-    ]
+    ],
+    "title": "Transforming the Language of Life: Transformer Neural Networks for Protein Prediction Tasks",
+    "authors": [
+      "Nambiar, A.",
+      "Heflin, M. E.",
+      "Liu, S.",
+      "Maslov, S.",
+      "Hopkins, M.",
+      "Ritz, A."
+    ],
+    "year": 2020,
+    "journal": "Biorxiv",
+    "doi": "10.1101/2020.06.15.153643",
+    "abstract": "AO_SCPLOWBSTRACTC_SCPLOWThe scientific community is rapidly generating protein sequence information, but only a fraction of these proteins can be experimentally characterized. While promising deep learning approaches for protein prediction tasks have emerged, they have computational limitations or are designed to solve a specific task. We present a Transformer neural network that pre-trains task-agnostic sequence representations. This model is fine-tuned to solve two different protein prediction tasks: protein family classification and protein interaction prediction. Our method is comparable to existing state-of-the art approaches for protein family classification, while being much more general than other architectures. Further, our method outperforms all other approaches for protein interaction prediction. These results offer a promising framework for fine-tuning the pre-trained sequence representations for other protein prediction tasks."
   },
   {
     "channel": "papers-protein",
@@ -119190,7 +119212,7 @@
     "timestamp": "2020-06-10T10:34:24.000600+00:00",
     "first_shared": "2020-06-10T10:34:24.000600+00:00",
     "slack_url": "https://koolab.slack.com/archives/C011SDT3KKQ/p1591785264000600",
-    "url": "https://arxiv.org/pdf/2006.04768.pdf",
+    "url": "https://arxiv.org/abs/2006.04768",
     "text": "https://arxiv.org/pdf/2006.04768.pdf",
     "reactions_count": 0,
     "reply_count": 0,
@@ -119264,7 +119286,7 @@
     "timestamp": "2020-06-08T20:05:44.000400+00:00",
     "first_shared": "2020-06-08T20:05:44.000400+00:00",
     "slack_url": "https://koolab.slack.com/archives/C011SDT3KKQ/p1591646744000400",
-    "url": "https://arxiv.org/pdf/2006.03555.pdf",
+    "url": "https://arxiv.org/abs/2006.03555",
     "text": "",
     "reactions_count": 0,
     "reply_count": 0,
@@ -119421,7 +119443,7 @@
     "timestamp": "2020-04-16T15:37:14.000400+00:00",
     "first_shared": "2020-04-16T15:37:14.000400+00:00",
     "slack_url": "https://koolab.slack.com/archives/C011SDT3KKQ/p1587051434000400",
-    "url": "https://arxiv.org/pdf/2004.02441.pdf",
+    "url": "https://arxiv.org/abs/2004.02441",
     "text": "",
     "reactions_count": 0,
     "reply_count": 0,
@@ -126042,7 +126064,7 @@
     "timestamp": "2025-04-14T14:01:30.392719+00:00",
     "first_shared": "2025-04-14T14:01:30.392719+00:00",
     "slack_url": "https://koolab.slack.com/archives/C08C020L554/p1744639290392719",
-    "url": "https://arxiv.org/pdf/2504.03976",
+    "url": "https://arxiv.org/abs/2504.03976",
     "text": "https://arxiv.org/pdf/2504.03976",
     "reactions_count": 0,
     "reply_count": 1,
@@ -129603,7 +129625,7 @@
     "timestamp": "2023-05-31T05:11:51.610989+00:00",
     "first_shared": "2023-05-31T05:11:51.610989+00:00",
     "slack_url": "https://koolab.slack.com/archives/CP40S009F/p1685509911610989",
-    "url": "https://arxiv.org/pdf/2206.07387.pdf",
+    "url": "https://arxiv.org/abs/2206.07387",
     "text": "Watch this: A few months after us, another team publishes gradient projection/correction (!) - they did it for image tasks (!!!), something that we considered but saw it as too challenging - they were able to obtain manifolds using variational autoencoder latent space, to project the gradients on. Still need to read it in detail, but on the first skim, seems they have some pretty good qualitative examples of how saliency maps look better if projected on a VAE manifold, but did not develop such a clear mathematical theory as we did, seems like they couldn't comprehend why exactly orthogonal gradients are spurious. This is great because it supports the generality on other tasks, that we struggled to find examples for. We were rejected from some journals for being \"too narrow\" in demonstrating wider applications, we just had one biology example on a simple one-hot space. Very happy to see it can be done on images.",
     "reactions_count": 0,
     "reply_count": 0,
@@ -131135,7 +131157,7 @@
     "timestamp": "2021-04-21T23:04:07.058800+00:00",
     "first_shared": "2021-04-21T23:04:07.058800+00:00",
     "slack_url": "https://koolab.slack.com/archives/CP40S009F/p1619046247058800",
-    "url": "https://www.biorxiv.org/content/10.1101/737981v2.full.pdf",
+    "url": "https://www.biorxiv.org/content/10.1101/737981v2",
     "text": "That was mostly this paper :",
     "reactions_count": 0,
     "reply_count": 0,
@@ -131187,7 +131209,25 @@
         "id": 27,
         "label": "Regulatory DNA"
       }
-    ]
+    ],
+    "title": "Deep learning at base-resolution reveals motif syntax of the cis-regulatory code",
+    "authors": [
+      "Avsec, Z.",
+      "Weilert, M.",
+      "Shrikumar, A.",
+      "Alexandari, A.",
+      "Krueger, S.",
+      "Dalal, K.",
+      "Fropf, R.",
+      "McAnany, C.",
+      "Gagneur, J.",
+      "Kundaje, A.",
+      "Zeitlinger, J."
+    ],
+    "year": 2019,
+    "journal": "Biorxiv",
+    "doi": "10.1101/737981",
+    "abstract": "The arrangement of transcription factor (TF) binding motifs (syntax) is an important part of the cis-regulatory code, yet remains elusive. We introduce a deep learning model, BPNet, that uses DNA sequence to predict base-resolution ChIP-nexus binding profiles of pluripotency TFs. We develop interpretation tools to learn predictive motif representations and identify soft syntax rules for cooperative TF binding interactions. Strikingly, Nanog preferentially binds with helical periodicity, and TFs often cooperate in a directional manner, which we validate using CRISPR-induced point mutations. Our model represents a powerful general approach to uncover the motifs and syntax of cis-regulatory sequences in genomics data.\n\nHighlightsO_LIThe neural network BPNet accurately predicts TF binding data at base-resolution.\nC_LIO_LIModel interpretation discovers TF motifs and TF interactions dependent on soft syntax.\nC_LIO_LIMotifs for Nanog and partners are preferentially spaced at [~]10.5 bp periodicity.\nC_LIO_LIDirectional cooperativity is validated: Sox2 enhances Nanog binding, but not vice versa.\nC_LI"
   },
   {
     "channel": "general",
@@ -132565,7 +132605,7 @@
     "timestamp": "2026-02-05T03:26:01.328069+00:00",
     "first_shared": "2026-02-05T03:26:01.328069+00:00",
     "slack_url": "https://koolab.slack.com/archives/CP40S02RX/p1770261961328069",
-    "url": "https://arxiv.org/pdf/2602.02384",
+    "url": "https://arxiv.org/abs/2602.02384",
     "text": "a formula for any real number, maybe https://arxiv.org/pdf/2602.02384",
     "reactions_count": 0,
     "reply_count": 0,
@@ -132697,66 +132737,6 @@
       {
         "id": 4,
         "label": "Single-Cell Models"
-      }
-    ]
-  },
-  {
-    "channel": "random",
-    "shared_by": "Peter Koo",
-    "timestamp": "2026-01-30T16:07:21.142259+00:00",
-    "first_shared": "2026-01-30T16:07:21.142259+00:00",
-    "slack_url": "https://koolab.slack.com/archives/CP40S02RX/p1769789241142259",
-    "url": "https://arxiv.org/auth/endorse?x=DJJICN",
-    "text": "[*Help*] can anyone who's registered as an endorser for the q-bio.GN (Genomics) subject class of arXiv give me an endorsement so i can post something? Thanks!",
-    "reactions_count": 0,
-    "reply_count": 0,
-    "reaction_details": {},
-    "channels": [
-      "random"
-    ],
-    "projections": {
-      "pca": [
-        0.008277332410216331,
-        -0.05052082985639572
-      ],
-      "tsne": [
-        6.25161600112915,
-        20.784746170043945
-      ],
-      "umap": [
-        7.760665416717529,
-        1.6753783226013184
-      ],
-      "pca3d": [
-        0.008277332410216331,
-        -0.05052082985639572,
-        -0.03375275805592537
-      ],
-      "tsne3d": [
-        -4.242630481719971,
-        3.9056689739227295,
-        -5.870741844177246
-      ],
-      "umap3d": [
-        9.39523696899414,
-        -1.029893398284912,
-        1.1424940824508667
-      ]
-    },
-    "cluster_id": 4,
-    "cluster_label": "Genomic Models",
-    "cluster_levels": [
-      {
-        "id": 4,
-        "label": "Genomic Models"
-      },
-      {
-        "id": 0,
-        "label": "Genomics Alignment"
-      },
-      {
-        "id": 26,
-        "label": "Genomics Learning"
       }
     ]
   },
@@ -132976,7 +132956,7 @@
     "timestamp": "2026-01-09T18:55:55.709459+00:00",
     "first_shared": "2026-01-09T18:55:55.709459+00:00",
     "slack_url": "https://koolab.slack.com/archives/CP40S02RX/p1767984955709459",
-    "url": "https://arxiv.org/pdf/2510.04950",
+    "url": "https://arxiv.org/abs/2510.04950",
     "text": "so apparently we really should be rude to LLMs (at least GPT 4o):",
     "reactions_count": 9,
     "reply_count": 1,
@@ -134036,7 +134016,7 @@
     "timestamp": "2025-05-20T16:24:46.063149+00:00",
     "first_shared": "2025-05-20T16:24:46.063149+00:00",
     "slack_url": "https://koolab.slack.com/archives/CP40S02RX/p1747758286063149",
-    "url": "https://arxiv.org/pdf/2306.15006",
+    "url": "https://arxiv.org/abs/2306.15006",
     "text": "Regarding the BPE in genomics: in the DNA-BERT2 paper, they made a small illustration. They also compared (performance, efficiency) it with 3-6mer DNA-BERT which has otherwise same architecture",
     "reactions_count": 0,
     "reply_count": 0,
@@ -139444,66 +139424,6 @@
       {
         "id": 3,
         "label": "Medical LLMs"
-      }
-    ]
-  },
-  {
-    "channel": "random",
-    "shared_by": "Antonio Majdandzic",
-    "timestamp": "2021-09-03T20:55:16.006300+00:00",
-    "first_shared": "2021-09-03T20:55:16.006300+00:00",
-    "slack_url": "https://koolab.slack.com/archives/CP40S02RX/p1630702516006300",
-    "url": "https://physicstoday.scitation.org/do/10.1063/PT.6.1.20180822a/full/?amp",
-    "text": "Great story on a scientific dispute in the computational community, caused by an algorithm mistake, about the existence of water's second critical point. A bit of background information: Water has 3 major phases: gas, liquid and ice, also a critical point where all the three phases merge (for non-room pressures and temperatures). My former PI (Stanley) proposed that water has a second critical point, involving exotic liquid phases. Two computational groups, form Princeton and Berkley, were competing to prove or disprove his theory....",
-    "reactions_count": 0,
-    "reply_count": 0,
-    "reaction_details": {},
-    "channels": [
-      "random"
-    ],
-    "projections": {
-      "pca": [
-        0.0014904085546731949,
-        -0.05070957541465759
-      ],
-      "tsne": [
-        -3.8234286308288574,
-        0.05721981078386307
-      ],
-      "umap": [
-        7.136292457580566,
-        3.0357325077056885
-      ],
-      "pca3d": [
-        0.0014904085546731949,
-        -0.05070957541465759,
-        -0.03554801642894745
-      ],
-      "tsne3d": [
-        -11.337699890136719,
-        4.470606803894043,
-        -11.8920259475708
-      ],
-      "umap3d": [
-        11.292491912841797,
-        -1.0134934186935425,
-        0.15245436131954193
-      ]
-    },
-    "cluster_id": 6,
-    "cluster_label": "AI Research Agents",
-    "cluster_levels": [
-      {
-        "id": 6,
-        "label": "AI Research Agents"
-      },
-      {
-        "id": 0,
-        "label": "Genomics Alignment"
-      },
-      {
-        "id": 32,
-        "label": "Health AI"
       }
     ]
   },

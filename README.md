@@ -4,6 +4,8 @@
 
 PaperTrail automatically discovers papers shared across your Slack workspace, enriches them with metadata from OpenAlex and PubMed, computes semantic embeddings, and serves an interactive CellXGene-style dashboard with a canvas-based 2D embedding map, sortable table, and AI-powered chatbot search.
 
+### [Live Demo: Koo Lab Dashboard](https://bschilder.github.io/PaperTrail/koolab/)
+
 [Documentation](https://bschilder.github.io/PaperTrail) · [Report Bug](https://github.com/bschilder/PaperTrail/issues) · [Request Feature](https://github.com/bschilder/PaperTrail/issues)
 
 ---

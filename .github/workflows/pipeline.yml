@@ -52,9 +52,14 @@ jobs:
       - name: Build docs
         run: |
           mkdocs build --strict
-          # Copy dashboard into docs site
+          # Deploy dashboard under workspace name from config
+          WORKSPACE=$(python -c "import yaml; c=yaml.safe_load(open('config.yml')); url=c.get('slack_workspace_url',''); name=url.split('//')[1].split('.')[0] if '//' in url else 'dashboard'; print(name)")
+          echo "Dashboard path: $WORKSPACE"
+          mkdir -p "site/$WORKSPACE"
+          cp build/dashboard.html "site/$WORKSPACE/index.html"
+          # Also keep /dashboard/ as redirect for backward compat
           mkdir -p site/dashboard
-          cp build/dashboard.html site/dashboard/index.html
+          echo "<meta http-equiv='refresh' content='0;url=../$WORKSPACE/'>" > site/dashboard/index.html
 
       - name: Commit updated data
         run: |
