@@ -2390,7 +2390,7 @@
                     <div class="sidebar-label">Color By</div>
                     <select class="color-by-select" id="colorBySelect">
                         <option value="channel">Channel</option>
-                        <option value="cluster">Cluster</option>
+                        <option value="cluster" selected>Cluster</option>
                         <option value="year">Year</option>
                         <option value="citations">Citations</option>
                         <option value="engagement">Engagement</option>
@@ -2447,7 +2447,7 @@
                     <select class="scale-by-select" id="scaleBySelect">
                         <option value="uniform">Uniform</option>
                         <option value="citations">Citations</option>
-                        <option value="engagement">Engagement</option>
+                        <option value="engagement" selected>Engagement</option>
                         <option value="year">Year</option>
                         <option value="relevance">Relevance</option>
                     </select>
@@ -2884,8 +2884,69 @@
         let leaderboardFocusIdx = -1;
         let semanticQuery = null;
         let semanticScores = new Map();
-        let colorByMode = 'channel';
-        let scaleByMode = 'uniform';
+        let colorByMode = 'cluster';
+        let scaleByMode = 'engagement';
+
+        // ── Global cluster color system ──
+        // 7 highly distinct base colors for level-0 clusters
+        const BASE_CLUSTER_COLORS = [
+            '#e6194b', '#3cb44b', '#4363d8', '#f58231', '#42d4f4',
+            '#f032e6', '#fabed4', '#469990', '#dcbeff', '#9A6324',
+            '#ffe119', '#aaffc3', '#808000', '#000075', '#a9a9a9',
+        ];
+
+        // Generate sub-cluster color as a hue shift of the parent
+        function getClusterColor(paper) {
+            const levels = paper.cluster_levels;
+            if (!levels || !levels.length) {
+                return BASE_CLUSTER_COLORS[(paper.cluster_id || 0) % BASE_CLUSTER_COLORS.length];
+            }
+            const l0id = levels[0].id;
+            const baseColor = BASE_CLUSTER_COLORS[l0id % BASE_CLUSTER_COLORS.length];
+            return baseColor;
+        }
+
+        function getClusterColorById(clusterId, hierLevel) {
+            // For level 0, use base color directly
+            if (!hierLevel || hierLevel === 0) {
+                return BASE_CLUSTER_COLORS[clusterId % BASE_CLUSTER_COLORS.length];
+            }
+            // For sub-clusters, find which level-0 cluster most papers belong to
+            // This is computed lazily and cached
+            return _subclusterColorCache[`${hierLevel}_${clusterId}`] || BASE_CLUSTER_COLORS[clusterId % BASE_CLUSTER_COLORS.length];
+        }
+
+        const _subclusterColorCache = {};
+        function buildSubclusterColorMap() {
+            // Map each sub-cluster to its dominant level-0 parent
+            const levelCounts = {}; // { "1_5": { 0: 100, 1: 50, ... } }
+            allPapers.forEach(p => {
+                if (!p.cluster_levels || p.cluster_levels.length < 2) return;
+                const l0 = p.cluster_levels[0].id;
+                for (let lvl = 1; lvl < p.cluster_levels.length; lvl++) {
+                    const subId = p.cluster_levels[lvl].id;
+                    const key = `${lvl}_${subId}`;
+                    if (!levelCounts[key]) levelCounts[key] = {};
+                    levelCounts[key][l0] = (levelCounts[key][l0] || 0) + 1;
+                }
+            });
+
+            // For each sub-cluster, find dominant parent and vary the hue
+            for (const [key, parents] of Object.entries(levelCounts)) {
+                const [lvl, subId] = key.split('_').map(Number);
+                const dominantParent = Object.entries(parents).sort((a,b) => b[1] - a[1])[0][0];
+                const baseHex = BASE_CLUSTER_COLORS[dominantParent % BASE_CLUSTER_COLORS.length];
+
+                // Vary lightness: parse hex, shift brightness
+                const r = parseInt(baseHex.slice(1,3), 16);
+                const g = parseInt(baseHex.slice(3,5), 16);
+                const b = parseInt(baseHex.slice(5,7), 16);
+                // Alternate between lighter and darker variants
+                const shift = ((subId % 5) - 2) * 25;
+                const clamp = v => Math.max(0, Math.min(255, v + shift));
+                _subclusterColorCache[key] = `rgb(${clamp(r)},${clamp(g)},${clamp(b)})`;
+            }
+        }
 
         // Modal history stack for back navigation
         let modalHistory = [];
@@ -3177,6 +3238,9 @@
             // Build O(1) index lookup
             paperIndexMap.clear();
             allPapers.forEach((p, i) => paperIndexMap.set(p, i));
+
+            // Build sub-cluster → parent color mapping
+            buildSubclusterColorMap();
 
             // Set top-N slider max to total paper count
             const topNSlider = document.getElementById('selectTopN');
@@ -3473,7 +3537,7 @@
                 </div>
             `;
 
-            const CLUSTER_COLORS = ['#64b5f6','#bb86fc','#66bb6a','#ffa726','#ef5350','#26c6da','#ffca28','#ab47bc','#8d6e63','#78909c','#ec407a','#7e57c2'];
+            const CLUSTER_COLORS = BASE_CLUSTER_COLORS;
 
             body.innerHTML = `
                 <div class="profile-section" style="max-height:400px;overflow-y:auto;">
@@ -3548,7 +3612,15 @@
             pushModalHistory();
             document.getElementById('topicActionPopup').classList.remove('visible');
             const lbl = label.toLowerCase();
-            const papers = allPapers.filter(p => (p.cluster_label || '').toLowerCase().includes(lbl));
+            const papers = allPapers.filter(p => {
+                // Check level-0 label
+                if ((p.cluster_label || '').toLowerCase().includes(lbl)) return true;
+                // Check all hierarchy levels
+                if (p.cluster_levels) {
+                    return p.cluster_levels.some(l => (l.label || '').toLowerCase().includes(lbl));
+                }
+                return false;
+            });
             const modal = document.getElementById('topicModal');
             const header = document.getElementById('topicHeader');
             const body = document.getElementById('topicBody');
@@ -4207,8 +4279,7 @@
             }
 
             if (colorByMode === 'cluster') {
-                const CLUSTER_COLORS = ['#64b5f6','#bb86fc','#66bb6a','#ffa726','#ef5350','#26c6da','#ffca28','#ab47bc','#8d6e63','#78909c','#ec407a','#7e57c2'];
-                return CLUSTER_COLORS[(paper.cluster_id || 0) % CLUSTER_COLORS.length];
+                return getClusterColor(paper);
             }
 
             if (colorByMode === 'year') {
@@ -4977,7 +5048,7 @@
             scale3D = scale;
 
             const sphereGeo = new THREE.SphereGeometry(1, 10, 8);
-            const CLUSTER_COLORS_3D = [0x64b5f6, 0xbb86fc, 0x66bb6a, 0xffa726, 0xef5350, 0x26c6da, 0xffca28, 0xab47bc, 0x8d6e63, 0x78909c, 0xec407a, 0x7e57c2];
+            const CLUSTER_COLORS_3D = [0xe6194b, 0x3cb44b, 0x4363d8, 0xf58231, 0x42d4f4, 0xf032e6, 0xfabed4, 0x469990, 0xdcbeff, 0x9A6324, 0xffe119, 0xaaffc3, 0x808000, 0x000075, 0xa9a9a9];
 
             const mat3D = new THREE.MeshStandardMaterial({
                 roughness: 0.4,
@@ -5514,7 +5585,7 @@
             const container = document.getElementById('mapLegend');
             if (!container) return;
 
-            const CLUSTER_COLORS_ARR = ['#64b5f6','#bb86fc','#66bb6a','#ffa726','#ef5350','#26c6da','#ffca28','#ab47bc','#8d6e63','#78909c','#ec407a','#7e57c2'];
+            const CLUSTER_COLORS_ARR = BASE_CLUSTER_COLORS;
 
             if (colorByMode === 'channel') {
                 const channels = Array.from(selectedChannels).sort();
@@ -5666,7 +5737,7 @@
                 ctx.fillText(minLabel, x, y + 20);
                 ctx.fillText(maxLabel, x + gradWidth - ctx.measureText(maxLabel).width, y + 20);
             } else if (colorByMode === 'cluster') {
-                const CLUSTER_COLORS = ['#64b5f6','#bb86fc','#66bb6a','#ffa726','#ef5350','#26c6da','#ffca28','#ab47bc','#8d6e63','#78909c','#ec407a','#7e57c2'];
+                const CLUSTER_COLORS = BASE_CLUSTER_COLORS;
                 const clusters = {};
                 filteredPapers.forEach(p => {
                     const cid = p.cluster_id || 0;
@@ -5818,8 +5889,10 @@
                 }
 
                 // Colored dot before label
-                const LABEL_COLORS = ['#64b5f6','#bb86fc','#66bb6a','#ffa726','#ef5350','#26c6da','#ffca28','#ab47bc','#8d6e63','#78909c','#ec407a','#7e57c2'];
-                const dotColor = LABEL_COLORS[rank % LABEL_COLORS.length];
+                // Use actual cluster color for the dot
+                const cidNum = typeof c.cid === 'string' && c.cid.includes('_') ? parseInt(c.cid.split('_')[1]) : parseInt(c.cid);
+                const cidLevel = typeof c.cid === 'string' && c.cid.startsWith('L') ? parseInt(c.cid.charAt(1)) : 0;
+                const dotColor = getClusterColorById(cidNum, cidLevel);
                 const dotR = Math.max(3, fontSize / 4);
                 ctx.globalAlpha = alpha;
                 ctx.beginPath();
