@@ -133,6 +133,11 @@ def enrich_url(url: str, email: str = "papertrail@example.com") -> dict[str, Any
     if not result.get("journal"):
         result["journal"] = _infer_journal_from_url(url)
 
+    # Reject erratum/corrigendum/retraction titles — these are not real papers
+    title = (result.get("title") or "").lower().strip()
+    if title in ("erratum", "corrigendum", "retraction", "correction", "publisher correction"):
+        result["title"] = ""
+
     return result
 
 
