@@ -5488,7 +5488,17 @@
             // Most cited paper
             const topCited = [...allPapers].sort((a, b) => (b.cited_by_count || 0) - (a.cited_by_count || 0))[0];
 
-            let html = `<span class="insight-chip" onclick="showAllClusters()" title="View all clusters">&#x1F30D; <span class="insight-highlight">${sortedClusters.length} clusters</span></span>`;
+            // Count subclusters from hierarchy levels
+            const subclusterCount = (() => {
+                if (!allPapers[0]?.cluster_levels || allPapers[0].cluster_levels.length < 2) return 0;
+                const l1ids = new Set();
+                allPapers.forEach(p => { if (p.cluster_levels?.[1]) l1ids.add(p.cluster_levels[1].id); });
+                return l1ids.size;
+            })();
+            const clusterText = subclusterCount > 0
+                ? `${sortedClusters.length} topics [${subclusterCount} subtopics]`
+                : `${sortedClusters.length} clusters`;
+            let html = `<span class="insight-chip" onclick="showAllClusters()" title="View all clusters">&#x1F30D; <span class="insight-highlight">${clusterText}</span></span>`;
             html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="document.getElementById('tableToggle').click()" title="View all papers"><span id="insightPaperCount">${allPapers.length}</span> papers</span>`;
             if (topCluster) html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="showTopicActions('${esc(topCluster[0]).replace(/'/g, "\\'")}', event)" title="Explore this topic">&#x1F4A1; <strong>${esc(topCluster[0])}</strong> (${topCluster[1]})</span>`;
             if (topPerson) html += `<span class="insight-sep">·</span><span class="insight-chip" onclick="showContributorProfile('${esc(topPerson[0]).replace(/'/g, "\\'")}')" title="View profile">&#x1F451; <strong>${esc(topPerson[0])}</strong> (${topPerson[1]})</span>`;
@@ -6998,19 +7008,20 @@
             renderMap();
         }
 
-        function triggerSemanticFromPanel() {
+        async function triggerSemanticFromPanel() {
             const query = document.getElementById('semanticPanelInput').value.trim();
             if (!query) return;
-            // Sync with sidebar semantic search
             document.getElementById('semanticQuery').value = query;
             semanticQuery = query;
-            computeSemanticSimilarity(query);
+            if (!window._preSearchColorMode) window._preSearchColorMode = colorByMode;
+            colorByMode = 'relevance';
+            document.getElementById('colorBySelect').value = 'relevance';
+            await computeSemanticSimilarity(query);
             document.getElementById('semanticActive').style.display = 'block';
             document.getElementById('semanticClear').style.display = 'block';
             document.getElementById('topNSection').style.display = 'block';
             document.getElementById('scaleBySelect').value = 'relevance';
             scaleByMode = 'relevance';
-            // Switch to map view
             document.getElementById('mapToggle').click();
             autoSelectTopN();
         }
