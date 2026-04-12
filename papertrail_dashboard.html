@@ -4412,13 +4412,22 @@
         function getPointColor(paper) {
             if (semanticQuery) {
                 const raw = semanticScores.get(paper.title) || 0;
-                const score = normalizeSemanticScore(raw);
-                // Cool blue (low) → warm yellow (mid) → hot red (high)
-                if (score < 0.5) {
-                    return interpolateColor([30, 40, 80], [60, 180, 220], score * 2);
-                } else {
-                    return interpolateColor([60, 180, 220], [255, 60, 60], (score - 0.5) * 2);
+                const s = normalizeSemanticScore(raw);
+                // Viridis-inspired 5-stop gradient: dark purple → blue → teal → green → yellow
+                const stops = [
+                    [0.00, [68, 1, 84]],
+                    [0.25, [59, 82, 139]],
+                    [0.50, [33, 145, 140]],
+                    [0.75, [94, 201, 98]],
+                    [1.00, [253, 231, 37]],
+                ];
+                for (let i = 0; i < stops.length - 1; i++) {
+                    if (s <= stops[i + 1][0]) {
+                        const t = (s - stops[i][0]) / (stops[i + 1][0] - stops[i][0]);
+                        return interpolateColor(stops[i][1], stops[i + 1][1], t);
+                    }
                 }
+                return interpolateColor(stops[stops.length - 2][1], stops[stops.length - 1][1], 1);
             }
 
             if (colorByMode === 'channel' && paper.channels && paper.channels.length > 0) {
