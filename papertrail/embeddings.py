@@ -182,7 +182,7 @@ def _embed_huggingface(texts: list[str], model: str) -> np.ndarray:
     import requests
 
     token = os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACEHUB_API_TOKEN")
-    url = f"https://api-inference.huggingface.co/pipeline/feature-extraction/{model}"
+    url = f"https://router.huggingface.co/hf-inference/models/{model}/pipeline/feature-extraction"
     headers = {"Authorization": f"Bearer {token}"} if token else {}
 
     all_embeddings = []

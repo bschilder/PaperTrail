@@ -8821,7 +8821,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             const token = hfToken || (connectedServices?.huggingface?.key);
             if (!token) return null;
             try {
-                const resp = await fetch('https://router.huggingface.co/pipeline/feature-extraction/BAAI/bge-small-en-v1.5', {
+                const resp = await fetch('https://router.huggingface.co/hf-inference/models/BAAI/bge-small-en-v1.5/pipeline/feature-extraction', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ inputs: text }),
