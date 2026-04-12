@@ -5565,12 +5565,19 @@
 
             // Animate fade: set targets based on filter, lerp toward them
             const filteredSet = new Set(filteredPapers);
+            const lerpSpeed = ttPlaying ? 0.15 : 0.05; // faster during timeline playback
             let fadeAnimating = false;
             allPapers.forEach(paper => {
-                paper._fadeTarget = filteredSet.has(paper) ? 1.0 : 0.0;
-                if (paper._fade === undefined) paper._fade = paper._fadeTarget;
+                const newTarget = filteredSet.has(paper) ? 1.0 : 0.0;
+                const prevTarget = paper._fadeTarget;
+                paper._fadeTarget = newTarget;
+                if (paper._fade === undefined) paper._fade = newTarget;
+                // Paper just appeared — start at partial visibility for smooth pop-in
+                if (newTarget === 1 && prevTarget === 0 && paper._fade < 0.1) {
+                    paper._fade = 0.15;
+                }
                 if (Math.abs(paper._fade - paper._fadeTarget) > 0.005) {
-                    paper._fade += (paper._fadeTarget - paper._fade) * 0.05;
+                    paper._fade += (paper._fadeTarget - paper._fade) * lerpSpeed;
                     fadeAnimating = true;
                 } else {
                     paper._fade = paper._fadeTarget;
