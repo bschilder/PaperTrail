@@ -5520,6 +5520,22 @@
             });
             const clusterCounts = {};
 
+            // Ghost pass: draw deselected papers as faded small dots
+            const filteredSet = new Set(filteredPapers);
+            allPapers.forEach(paper => {
+                if (filteredSet.has(paper)) return; // drawn in main pass
+                const proj = paper.projections && paper.projections[currentProjection];
+                if (!proj) return;
+                const [sx, sy] = dataToScreen(proj[0], proj[1]);
+                if (sx < -50 || sx > canvas.width + 50 || sy < -50 || sy > canvas.height + 50) return;
+                ctx.globalAlpha = 0.08;
+                ctx.fillStyle = '#888';
+                ctx.beginPath();
+                ctx.arc(sx, sy, Math.max(1.5, basePointSize * 0.4), 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+
             filteredPapers.forEach((paper, idx) => {
                 const proj = paper.projections && paper.projections[currentProjection];
                 if (!proj) return; // already set in pre-pass
