@@ -2384,8 +2384,8 @@
                         <span class="sidebar-tip">Cmd+&#8592;&#8594; or keys 1/2/3</span>
                     </div>
                     <div class="projection-buttons" id="projectionButtons">
-                        <button class="proj-btn" data-proj="umap">UMAP</button>
-                        <button class="proj-btn active" data-proj="tsne">t-SNE</button>
+                        <button class="proj-btn active" data-proj="umap">UMAP</button>
+                        <button class="proj-btn" data-proj="tsne">t-SNE</button>
                         <button class="proj-btn" data-proj="pca">PCA</button>
                     </div>
                 </div>
@@ -2401,6 +2401,7 @@
                         <option value="density">Density (eq_hist)</option>
                         <option value="contributor">Contributor</option>
                         <option value="journal">Journal</option>
+                        <option value="relevance">Relevance</option>
                     </select>
                 </div>
 
@@ -2934,7 +2935,7 @@
         let leaderboardFocusSection = -1; // -1=none, 0=contributors, 1=engaged, 2=cited, 3=recent
         let leaderboardFocusIdx = -1;
         let semanticQuery = null;
-        let semanticScores = new Map();
+        let semanticScores = new Map(); // key: paper object, value: score
         let colorByMode = 'cluster';
         let scaleByMode = 'engagement';
 
@@ -3089,7 +3090,7 @@
         let kdeCanvas = null; // offscreen canvas for KDE
         let renderedLabels = []; // {x, y, w, h, label} for click detection
         let hiddenClusters = new Set(); // cluster labels hidden via legend toggle
-        let currentProjection = 'tsne';
+        let currentProjection = 'umap';
 
         // Sidebar section focus state for CMD+Up/Down navigation
         let focusedSidebarIdx = -1;
@@ -4402,7 +4403,7 @@
             if (scaleByMode === 'engagement') return Math.max(basePointSize * 0.7, Math.min(basePointSize * 3, basePointSize + applyTransform(paper.engagement || 0, 5) * basePointSize * 2));
             if (scaleByMode === 'year') return Math.max(basePointSize * 0.7, Math.min(basePointSize * 3, basePointSize + applyTransform((paper.year || 2020) - 2015, 10) * basePointSize * 2));
             if (scaleByMode === 'relevance' && semanticQuery) {
-                const raw = semanticScores.get(paper.title) || 0;
+                const raw = semanticScores.get(paper) || 0;
                 const score = normalizeSemanticScore(raw);
                 return Math.max(basePointSize * 0.5, basePointSize + score * basePointSize * 2);
             }
@@ -4419,8 +4420,8 @@
         }
 
         function getPointColor(paper) {
-            if (semanticQuery) {
-                const raw = semanticScores.get(paper.title) || 0;
+            if (semanticQuery && colorByMode === 'relevance') {
+                const raw = semanticScores.get(paper) || 0;
                 const s = normalizeSemanticScore(raw);
                 // Viridis-inspired 5-stop gradient: dark purple → blue → teal → green → yellow
                 const stops = [
@@ -6940,7 +6941,7 @@
                         if (emb) {
                             const sim = cosineSimilarity(queryEmb, emb);
                             // Normalize to 0-1 range (cosine sim can be negative)
-                            semanticScores.set(paper.title, Math.max(0, sim));
+                            semanticScores.set(paper, Math.max(0, sim));
                         }
                     });
                     // Compute score range for normalization
@@ -6966,7 +6967,7 @@
                     if (title.includes(term)) score += 3 * Math.max(1, idf);
                     else if (abstract.includes(term)) score += 1 * Math.max(1, idf);
                 });
-                semanticScores.set(paper.title, Math.min(1, score / (queryTerms.length * 3)));
+                semanticScores.set(paper, Math.min(1, score / (queryTerms.length * 3)));
             });
             const scores = Array.from(semanticScores.values());
             scores.sort((a, b) => a - b);
@@ -6980,7 +6981,7 @@
             if (!semanticQuery) return;
             const topN = parseInt(document.getElementById('selectTopN').value);
             const sorted = Array.from(filteredPapers.entries())
-                .sort((a, b) => (semanticScores.get(b[1].title) || 0) - (semanticScores.get(a[1].title) || 0))
+                .sort((a, b) => (semanticScores.get(b[1]) || 0) - (semanticScores.get(a[1]) || 0))
                 .slice(0, topN);
 
             selectedPapers.clear();
@@ -9365,6 +9366,10 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 document.getElementById('topNSection').style.display = 'block';
                 document.getElementById('scaleBySelect').value = 'relevance';
                 scaleByMode = 'relevance';
+                // Auto-switch color to relevance
+                if (!window._preSearchColorMode) window._preSearchColorMode = colorByMode;
+                colorByMode = 'relevance';
+                document.getElementById('colorBySelect').value = 'relevance';
                 autoSelectTopN();
             });
 
@@ -9373,6 +9378,12 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 semanticScores.clear();
                 document.getElementById('semanticQuery').value = '';
                 document.getElementById('semanticActive').style.display = 'none';
+                // Restore previous color mode
+                if (window._preSearchColorMode) {
+                    colorByMode = window._preSearchColorMode;
+                    document.getElementById('colorBySelect').value = colorByMode;
+                    window._preSearchColorMode = null;
+                }
                 document.getElementById('semanticClear').style.display = 'none';
                 document.getElementById('topNSection').style.display = 'none';
                 document.getElementById('scaleBySelect').value = 'uniform';
