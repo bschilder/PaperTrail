@@ -2461,6 +2461,11 @@
                             <input type="range" id="topicLinesOpacity" min="5" max="80" value="50" step="5" style="flex:1;">
                             <span class="threshold-display" id="topicLinesOpacityDisplay" style="min-width:25px;">50%</span>
                         </div>
+                        <div class="select-controls" style="margin-bottom:4px;">
+                            <span style="font-size:10px;color:#666;min-width:55px;">Curve</span>
+                            <input type="range" id="topicLinesCurve" min="0" max="1" value="0.3" step="0.05" style="flex:1;">
+                            <span class="threshold-display" id="topicLinesCurveDisplay" style="min-width:20px;">0.3</span>
+                        </div>
                         <div class="select-controls">
                             <span style="font-size:10px;color:#666;min-width:55px;">Color</span>
                             <select class="color-by-select" id="topicLinesColor" style="flex:1;font-size:11px;">
@@ -3072,6 +3077,7 @@
         let topicLinesWidth = 3;
         let topicLinesOpacity = 50;
         let topicLinesColor = '#fff';
+        let topicLinesCurve = 0.3; // 0 = straight, 1 = very curved
         let kdeOpacityOverride = null; // for fade-in animation
         let kdeCanvas = null; // offscreen canvas for KDE
         let renderedLabels = []; // {x, y, w, h, label} for click detection
@@ -5970,13 +5976,22 @@
                         ? getClusterColorById(parseInt(String(a.cid).split('_').pop()), hierLevel)
                         : topicLinesColor;
 
+                    // Compute control point for bezier curve
+                    const mx = (a.cx + b.cx) / 2;
+                    const my = (a.cy + b.cy) / 2;
+                    const dx = b.cx - a.cx;
+                    const dy = b.cy - a.cy;
+                    // Perpendicular offset scaled by curve amount
+                    const cpx = mx - dy * topicLinesCurve;
+                    const cpy = my + dx * topicLinesCurve;
+
                     // Glow pass
                     ctx.globalAlpha = alpha * 0.3;
                     ctx.strokeStyle = lineColor;
                     ctx.lineWidth = topicLinesWidth + 4;
                     ctx.beginPath();
                     ctx.moveTo(a.cx, a.cy);
-                    ctx.lineTo(b.cx, b.cy);
+                    ctx.quadraticCurveTo(cpx, cpy, b.cx, b.cy);
                     ctx.stroke();
 
                     // Main line
@@ -5985,7 +6000,7 @@
                     ctx.lineWidth = topicLinesWidth;
                     ctx.beginPath();
                     ctx.moveTo(a.cx, a.cy);
-                    ctx.lineTo(b.cx, b.cy);
+                    ctx.quadraticCurveTo(cpx, cpy, b.cx, b.cy);
                     ctx.stroke();
                 });
             });
@@ -6036,9 +6051,15 @@
                     ctx.strokeStyle = subColor;
                     ctx.lineWidth = Math.max(1, topicLinesWidth * 0.6);
                     ctx.setLineDash([4, 4]);
+                    const smx = (sub.cx + px) / 2;
+                    const smy = (sub.cy + py) / 2;
+                    const sdx = px - sub.cx;
+                    const sdy = py - sub.cy;
+                    const scpx = smx - sdy * topicLinesCurve;
+                    const scpy = smy + sdx * topicLinesCurve;
                     ctx.beginPath();
                     ctx.moveTo(sub.cx, sub.cy);
-                    ctx.lineTo(px, py);
+                    ctx.quadraticCurveTo(scpx, scpy, px, py);
                     ctx.stroke();
                     ctx.setLineDash([]);
                 });
@@ -9086,6 +9107,11 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             document.getElementById('topicLinesOpacity').addEventListener('input', (e) => {
                 topicLinesOpacity = parseInt(e.target.value);
                 document.getElementById('topicLinesOpacityDisplay').textContent = topicLinesOpacity + '%';
+                renderMap();
+            });
+            document.getElementById('topicLinesCurve').addEventListener('input', (e) => {
+                topicLinesCurve = parseFloat(e.target.value);
+                document.getElementById('topicLinesCurveDisplay').textContent = topicLinesCurve;
                 renderMap();
             });
             document.getElementById('topicLinesColor').addEventListener('change', (e) => {
