@@ -3069,6 +3069,7 @@
 
         // Time travel state (global so filterPapers can access)
         let ttCutoffDate = null; // null = show all
+        let ttPlaying = false;
         let basePointSize = 3; // global point size multiplier
         let scaleTransform = 'linear'; // linear, log, sqrt
         let densityMap = new Map(); // paper -> density score (0-1)
@@ -9188,7 +9189,6 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             document.getElementById('exportXlsx').addEventListener('click', () => downloadFiltered('xlsx'));
 
             // ===== TIME TRAVEL =====
-            let ttPlaying = false;
             let ttAnimFrame = null;
 
             // Build sorted list of paper dates
