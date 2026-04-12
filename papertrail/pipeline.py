@@ -256,9 +256,14 @@ def run_pipeline(
                 "label": level["labels"][cid],
             })
 
+    # Store embeddings for client-side semantic search
+    # Round to 4 decimal places to reduce JSON size
+    for i, p in enumerate(all_papers):
+        p["_embedding"] = [round(float(x), 4) for x in embeddings[i]]
+
     with open(final_path, "w") as f:
         json.dump(all_papers, f, indent=2)
-    logger.info("Embedded %d papers → %s", len(all_papers), final_path)
+    logger.info("Embedded %d papers → %s (%d dims)", len(all_papers), final_path, embeddings.shape[1])
 
     # ── Step 4: Build Dashboard ─────────────────────────────────
     logger.info("Building dashboard...")

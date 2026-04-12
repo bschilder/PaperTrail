@@ -3237,6 +3237,12 @@
                     const jsonStr = atob(dataB64);
                     const parsed = JSON.parse(jsonStr);
                     allPapers = Array.isArray(parsed) ? parsed : (parsed.papers || []);
+                    // Load search embeddings if available
+                    if (!Array.isArray(parsed) && parsed.search_embeddings) {
+                        window._searchEmbeddings = parsed.search_embeddings;
+                        window._embeddingDim = parsed.embedding_dim || 0;
+                        console.log(`Loaded ${window._searchEmbeddings.length} search embeddings (${window._embeddingDim}d)`);
+                    }
                 }
             } catch (error) {
                 console.error("Error loading data:", error);
@@ -6867,21 +6873,42 @@
         }
 
         // ===== SEMANTIC SEARCH =====
-        function computeSemanticSimilarity(query) {
+        async function computeSemanticSimilarity(query) {
             semanticScores.clear();
-            const queryTerms = query.toLowerCase().split(/\s+/).filter(t => t.length > 2);
 
+            // Try real embedding-based search first
+            if (window._searchEmbeddings && window._searchEmbeddings.length) {
+                const queryEmb = await embedQuery(query);
+                if (queryEmb && queryEmb.length === window._embeddingDim) {
+                    allPapers.forEach((paper, idx) => {
+                        const emb = window._searchEmbeddings[idx];
+                        if (emb) {
+                            const sim = cosineSimilarity(queryEmb, emb);
+                            // Normalize to 0-1 range (cosine sim can be negative)
+                            semanticScores.set(paper.title, Math.max(0, sim));
+                        }
+                    });
+                    console.log('Semantic search: embedding-based');
+                    renderMap();
+                    return;
+                }
+            }
+
+            // Fallback: BM25-style text matching
+            const queryTerms = query.toLowerCase().split(/\s+/).filter(t => t.length > 2);
             filteredPapers.forEach(paper => {
-                const text = ((paper.title || '') + ' ' + (paper.abstract || '')).toLowerCase();
+                const title = (paper.title || '').toLowerCase();
+                const abstract = (paper.abstract || '').toLowerCase();
                 let score = 0;
                 queryTerms.forEach(term => {
-                    if (text.includes(term)) {
-                        const matches = (text.match(new RegExp(term, 'g')) || []).length;
-                        score += matches * (term.length / 10);
-                    }
+                    const idf = getIDF(term);
+                    if (title.includes(term)) score += 3 * Math.max(1, idf);
+                    else if (abstract.includes(term)) score += 1 * Math.max(1, idf);
                 });
-                semanticScores.set(paper.title, Math.min(1, score / queryTerms.length));
+                semanticScores.set(paper.title, Math.min(1, score / (queryTerms.length * 3)));
             });
+            console.log('Semantic search: BM25 fallback');
+            renderMap();
         }
 
         function autoSelectTopN() {
@@ -8788,6 +8815,51 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             return null;
         }
 
+        // ── Semantic search via embeddings ──
+        async function embedQuery(text) {
+            // Try HF Inference API
+            const token = hfToken || (connectedServices?.huggingface?.key);
+            if (!token) return null;
+            try {
+                const resp = await fetch('https://router.huggingface.co/pipeline/feature-extraction/BAAI/bge-small-en-v1.5', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ inputs: text }),
+                    signal: AbortSignal.timeout(5000),
+                });
+                if (!resp.ok) return null;
+                const embedding = await resp.json();
+                // API returns [[...]] for single input
+                return Array.isArray(embedding[0]) ? embedding[0] : embedding;
+            } catch { return null; }
+        }
+
+        function cosineSimilarity(a, b) {
+            let dot = 0, normA = 0, normB = 0;
+            for (let i = 0; i < a.length; i++) {
+                dot += a[i] * b[i];
+                normA += a[i] * a[i];
+                normB += b[i] * b[i];
+            }
+            return dot / (Math.sqrt(normA) * Math.sqrt(normB) + 1e-8);
+        }
+
+        async function semanticSearchPapers(query) {
+            if (!window._searchEmbeddings || !window._searchEmbeddings.length) return null;
+
+            const queryEmb = await embedQuery(query);
+            if (!queryEmb || queryEmb.length !== window._embeddingDim) return null;
+
+            // Compute cosine similarity against all papers
+            const scores = window._searchEmbeddings.map((emb, idx) => ({
+                paper: allPapers[idx],
+                score: cosineSimilarity(queryEmb, emb),
+                idx,
+            }));
+            scores.sort((a, b) => b.score - a.score);
+            return scores.filter(s => s.score > 0.1).slice(0, 50);
+        }
+
         function searchPapers(query) {
             const parsed = parseQuery(query);
 
@@ -9212,12 +9284,17 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 }
             });
 
-            document.getElementById('semanticSearch').addEventListener('click', () => {
+            document.getElementById('semanticSearch').addEventListener('click', async () => {
                 const query = document.getElementById('semanticQuery').value.trim();
                 if (!query) return;
 
+                const btn = document.getElementById('semanticSearch');
+                btn.textContent = 'Searching...';
+                btn.disabled = true;
                 semanticQuery = query;
-                computeSemanticSimilarity(query);
+                await computeSemanticSimilarity(query);
+                btn.textContent = 'Search';
+                btn.disabled = false;
                 document.getElementById('semanticActive').style.display = 'block';
                 document.getElementById('semanticClear').style.display = 'block';
                 document.getElementById('topNSection').style.display = 'block';

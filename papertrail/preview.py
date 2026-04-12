@@ -52,6 +52,16 @@ def build_preview(
             }
         clusters[cid]["size"] += 1
 
+    # Extract embeddings into compact array (not per-paper) for search
+    search_embeddings = None
+    embedding_dim = 0
+    if papers and papers[0].get("_embedding"):
+        embedding_dim = len(papers[0]["_embedding"])
+        search_embeddings = [p.get("_embedding", []) for p in papers]
+        # Remove from per-paper data to avoid double storage
+        for p in papers:
+            p.pop("_embedding", None)
+
     data = {
         "papers": papers,
         "embeddings": {
@@ -65,6 +75,9 @@ def build_preview(
         "clusters": clusters,
         "mentions": {"channels": channels, "users": users},
     }
+    if search_embeddings:
+        data["search_embeddings"] = search_embeddings
+        data["embedding_dim"] = embedding_dim
 
     # Load template
     if TEMPLATE_PATH.exists():
