@@ -3083,6 +3083,8 @@
         let topicLinesOpacity = 80;
         let topicLinesColor = 'cluster';
         let topicLinesCurve = 0; // 0 = straight, 1 = very curved
+        let _prevHierLevel = 0;
+        let _subLineGrowth = 1; // 0 = lines at parent, 1 = fully extended
         let kdeOpacityOverride = null; // for fade-in animation
         let kdeCanvas = null; // offscreen canvas for KDE
         let renderedLabels = []; // {x, y, w, h, label} for click detection
@@ -6080,8 +6082,25 @@
                 });
             });
 
-            // At higher zoom: draw lines from subtopics to their parent topic centroid
-            if (hierLevel > 0) {
+            // Animate subtopic line growth when zoom crosses hierarchy threshold
+            if (hierLevel > _prevHierLevel) {
+                _subLineGrowth = 0; // start growing
+            } else if (hierLevel < _prevHierLevel) {
+                _subLineGrowth = 0; // shrink back
+            }
+            _prevHierLevel = hierLevel;
+
+            // Lerp growth toward target
+            const growthTarget = hierLevel > 0 ? 1 : 0;
+            if (Math.abs(_subLineGrowth - growthTarget) > 0.01) {
+                _subLineGrowth += (growthTarget - _subLineGrowth) * 0.08;
+                requestAnimationFrame(() => renderMap());
+            } else {
+                _subLineGrowth = growthTarget;
+            }
+
+            // Draw subtopic-to-parent lines with animated growth
+            if (_subLineGrowth > 0.01) {
                 // Build parent centroids (level 0)
                 const parentCentroids = {};
                 allPapers.forEach(paper => {
@@ -6090,20 +6109,19 @@
                     if (!proj) return;
                     const [sx, sy] = dataToScreen(proj[0], proj[1]);
                     const pid = paper.cluster_levels[0].id;
-                    if (!parentCentroids[pid]) parentCentroids[pid] = { x: 0, y: 0, count: 0, label: paper.cluster_levels[0].label };
+                    if (!parentCentroids[pid]) parentCentroids[pid] = { x: 0, y: 0, count: 0 };
                     parentCentroids[pid].x += sx;
                     parentCentroids[pid].y += sy;
                     parentCentroids[pid].count++;
                 });
 
                 entries.forEach(sub => {
-                    // Find which parent this subtopic belongs to
                     const cidParts = sub.cid.toString();
                     if (!cidParts.includes('_')) return;
                     const subLevel = parseInt(cidParts.replace(/^L/, '').split('_')[0]);
                     const subId = parseInt(cidParts.split('_')[1]);
 
-                    // Find the dominant parent
+                    // Find dominant parent
                     const parentVotes = {};
                     allPapers.forEach(p => {
                         if (!p.cluster_levels || !p.cluster_levels[subLevel]) return;
@@ -6119,22 +6137,27 @@
                     const px = pc.x / pc.count;
                     const py = pc.y / pc.count;
 
+                    // Animate: line endpoint grows from parent toward subtopic
+                    const g = _subLineGrowth;
+                    const endX = px + (sub.cx - px) * g;
+                    const endY = py + (sub.cy - py) * g;
+
                     const subColor = topicLinesColor === 'cluster'
                         ? getClusterColorById(parseInt(parentId), 0)
                         : topicLinesColor;
-                    ctx.globalAlpha = (topicLinesOpacity / 100) * 0.5;
+                    ctx.globalAlpha = (topicLinesOpacity / 100) * 0.5 * g;
                     ctx.strokeStyle = subColor;
                     ctx.lineWidth = Math.max(1, topicLinesWidth * 0.6);
                     ctx.setLineDash([4, 4]);
-                    const smx = (sub.cx + px) / 2;
-                    const smy = (sub.cy + py) / 2;
-                    const sdx = px - sub.cx;
-                    const sdy = py - sub.cy;
+                    const smx = (endX + px) / 2;
+                    const smy = (endY + py) / 2;
+                    const sdx = endX - px;
+                    const sdy = endY - py;
                     const scpx = smx - sdy * topicLinesCurve;
                     const scpy = smy + sdx * topicLinesCurve;
                     ctx.beginPath();
-                    ctx.moveTo(sub.cx, sub.cy);
-                    ctx.quadraticCurveTo(scpx, scpy, px, py);
+                    ctx.moveTo(px, py);
+                    ctx.quadraticCurveTo(scpx, scpy, endX, endY);
                     ctx.stroke();
                     ctx.setLineDash([]);
                 });
