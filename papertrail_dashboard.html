@@ -6130,26 +6130,32 @@
                 placed.push(bbox);
                 renderedLabels.push({ ...bbox, label: c.label, cid: c.cid, hierLevel: hierLevel >= 0 ? hierLevel : 0 });
 
-                // Background: subtle frosted pill for readability
-                if (isMajor || isClusterMode) {
-                    ctx.fillStyle = `rgba(15, 15, 23, ${isMajor ? 0.75 : 0.55})`;
-                    const px = 8, py = 4;
-                    ctx.beginPath();
-                    ctx.roundRect(c.cx - tw/2 - px, c.cy - th/2 - py, tw + px*2, th + py*2, fontSize/3);
-                    ctx.fill();
-                }
-
-                // Colored dot before label
-                // Use actual cluster color for the dot
+                // Cluster color for this label
                 const cidNum = typeof c.cid === 'string' && c.cid.includes('_') ? parseInt(c.cid.split('_')[1]) : parseInt(c.cid);
                 const cidLevel = typeof c.cid === 'string' && c.cid.startsWith('L') ? parseInt(c.cid.charAt(1)) : 0;
-                const dotColor = getClusterColorById(cidNum, cidLevel);
-                const dotR = Math.max(3, fontSize / 4);
-                ctx.globalAlpha = alpha;
+                const clusterColor = getClusterColorById(cidNum, cidLevel);
+
+                // Background pill with colored outline
+                const px = 8, py = 4;
+                const pillX = c.cx - tw/2 - px;
+                const pillY = c.cy - th/2 - py;
+                const pillW = tw + px*2;
+                const pillH = th + py*2;
+                const pillR = fontSize/3;
+
+                ctx.globalAlpha = alpha * (isMajor ? 0.75 : 0.55);
+                ctx.fillStyle = 'rgba(15, 15, 23, 0.85)';
                 ctx.beginPath();
-                ctx.arc(c.cx - tw/2 - dotR - 4, c.cy, dotR, 0, Math.PI * 2);
-                ctx.fillStyle = dotColor;
+                ctx.roundRect(pillX, pillY, pillW, pillH, pillR);
                 ctx.fill();
+
+                // Colored outline
+                ctx.globalAlpha = alpha * (isMajor ? 0.9 : 0.6);
+                ctx.strokeStyle = clusterColor;
+                ctx.lineWidth = isMajor ? 2 : 1.5;
+                ctx.beginPath();
+                ctx.roundRect(pillX, pillY, pillW, pillH, pillR);
+                ctx.stroke();
 
                 // Text with slight text-shadow effect via double render
                 ctx.globalAlpha = alpha * 0.3;
