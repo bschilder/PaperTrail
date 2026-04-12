@@ -6215,10 +6215,25 @@
             // Show label action hint
             if (hoveredLabel && !isDragging) {
                 const tooltip = document.getElementById('tooltip');
-                const clusterPapers = filteredPapers.filter(p => p.cluster_label === hoveredLabel.label);
+                // Match papers using hierarchy ID if available, else label
+                let clusterPapers;
+                const hCid = hoveredLabel.cid;
+                if (hCid && typeof hCid === 'string' && hCid.includes('_')) {
+                    const [lvlStr, idStr] = hCid.replace(/^L/, '').split('_');
+                    const lvl = parseInt(lvlStr);
+                    const id = parseInt(idStr);
+                    clusterPapers = filteredPapers.filter(p => p.cluster_levels && p.cluster_levels[lvl] && p.cluster_levels[lvl].id === id);
+                } else {
+                    clusterPapers = filteredPapers.filter(p => {
+                        if (p.cluster_label === hoveredLabel.label) return true;
+                        return p.cluster_levels && p.cluster_levels.some(l => l.label === hoveredLabel.label);
+                    });
+                }
+                const isSubtopic = hoveredLabel.hierLevel > 0;
+                const typeLabel = isSubtopic ? 'Subtopic' : 'Topic';
                 tooltip.innerHTML = `
                     <div class="tooltip-title">${esc(hoveredLabel.label)}</div>
-                    <div class="tooltip-content">${clusterPapers.length} papers</div>
+                    <div class="tooltip-content">${typeLabel} · ${clusterPapers.length} papers</div>
                     <div style="font-size:10px;color:#64b5f6;margin-top:4px;">Click for options</div>
                 `;
                 tooltip.classList.add('visible');
