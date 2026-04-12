@@ -3249,6 +3249,13 @@
                 allPapers = [];
             }
 
+            // Filter out junk titles that slipped through the pipeline
+            const JUNK = new Set(['erratum','corrigendum','retraction','correction','publisher correction','correspondence','contents','cover image','nature','science','cell','just a moment','access denied','page not found','404']);
+            allPapers = allPapers.filter(p => {
+                const t = (p.title || '').trim().toLowerCase();
+                return t && !JUNK.has(t);
+            });
+
             const channels = new Set();
             allPapers.forEach(paper => {
                 // Normalize: ensure every paper has channels array
