@@ -2458,23 +2458,23 @@
                         </div>
                         <div class="select-controls" style="margin-bottom:4px;">
                             <span style="font-size:10px;color:#666;min-width:55px;">Opacity</span>
-                            <input type="range" id="topicLinesOpacity" min="5" max="80" value="50" step="5" style="flex:1;">
-                            <span class="threshold-display" id="topicLinesOpacityDisplay" style="min-width:25px;">50%</span>
+                            <input type="range" id="topicLinesOpacity" min="5" max="100" value="80" step="5" style="flex:1;">
+                            <span class="threshold-display" id="topicLinesOpacityDisplay" style="min-width:25px;">80%</span>
                         </div>
                         <div class="select-controls" style="margin-bottom:4px;">
                             <span style="font-size:10px;color:#666;min-width:55px;">Curve</span>
-                            <input type="range" id="topicLinesCurve" min="0" max="1" value="0.3" step="0.05" style="flex:1;">
-                            <span class="threshold-display" id="topicLinesCurveDisplay" style="min-width:20px;">0.3</span>
+                            <input type="range" id="topicLinesCurve" min="0" max="1" value="0" step="0.05" style="flex:1;">
+                            <span class="threshold-display" id="topicLinesCurveDisplay" style="min-width:20px;">0</span>
                         </div>
                         <div class="select-controls">
                             <span style="font-size:10px;color:#666;min-width:55px;">Color</span>
                             <select class="color-by-select" id="topicLinesColor" style="flex:1;font-size:11px;">
                                 <option value="#888">Grey</option>
                                 <option value="#64b5f6">Blue</option>
-                                <option value="#fff" selected>White</option>
+                                <option value="#fff">White</option>
                                 <option value="#ffa726">Orange</option>
                                 <option value="#66bb6a">Green</option>
-                                <option value="cluster">Match cluster</option>
+                                <option value="cluster" selected>Match cluster</option>
                             </select>
                         </div>
                     </div>
@@ -3075,9 +3075,9 @@
         let kdeEnabled = true; // KDE on by default
         let topicLinesEnabled = true; // Topic connection lines on by default
         let topicLinesWidth = 3;
-        let topicLinesOpacity = 50;
-        let topicLinesColor = '#fff';
-        let topicLinesCurve = 0.3; // 0 = straight, 1 = very curved
+        let topicLinesOpacity = 80;
+        let topicLinesColor = 'cluster';
+        let topicLinesCurve = 0; // 0 = straight, 1 = very curved
         let kdeOpacityOverride = null; // for fade-in animation
         let kdeCanvas = null; // offscreen canvas for KDE
         let renderedLabels = []; // {x, y, w, h, label} for click detection
