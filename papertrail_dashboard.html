@@ -5520,41 +5520,22 @@
             });
             const clusterCounts = {};
 
-            // Animate fade for deselected papers
+            // Animate fade: set targets based on filter, lerp toward them
             const filteredSet = new Set(filteredPapers);
-            let needsRedraw = false;
+            let fadeAnimating = false;
             allPapers.forEach(paper => {
-                const target = filteredSet.has(paper) ? 1.0 : 0.0;
-                if (paper._fade === undefined) paper._fade = target;
-                if (Math.abs(paper._fade - target) > 0.01) {
-                    paper._fade += (target - paper._fade) * 0.15;
-                    needsRedraw = true;
+                paper._fadeTarget = filteredSet.has(paper) ? 1.0 : 0.0;
+                if (paper._fade === undefined) paper._fade = paper._fadeTarget;
+                if (Math.abs(paper._fade - paper._fadeTarget) > 0.005) {
+                    paper._fade += (paper._fadeTarget - paper._fade) * 0.12;
+                    fadeAnimating = true;
                 } else {
-                    paper._fade = target;
+                    paper._fade = paper._fadeTarget;
                 }
             });
-            if (needsRedraw) requestAnimationFrame(() => renderMap());
 
-            // Ghost pass: draw fading/deselected papers
-            allPapers.forEach(paper => {
-                if (paper._fade >= 0.99) return; // fully visible — drawn in main pass
-                const proj = paper.projections && paper.projections[currentProjection];
-                if (!proj) return;
-                const [sx, sy] = dataToScreen(proj[0], proj[1]);
-                if (sx < -50 || sx > canvas.width + 50 || sy < -50 || sy > canvas.height + 50) return;
-                const fade = paper._fade;
-                const ghostAlpha = 0.08 + fade * 0.67; // 0.08 when gone, 0.75 when full
-                const ghostSize = Math.max(1.5, basePointSize * (0.4 + fade * 0.6));
-                ctx.globalAlpha = ghostAlpha;
-                ctx.fillStyle = fade > 0.3 ? getPointColor(paper) : '#888';
-                ctx.beginPath();
-                ctx.arc(sx, sy, ghostSize, 0, Math.PI * 2);
-                ctx.fill();
-            });
-            ctx.globalAlpha = 1;
-
-            filteredPapers.forEach((paper, idx) => {
-                if (paper._fade !== undefined && paper._fade < 0.99) return; // still fading in — drawn by ghost pass
+            // Unified render: draw ALL papers using their fade value
+            allPapers.forEach((paper, idx) => {
                 const proj = paper.projections && paper.projections[currentProjection];
                 if (!proj) return; // already set in pre-pass
 
@@ -5579,20 +5560,23 @@
 
                 if (sx < -50 || sx > canvas.width + 50 || sy < -50 || sy > canvas.height + 50) return;
 
-                const radius = getPointRadius(paper);
-                const color = getPointColor(paper);
+                const fade = paper._fade !== undefined ? paper._fade : 1;
+                const baseRadius = getPointRadius(paper);
+                const radius = baseRadius * (0.4 + fade * 0.6); // shrink to 40% when faded
+                const color = fade > 0.2 ? getPointColor(paper) : '#666';
                 const allIdx = (paperIndexMap.get(paper) ?? -1);
                 const isSelected = selectedPapers.has(allIdx);
+                const isActive = fade > 0.5;
 
-                const isHovered = (idx === hoveredPaperIdx);
+                const isHovered = isActive && (idx === hoveredPaperIdx);
 
-                // Glow effect for hovered/selected points
-                if (isHovered || isSelected) {
+                // Glow effect for hovered/selected points (only active)
+                if (isActive && (isHovered || isSelected)) {
                     const glowRadius = isHovered ? radius + 12 : radius + 6;
                     const grad = ctx.createRadialGradient(sx, sy, radius, sx, sy, glowRadius);
                     grad.addColorStop(0, color.replace('rgb', 'rgba').replace(')', ', 0.4)'));
                     grad.addColorStop(1, 'rgba(0,0,0,0)');
-                    ctx.globalAlpha = 0.6;
+                    ctx.globalAlpha = 0.6 * fade;
                     ctx.fillStyle = grad;
                     ctx.beginPath();
                     ctx.arc(sx, sy, glowRadius, 0, Math.PI * 2);
@@ -5600,7 +5584,8 @@
                 }
 
                 const r = isHovered ? radius + 1.5 : radius;
-                ctx.globalAlpha = paper.title ? (isSelected || isHovered ? 1 : 0.75) : 0.25;
+                const baseAlpha = paper.title ? (isSelected || isHovered ? 1 : 0.75) : 0.25;
+                ctx.globalAlpha = baseAlpha * (0.08 + fade * 0.92); // fade to 8% opacity
 
                 // Orb effect: radial gradient with highlight
                 const orbGrad = ctx.createRadialGradient(sx - r * 0.3, sy - r * 0.3, r * 0.1, sx, sy, r);
@@ -5665,6 +5650,11 @@
 
             // Draw minimap
             drawMinimap();
+
+            // Continue animation loop if papers are still fading
+            if (fadeAnimating) {
+                requestAnimationFrame(() => renderMap());
+            }
         }
 
         function updateHTMLLegend() {
