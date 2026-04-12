@@ -3305,8 +3305,33 @@
                 topNSlider.max = allPapers.length;
             }
 
+            // Build search index for faster queries
+            buildSearchIndex();
+
             filterPapers();
             drawSparkline();
+        }
+
+        // Inverted index for search
+        const searchIndex = { docFreq: {}, totalDocs: 0 };
+        function buildSearchIndex() {
+            searchIndex.totalDocs = allPapers.length;
+            searchIndex.docFreq = {};
+            allPapers.forEach(p => {
+                const words = new Set();
+                const text = ((p.title || '') + ' ' + (p.abstract || '')).toLowerCase();
+                // Extract words (simple tokenization)
+                text.replace(/[a-z]{3,}/g, w => { words.add(w); return w; });
+                words.forEach(w => {
+                    searchIndex.docFreq[w] = (searchIndex.docFreq[w] || 0) + 1;
+                });
+            });
+        }
+
+        function getIDF(term) {
+            const df = searchIndex.docFreq[term] || 0;
+            if (df === 0) return 0;
+            return Math.log((searchIndex.totalDocs - df + 0.5) / (df + 0.5) + 1);
         }
 
         // ===== UI INITIALIZATION =====
@@ -8798,30 +8823,60 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     }
                 }
 
-                // Keyword scoring (fuzzy)
+                // BM25-style keyword scoring with field weighting
                 if (parsed.keywords.length > 0 && passes) {
-                    const text = ((paper.title || '') + ' ' + (paper.abstract || '') + ' ' +
-                                  (paper.journal || '') + ' ' + (Array.isArray(paper.authors) ? paper.authors.join(' ') : (paper.authors || '')) +
-                                  ' ' + (paper.cluster_label || '')).toLowerCase();
+                    const title = (paper.title || '').toLowerCase();
+                    const abstract = (paper.abstract || '').toLowerCase();
+                    const authors = (Array.isArray(paper.authors) ? paper.authors.join(' ') : (paper.authors || '')).toLowerCase();
+                    const journal = (paper.journal || '').toLowerCase();
+                    const cluster = (paper.cluster_label || '').toLowerCase();
+                    const text = (paper.text || '').toLowerCase();
 
-                    let keywordScore = 0;
+                    let totalScore = 0;
                     let matchedKeywords = 0;
+
+                    // Build query bigrams for phrase matching
+                    const queryPhrase = parsed.keywords.join(' ');
+
                     for (const kw of parsed.keywords) {
-                        if (text.includes(kw)) {
+                        let kwScore = 0;
+                        // Exact word boundary match scores higher than substring
+                        const wordRe = new RegExp('\\b' + kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+                        const hasExact = (s) => wordRe.test(s);
+                        const hasPartial = (s) => s.includes(kw);
+
+                        // Field weights: title > abstract > authors > cluster > journal > text
+                        if (hasExact(title))         kwScore += 10;
+                        else if (hasPartial(title))   kwScore += 5;
+                        if (hasExact(abstract))       kwScore += 3;
+                        else if (hasPartial(abstract)) kwScore += 1.5;
+                        if (hasExact(authors))        kwScore += 4;
+                        if (hasExact(cluster))        kwScore += 2;
+                        if (hasExact(journal))        kwScore += 1;
+                        if (hasPartial(text))         kwScore += 0.5;
+
+                        // BM25-style scoring with IDF weighting
+                        if (kwScore > 0) {
                             matchedKeywords++;
-                            // Title matches score higher
-                            if ((paper.title || '').toLowerCase().includes(kw)) keywordScore += 3;
-                            else if ((paper.abstract || '').toLowerCase().includes(kw)) keywordScore += 1;
-                            else keywordScore += 0.5;
+                            const tf = (title.split(kw).length - 1) + (abstract.split(kw).length - 1) * 0.5;
+                            const tfSaturated = (tf * 1.2) / (tf + 0.75);
+                            const idf = getIDF(kw); // rare terms score higher
+                            totalScore += kwScore * (1 + tfSaturated) * Math.max(1, idf);
                         }
                     }
 
-                    // Require at least half of keywords to match for multi-word queries
-                    const minMatchRatio = parsed.keywords.length >= 3 ? 0.5 : (parsed.keywords.length >= 2 ? 0.5 : 0);
-                    if (matchedKeywords === 0 || (matchedKeywords / parsed.keywords.length) < minMatchRatio) {
+                    // Phrase match bonus: if the full query appears as a phrase
+                    if (parsed.keywords.length > 1) {
+                        if (title.includes(queryPhrase)) totalScore *= 2.5;
+                        else if (abstract.includes(queryPhrase)) totalScore *= 1.5;
+                    }
+
+                    // Require minimum keyword coverage
+                    const coverage = matchedKeywords / parsed.keywords.length;
+                    if (matchedKeywords === 0 || coverage < 0.4) {
                         passes = false;
                     } else {
-                        score = keywordScore * (matchedKeywords / parsed.keywords.length);
+                        score = totalScore * coverage;
                     }
                 }
 
