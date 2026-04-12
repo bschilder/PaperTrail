@@ -5520,23 +5520,41 @@
             });
             const clusterCounts = {};
 
-            // Ghost pass: draw deselected papers as faded small dots
+            // Animate fade for deselected papers
             const filteredSet = new Set(filteredPapers);
+            let needsRedraw = false;
             allPapers.forEach(paper => {
-                if (filteredSet.has(paper)) return; // drawn in main pass
+                const target = filteredSet.has(paper) ? 1.0 : 0.0;
+                if (paper._fade === undefined) paper._fade = target;
+                if (Math.abs(paper._fade - target) > 0.01) {
+                    paper._fade += (target - paper._fade) * 0.15;
+                    needsRedraw = true;
+                } else {
+                    paper._fade = target;
+                }
+            });
+            if (needsRedraw) requestAnimationFrame(() => renderMap());
+
+            // Ghost pass: draw fading/deselected papers
+            allPapers.forEach(paper => {
+                if (paper._fade >= 0.99) return; // fully visible — drawn in main pass
                 const proj = paper.projections && paper.projections[currentProjection];
                 if (!proj) return;
                 const [sx, sy] = dataToScreen(proj[0], proj[1]);
                 if (sx < -50 || sx > canvas.width + 50 || sy < -50 || sy > canvas.height + 50) return;
-                ctx.globalAlpha = 0.08;
-                ctx.fillStyle = '#888';
+                const fade = paper._fade;
+                const ghostAlpha = 0.08 + fade * 0.67; // 0.08 when gone, 0.75 when full
+                const ghostSize = Math.max(1.5, basePointSize * (0.4 + fade * 0.6));
+                ctx.globalAlpha = ghostAlpha;
+                ctx.fillStyle = fade > 0.3 ? getPointColor(paper) : '#888';
                 ctx.beginPath();
-                ctx.arc(sx, sy, Math.max(1.5, basePointSize * 0.4), 0, Math.PI * 2);
+                ctx.arc(sx, sy, ghostSize, 0, Math.PI * 2);
                 ctx.fill();
             });
             ctx.globalAlpha = 1;
 
             filteredPapers.forEach((paper, idx) => {
+                if (paper._fade !== undefined && paper._fade < 0.99) return; // still fading in — drawn by ghost pass
                 const proj = paper.projections && paper.projections[currentProjection];
                 if (!proj) return; // already set in pre-pass
 
