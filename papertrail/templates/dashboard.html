@@ -5922,14 +5922,11 @@
 
             if (entries.length < 2) return;
 
-            // k-nearest neighbors: connect each topic to its 2 nearest
-            const k = Math.min(2, entries.length - 1);
+            // k-nearest neighbors: connect each topic to its 3 nearest
+            const k = Math.min(3, entries.length - 1);
             const drawnPairs = new Set();
 
-            ctx.lineWidth = 1;
-
             entries.forEach(a => {
-                // Sort others by distance
                 const others = entries
                     .filter(b => b.cid !== a.cid)
                     .map(b => ({ ...b, dist: Math.hypot(a.cx - b.cx, a.cy - b.cy) }))
@@ -5940,8 +5937,12 @@
                     if (drawnPairs.has(pairKey)) return;
                     drawnPairs.add(pairKey);
 
-                    ctx.globalAlpha = 0.12;
-                    ctx.strokeStyle = '#666';
+                    // Fade with distance — closer connections are more visible
+                    const maxDist = Math.max(canvas.width, canvas.height) * 0.6;
+                    const alpha = Math.max(0.06, 0.25 * (1 - b.dist / maxDist));
+                    ctx.globalAlpha = alpha;
+                    ctx.strokeStyle = '#888';
+                    ctx.lineWidth = 1.5;
                     ctx.beginPath();
                     ctx.moveTo(a.cx, a.cy);
                     ctx.lineTo(b.cx, b.cy);
@@ -5988,8 +5989,9 @@
                     const px = pc.x / pc.count;
                     const py = pc.y / pc.count;
 
-                    ctx.globalAlpha = 0.08;
-                    ctx.strokeStyle = '#555';
+                    ctx.globalAlpha = 0.2;
+                    ctx.strokeStyle = '#777';
+                    ctx.lineWidth = 1;
                     ctx.setLineDash([4, 4]);
                     ctx.beginPath();
                     ctx.moveTo(sub.cx, sub.cy);

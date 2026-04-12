@@ -424,21 +424,29 @@ def refine_cluster_labels_llm(
         import json as _json
         import requests
 
+        content = None
+
+        # Try HuggingFace first
         if hf_token:
-            logger.info("Generating cluster labels via HuggingFace LLM...")
-            resp = requests.post(
-                "https://router.huggingface.co/v1/chat/completions",
-                headers={"Content-Type": "application/json", "Authorization": f"Bearer {hf_token}"},
-                json={
-                    "model": "Qwen/Qwen3-8B",
-                    "messages": [{"role": "user", "content": prompt + "\n\n/no_think"}],
-                    "max_tokens": 512,
-                },
-                timeout=60,
-            )
-            resp.raise_for_status()
-            content = resp.json()["choices"][0]["message"]["content"]
-        else:
+            try:
+                logger.info("Generating cluster labels via HuggingFace LLM...")
+                resp = requests.post(
+                    "https://router.huggingface.co/v1/chat/completions",
+                    headers={"Content-Type": "application/json", "Authorization": f"Bearer {hf_token}"},
+                    json={
+                        "model": "Qwen/Qwen3-8B",
+                        "messages": [{"role": "user", "content": prompt + "\n\n/no_think"}],
+                        "max_tokens": 512,
+                    },
+                    timeout=60,
+                )
+                resp.raise_for_status()
+                content = resp.json()["choices"][0]["message"]["content"]
+            except Exception as hf_err:
+                logger.warning("HuggingFace LLM failed: %s", hf_err)
+
+        # Fall back to OpenAI
+        if not content and openai_key:
             logger.info("Generating cluster labels via OpenAI...")
             resp = requests.post(
                 "https://api.openai.com/v1/chat/completions",
@@ -452,6 +460,10 @@ def refine_cluster_labels_llm(
             )
             resp.raise_for_status()
             content = resp.json()["choices"][0]["message"]["content"]
+
+        if not content:
+            logger.warning("No LLM available for cluster labeling, using TF-IDF labels")
+            return None
 
         # Strip thinking tags and parse JSON
         import re
