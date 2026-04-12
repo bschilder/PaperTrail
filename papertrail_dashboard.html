@@ -2443,6 +2443,16 @@
                 </div>
 
                 <div class="sidebar-section">
+                    <div class="sidebar-label" style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>Topic Lines</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="topicLinesToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
                     <div class="sidebar-label">Scale By</div>
                     <select class="scale-by-select" id="scaleBySelect">
                         <option value="uniform">Uniform</option>
@@ -3035,6 +3045,7 @@
         let scaleTransform = 'linear'; // linear, log, sqrt
         let densityMap = new Map(); // paper -> density score (0-1)
         let kdeEnabled = true; // KDE on by default
+        let topicLinesEnabled = true; // Topic connection lines on by default
         let kdeOpacityOverride = null; // for fade-in animation
         let kdeCanvas = null; // offscreen canvas for KDE
         let renderedLabels = []; // {x, y, w, h, label} for click detection
@@ -5527,7 +5538,7 @@
                 paper._fadeTarget = filteredSet.has(paper) ? 1.0 : 0.0;
                 if (paper._fade === undefined) paper._fade = paper._fadeTarget;
                 if (Math.abs(paper._fade - paper._fadeTarget) > 0.005) {
-                    paper._fade += (paper._fadeTarget - paper._fade) * 0.12;
+                    paper._fade += (paper._fadeTarget - paper._fade) * 0.05;
                     fadeAnimating = true;
                 } else {
                     paper._fade = paper._fadeTarget;
@@ -5626,6 +5637,11 @@
                 }
             });
             ctx.globalAlpha = 1;
+
+            // Draw topic connection lines
+            if (topicLinesEnabled) {
+                drawTopicLines(clusterCentroids, hierLevel);
+            }
 
             // Draw hierarchical cluster labels (DataMapPlot-inspired)
             drawHierarchicalLabels(clusterCentroids, hierLevel);
@@ -5891,6 +5907,99 @@
                 Math.min(mw - pad * 2, vpRight - vpLeft),
                 Math.min(mh - pad * 2, vpBottom - vpTop)
             );
+        }
+
+        function drawTopicLines(clusterCentroids, hierLevel) {
+            const entries = Object.entries(clusterCentroids)
+                .filter(([_, c]) => c.count >= 3)
+                .map(([cid, c]) => ({
+                    cid,
+                    cx: c.x / c.count,
+                    cy: c.y / c.count,
+                    count: c.count,
+                    label: c.label,
+                }));
+
+            if (entries.length < 2) return;
+
+            // k-nearest neighbors: connect each topic to its 2 nearest
+            const k = Math.min(2, entries.length - 1);
+            const drawnPairs = new Set();
+
+            ctx.lineWidth = 1;
+
+            entries.forEach(a => {
+                // Sort others by distance
+                const others = entries
+                    .filter(b => b.cid !== a.cid)
+                    .map(b => ({ ...b, dist: Math.hypot(a.cx - b.cx, a.cy - b.cy) }))
+                    .sort((x, y) => x.dist - y.dist);
+
+                others.slice(0, k).forEach(b => {
+                    const pairKey = [a.cid, b.cid].sort().join('-');
+                    if (drawnPairs.has(pairKey)) return;
+                    drawnPairs.add(pairKey);
+
+                    ctx.globalAlpha = 0.12;
+                    ctx.strokeStyle = '#666';
+                    ctx.beginPath();
+                    ctx.moveTo(a.cx, a.cy);
+                    ctx.lineTo(b.cx, b.cy);
+                    ctx.stroke();
+                });
+            });
+
+            // At higher zoom: draw lines from subtopics to their parent topic centroid
+            if (hierLevel > 0) {
+                // Build parent centroids (level 0)
+                const parentCentroids = {};
+                allPapers.forEach(paper => {
+                    if (!paper.cluster_levels || !paper.cluster_levels[0]) return;
+                    const proj = paper.projections && paper.projections[currentProjection];
+                    if (!proj) return;
+                    const [sx, sy] = dataToScreen(proj[0], proj[1]);
+                    const pid = paper.cluster_levels[0].id;
+                    if (!parentCentroids[pid]) parentCentroids[pid] = { x: 0, y: 0, count: 0, label: paper.cluster_levels[0].label };
+                    parentCentroids[pid].x += sx;
+                    parentCentroids[pid].y += sy;
+                    parentCentroids[pid].count++;
+                });
+
+                entries.forEach(sub => {
+                    // Find which parent this subtopic belongs to
+                    const cidParts = sub.cid.toString();
+                    if (!cidParts.includes('_')) return;
+                    const subLevel = parseInt(cidParts.replace(/^L/, '').split('_')[0]);
+                    const subId = parseInt(cidParts.split('_')[1]);
+
+                    // Find the dominant parent
+                    const parentVotes = {};
+                    allPapers.forEach(p => {
+                        if (!p.cluster_levels || !p.cluster_levels[subLevel]) return;
+                        if (p.cluster_levels[subLevel].id !== subId) return;
+                        const pid = p.cluster_levels[0].id;
+                        parentVotes[pid] = (parentVotes[pid] || 0) + 1;
+                    });
+
+                    const parentId = Object.entries(parentVotes).sort((a, b) => b[1] - a[1])[0]?.[0];
+                    if (parentId === undefined || !parentCentroids[parentId]) return;
+
+                    const pc = parentCentroids[parentId];
+                    const px = pc.x / pc.count;
+                    const py = pc.y / pc.count;
+
+                    ctx.globalAlpha = 0.08;
+                    ctx.strokeStyle = '#555';
+                    ctx.setLineDash([4, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(sub.cx, sub.cy);
+                    ctx.lineTo(px, py);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                });
+            }
+
+            ctx.globalAlpha = 1;
         }
 
         function drawHierarchicalLabels(clusterCentroids, hierLevel) {
@@ -8919,6 +9028,11 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             }
 
             // KDE controls
+            document.getElementById('topicLinesToggle').addEventListener('change', (e) => {
+                topicLinesEnabled = e.target.checked;
+                renderMap();
+            });
+
             document.getElementById('kdeToggle').addEventListener('change', (e) => {
                 kdeEnabled = e.target.checked;
                 document.getElementById('kdeOptions').style.display = kdeEnabled ? 'block' : 'none';
