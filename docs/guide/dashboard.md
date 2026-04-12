@@ -1,425 +1,169 @@
-# Building the Dashboard
+# Dashboard Guide
 
-The dashboard builder creates a self-contained interactive HTML file for exploring papers. No server required!
+The PaperTrail dashboard is a self-contained interactive HTML file for exploring your team's paper landscape. No server required — just open in any browser.
 
-## How It Works
+**[Live Demo: Koo Lab Dashboard](https://bschilder.github.io/PaperTrail/koolab/)**
 
-The builder:
+## Views
 
-1. **Takes the final JSON** with embeddings and metadata
-2. **Embeds data** in the HTML file (JSON + FAISS index)
-3. **Includes JavaScript** for interactivity
-4. **Generates visualization** with d3.js scatter plot
-5. **Creates search index** for full-text search
-6. **Exports single HTML file** ready to share
+The dashboard has four main views, accessible from the top navigation bar.
 
-## Basic Usage
+### Map View
 
-### Build Dashboard
+The default view — a canvas-based 2D scatter plot where each dot is a paper.
 
-```bash
-papertrail build papers_final.json -o dashboard.html
-```
+![Map View](../images/map-view.png)
 
-Opens the dashboard in your browser:
+**Key features:**
 
-```bash
-# macOS
-open dashboard.html
+| Region | What it does |
+|--------|-------------|
+| **Scatter plot** (center) | Papers plotted by semantic similarity. Nearby papers discuss similar topics. |
+| **Topic labels** | Hierarchical cluster labels with colored pill outlines. Zoom in to see subtopics. |
+| **Topic lines** | Lines connecting related topics (configurable thickness, opacity, curve, color). |
+| **Channel filter** (left sidebar) | Toggle channels on/off. Deselected papers fade to ghost dots. |
+| **Projection buttons** | Switch between UMAP (default), t-SNE, and PCA projections. |
+| **Color By** | Cluster (default), Channel, Year, Citations, Engagement, Density, Contributor, Journal. |
+| **Scale By** | Engagement (default), Citations, Year, Uniform. Controls dot size. |
+| **KDE Background** | Density heatmap with configurable bandwidth, opacity, and palette. |
+| **Topic Lines** | Toggle and configure connection lines between topic clusters. |
+| **Time slider** (bottom) | Scrub through time or press play for chronological animation. Papers fade in smoothly. |
+| **Tool buttons** (right) | Pan, lasso select, rectangle select, reset zoom, save as PNG. |
 
-# Linux
-xdg-open dashboard.html
+**Interactions:**
 
-# Windows
-start dashboard.html
-```
+- **Scroll** to zoom in/out
+- **Click + drag** to pan
+- **Click a dot** to see paper details
+- **Click a topic label** for topic info popup (paper count, top contributors, top papers)
+- **Lasso/rectangle** to select multiple papers
+- **Hover** over topics for paper count tooltip
 
-Or just double-click the file!
+### 3D View
 
-### Customize Title
+WebGL-powered 3D scatter plot using Three.js.
 
-```bash
-papertrail build papers_final.json -o dashboard.html \
-  --title "My Lab Papers"
-```
+![3D View](../images/3d-view.png)
 
-### Add Description
-
-```bash
-papertrail build papers_final.json -o dashboard.html \
-  --description "Papers shared in our Slack workspace"
-```
-
-## Dashboard Features
+- **Rotate**: Click + drag
+- **Zoom**: Scroll
+- **Click**: Select paper
+- Same color modes as Map view
 
 ### Table View
 
-- **Sortable columns**: Click header to sort
-- **Searchable**: Use Ctrl+F in browser
-- **Scrollable**: Vertical and horizontal scroll
-- **Columns**: Title, authors, journal, year, citations, channel, date, engagement
+Sortable, filterable spreadsheet of all papers.
 
-Click a row to open the detail panel.
+![Table View](../images/table-view.png)
 
-### Embedding Map
+**Columns:** Title, Year, Journal, Authors, Channels, Shared By, Date Shared, Citations, Engagement, Cluster.
 
-**2D Scatter Plot** of papers using d3.js:
+- **Click column header** to sort ascending/descending
+- **Filter row** below headers — type to filter (supports `>5`, `>=10` for numeric columns)
+- **Click row** to see paper detail panel
+- **Export CSV / Export XLSX** buttons in top-right
+- **Slack icon** links directly to the original Slack message
+- **Paper icon** links to the paper URL
 
-- **Hover**: See paper title and details
-- **Click**: Open detail panel
-- **Zoom**: Scroll to zoom in/out
-- **Pan**: Click and drag to move around
+### Leaderboard View
 
-**Color by** dropdown to switch coloring:
+Rankings and statistics about your paper collection.
 
-- **Cluster**: k-means clusters (auto-computed)
-- **Channel**: Slack channel
-- **User**: Who shared it
-- **Date**: Timeline gradient
-- **Year**: Publication year
-- **Citations**: Citation count gradient
+![Leaderboard View](../images/leaderboard-view.png)
 
-**Projection** dropdown to switch 2D projections:
+- **Top Contributors** — Who shares the most papers, with contribution heatmap
+- **Most Engaged** — Papers with the most reactions + replies
+- **Most Cited** — Highest citation count papers
+- **Topic Breakdown** — Cluster sizes and proportions
+- **Channel Stats** — Papers per channel with bar charts
 
-- **UMAP** (recommended)
-- **t-SNE**
-- **PCA**
+## AI Agent
 
-### Detail Panel
+Click **Ask AI** in the top-right to open the AI-powered search bar.
 
-Click a paper to see:
+**What you can ask:**
 
-- Full title and authors
-- Abstract
-- Journal, year, citation count
-- DOI, arXiv ID, URL
-- Engagement metrics
-- Channel and user who shared
-- Direct link to original Slack message
+- `"What are the most cited papers about protein design?"` — searches papers with tool use
+- `"Who contributes the most to genomics?"` — contributor analysis
+- `"Compare #papers-dl and #papers-genomics"` — channel comparison
+- `"What's trending in the last 6 months?"` — trend analysis
+- `@Peter Koo` or `#papers-dl` — autocomplete for people and channels
 
-### Semantic Search
+**Configuration** (click the gear icon inside Ask AI):
 
-Chat-style search interface:
+- **Service**: HuggingFace (free, default), Anthropic (Claude), OpenAI
+- **Model**: Qwen 3 8B (default), plus 8 other models
+- **Reasoning traces**: Optional toggle to show model thinking
+- **Chat history**: Downloadable in JSON or CSV format
 
-1. **Type a query**: "transformer attention mechanisms"
-2. **Results appear**: Similar papers ranked by relevance
-3. **Click result**: Opens detail panel
-4. **Autocomplete**: Suggests paper titles as you type
+## Semantic Search
 
-Uses FAISS index for sub-millisecond search across all embeddings.
+Click **Search** to open the semantic search bar. Type a query and papers are ranked by content similarity — not keyword matching. Results are highlighted and sized by relevance.
 
-## Advanced Options
+**Example queries:**
 
-### Customize Colors
+- `single cell RNA sequencing`
+- `attention mechanism transformer`
+- `protein folding prediction`
+
+## Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `1` / `2` / `3` | Switch projection (UMAP/t-SNE/PCA) |
+| `V` | Pan mode |
+| `L` | Lasso select mode |
+| `R` | Rectangle select mode |
+| `/` | Open AI agent |
+| `?` | Show all shortcuts |
+| `Esc` | Close panels |
+| Arrow keys | Switch views |
+
+## URL Hash State
+
+The dashboard saves your current view state in the URL hash. Share URLs like:
+
+```
+dashboard.html#p=umap&c=cluster&s=engagement&z=1.5
+```
+
+Parameters: `p` (projection), `c` (color mode), `s` (scale mode), `z` (zoom level).
+
+## Building the Dashboard
+
+### From CLI
 
 ```bash
-papertrail build papers_final.json -o dashboard.html \
-  --primary-color "#2196F3" \
-  --accent-color "#FF9800"
+papertrail build papers_final.json -o dashboard.html --title "My Lab"
 ```
 
-### Set Default Projection
-
-```bash
-papertrail build papers_final.json -o dashboard.html \
-  --default-projection tsne
-```
-
-### Set Default Coloring
-
-```bash
-papertrail build papers_final.json -o dashboard.html \
-  --default-coloring channel
-```
-
-### Include Additional Metadata
-
-Add custom fields to display:
-
-```bash
-papertrail build papers_final.json -o dashboard.html \
-  --extra-fields "keywords,institution,funding"
-```
-
-### Data Size Optimization
-
-For large datasets (10,000+ papers), compress data:
-
-```bash
-papertrail build papers_final.json -o dashboard.html --compress
-```
-
-Reduces file size significantly with minimal quality loss.
-
-### Template Customization
-
-Use a custom HTML template:
-
-```bash
-papertrail build papers_final.json -o dashboard.html \
-  --template custom_template.html
-```
-
-## Sharing & Deployment
-
-### Share Locally
-
-```bash
-# Simply copy the file
-cp dashboard.html ~/Dropbox/papers_dashboard.html
-
-# Or email it
-mail -a dashboard.html user@example.com
-```
-
-### Host on Web Server
-
-```bash
-# Copy to web server
-scp dashboard.html user@server.com:/var/www/html/papers.html
-```
-
-Then access at `https://server.com/papers.html`
-
-### GitHub Pages
-
-```bash
-# Commit to repo
-git add dashboard.html
-git commit -m "Update paper dashboard"
-git push
-
-# View at https://username.github.io/repo/dashboard.html
-```
-
-### Google Drive / Dropbox
-
-Simply upload the HTML file. These services will:
-
-- Serve it directly
-- Allow sharing via link
-- Work in all browsers
-
-## Customization
-
-### Edit HTML Directly
-
-The dashboard HTML is a single file. You can edit it:
-
-```html
-<!-- Change the title -->
-<title>My Research Papers</title>
-
-<!-- Modify colors in CSS -->
-<style>
-  .header { background-color: #2196F3; }
-</style>
-
-<!-- Add custom scripts -->
-<script>
-  // Your custom JavaScript here
-</script>
-```
-
-### Modify Table Columns
-
-Edit the data extraction section to show different fields:
-
-```javascript
-const columns = ["title", "authors", "year", "journal", "citations"];
-```
-
-### Customize Search
-
-Modify search weighting:
-
-```javascript
-const searchWeights = {
-  title: 2.0,
-  abstract: 1.0,
-  authors: 1.5,
-  keywords: 1.0
-};
-```
-
-## Performance Tips
-
-### For Large Datasets (10,000+ papers)
-
-1. **Enable compression**:
-   ```bash
-   papertrail build papers_final.json -o dashboard.html --compress
-   ```
-
-2. **Limit initial display** of table (lazy load):
-   ```html
-   <script>
-     const INITIAL_ROWS = 100;  // Show first 100, load more on scroll
-   </script>
-   ```
-
-3. **Use efficient projection** (PCA is fastest):
-   ```bash
-   papertrail build papers_final.json -o dashboard.html \
-     --default-projection pca
-   ```
-
-### Browser Optimization
-
-For very large datasets (20,000+ papers):
-
-- Use Chrome/Edge (faster d3.js rendering)
-- Close other tabs
-- Increase browser memory: `--max-old-space-size=4096`
-
-### File Size
-
-Check file size:
-
-```bash
-ls -lh dashboard.html
-```
-
-Typical sizes:
-
-- 100 papers: 2-5 MB
-- 1,000 papers: 20-50 MB
-- 10,000 papers: 200-500 MB
-
-Compress with gzip for storage:
-
-```bash
-gzip -k dashboard.html  # Creates dashboard.html.gz
-```
-
-## Python API
-
-Build dashboards programmatically:
+### From Python
 
 ```python
-from papertrail.preview import DashboardBuilder
+from papertrail.preview import build_preview
 
-# Create builder
-builder = DashboardBuilder()
-
-# Build dashboard
-builder.build(
-    papers=papers_with_embeddings,
-    output_path="dashboard.html",
-    title="My Papers",
-    description="Papers from our Slack workspace",
-    default_coloring="cluster",
-    default_projection="umap"
-)
+build_preview(papers, output_path="dashboard.html", title="My Lab")
 ```
 
-## Tips & Tricks
+### Automated Pipeline
 
-### Export Data from Dashboard
+The GitHub Actions pipeline automatically builds and deploys the dashboard weekly:
 
-In browser console (F12):
+1. Scrapes all configured Slack channels
+2. Enriches metadata via OpenAlex/Crossref/bioRxiv APIs
+3. Computes embeddings and hierarchical clusters
+4. Builds dashboard and deploys to GitHub Pages
 
-```javascript
-// Get all papers as JSON
-const data = JSON.stringify(window.papers);
-console.log(data);
+See [Deployment Guide](../getting-started/quickstart.md) for setup instructions.
 
-// Copy to clipboard
-copy(data);
+## Deployment
+
+The dashboard is deployed to GitHub Pages at:
+
+```
+https://<username>.github.io/PaperTrail/<workspace>/
 ```
 
-### Embed Dashboard in Website
+Where `<workspace>` is derived from your Slack workspace URL in `config.yml`. For example, `koolab.slack.com` deploys to `/koolab/`.
 
-```html
-<!-- In your website -->
-<iframe src="dashboard.html" width="100%" height="800px"></iframe>
-```
-
-### Share with Export Settings
-
-Create multiple dashboards with different defaults:
-
-```bash
-# One with cluster coloring
-papertrail build papers_final.json -o dashboard_clusters.html \
-  --default-coloring cluster
-
-# One with channel coloring
-papertrail build papers_final.json -o dashboard_channels.html \
-  --default-coloring channel
-
-# One with timeline coloring
-papertrail build papers_final.json -o dashboard_timeline.html \
-  --default-coloring date
-```
-
-### Add Search Filters
-
-Modify HTML to add predefined search filters:
-
-```javascript
-// Quick filter buttons
-const quickFilters = {
-  "Deep Learning": "neural network deep learning",
-  "Biology": "cell biology genetics",
-  "Statistics": "statistical analysis hypothesis test"
-};
-```
-
-### Track Search Popularity
-
-```javascript
-// Log popular searches
-document.addEventListener("search", (e) => {
-  console.log(`Searched for: ${e.detail.query}`);
-});
-```
-
-## Troubleshooting
-
-### Dashboard is slow
-
-Check:
-
-- File size (compress if >200MB)
-- Number of papers (UMAP is slower for 10,000+)
-- Browser (use Chrome/Edge)
-- Try PCA projection instead of UMAP
-
-### Search returns no results
-
-Check:
-
-- Papers have abstracts (required for search)
-- Query words are spelled correctly
-- Try shorter queries ("deep learning" vs "distributed deep learning systems")
-
-### Maps doesn't show
-
-Check:
-
-- Papers have embeddings (required)
-- Projection was computed (--projections umap)
-- Browser JavaScript is enabled
-
-### File size is huge
-
-Solutions:
-1. Compress: `--compress`
-2. Use PCA (smaller embedding space)
-3. Use HuggingFace backend (384D vs 1536D embeddings)
-4. Reduce number of papers
-
-### Colors don't match expectations
-
-Check:
-
-- Coloring dropdown is set correctly
-- Papers have required metadata (channel, date, etc.)
-- Color palette is appropriate for your data
-
-## Next Steps
-
-- **[Searching Papers](searching.md)** — Use semantic search API
-- **[Koo Lab Example](../examples/koo-lab.md)** — Real-world dashboard example
-- **[API Reference: Preview](../api/projections.md)** — Detailed Python API
+The old `/dashboard/` path redirects automatically.

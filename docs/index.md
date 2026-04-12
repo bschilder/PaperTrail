@@ -2,7 +2,9 @@
 
 **Every paper your team shares — found and mapped.**
 
-PaperTrail automatically discovers papers shared across your Slack workspace, enriches them with metadata from Semantic Scholar and OpenAlex, computes semantic embeddings, and serves an interactive dashboard with table view, 2D embedding map, and semantic search.
+PaperTrail automatically discovers papers shared across your Slack workspace, enriches them with metadata, computes semantic embeddings, and builds an interactive visual dashboard with hierarchical topic clustering, AI-powered search, and full engagement metrics.
+
+### [Live Demo: Koo Lab Dashboard](https://bschilder.github.io/PaperTrail/koolab/)
 
 - **GitHub**: [bschilder/PaperTrail](https://github.com/bschilder/PaperTrail)
 - **PyPI**: [papertrail-lab](https://pypi.org/project/papertrail-lab/)
@@ -12,21 +14,31 @@ PaperTrail automatically discovers papers shared across your Slack workspace, en
 
 ## Features
 
-PaperTrail provides a complete end-to-end pipeline for paper discovery and analysis:
+### Web App (Dashboard)
 
-- **Slack Scraping** — Automatically detects papers from shared links (DOI, arXiv, bioRxiv, PubMed, and other scholarly URLs) across all channels. Tracks engagement metrics like reactions and thread replies.
+A self-contained HTML file — no server required. See the full [Dashboard Guide](guide/dashboard.md).
 
-- **Metadata Enrichment** — Fetches rich metadata including title, authors, abstract, journal, year, and affiliated institutions from Semantic Scholar and OpenAlex APIs.
+![Map View](images/map-view.png)
 
-- **LLM Embeddings** — Generates high-quality semantic embeddings via OpenAI (default), HuggingFace Inference API, or local ONNX models. Stored in a FAISS vector database for sub-millisecond similarity search.
+- **Canvas scatter plot** with UMAP/t-SNE/PCA projections and hardware-accelerated rendering
+- **Hierarchical topic clustering** — LLM-generated labels at 3 zoom levels (7 → 15 → 35 topics)
+- **Topic connection lines** — configurable thickness, opacity, curve, and color
+- **8 color modes**: Cluster, Channel, Year, Citations, Engagement, Density, Contributor, Journal
+- **Smooth animations** — papers fade in/out when filtering, timeline playback with gradual dot appearance
+- **3D WebGL view** powered by Three.js
+- **Sortable table** with column filters, CSV/XLSX export, Slack message links
+- **Leaderboard** — top contributors, most cited, most engaged
+- **AI chatbot** — natural language search with tool use (HuggingFace, Claude, OpenAI)
+- **Semantic search** — content-based similarity ranking
+- **Time travel** — chronological animation with smooth fade-in
+- **KDE density background** with 7 color palettes
+- **Lasso & rectangle selection**
+- **URL hash state** for shareable views
+- **Dark theme** optimized for readability
 
-- **Interactive Dashboard** — Self-contained HTML file with sortable table, d3.js scatter plot (UMAP/t-SNE/PCA projections), color-by filters (cluster/channel/user/date), detail panel, and semantic search chat with autocomplete.
+### Backend (Python Pipeline)
 
-- **CLI Pipeline** — Simple four-step workflow: `scrape → enrich → embed → build`.
-
----
-
-## Architecture
+A four-step CLI pipeline. See individual guides: [Scraping](guide/scraping.md) · [Enriching](guide/enriching.md) · [Embeddings](guide/embeddings.md) · [Dashboard](guide/dashboard.md)
 
 ```
 Slack Workspace
@@ -35,131 +47,90 @@ Slack Workspace
 ┌─────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
 │   Scraper    │───▶│   Enricher   │───▶│  Embeddings  │───▶│   Preview    │
 │              │    │              │    │              │    │              │
-│ - Slack API  │    │ - Semantic   │    │ - OpenAI     │    │ - Table view │
-│ - URL detect │    │   Scholar    │    │ - HuggingFace│    │ - Map view   │
-│ - Engagement │    │ - OpenAlex   │    │ - Local ONNX │    │ - Chat       │
-│   metrics    │    │              │    │ - FAISS store│    │ - Detail     │
+│ - Slack API  │    │ - Page scrape│    │ - TF-IDF/SVD │    │ - Map view   │
+│ - 30+ domains│    │ - OpenAlex   │    │ - OpenAI     │    │ - 3D view    │
+│ - Reactions  │    │ - Crossref   │    │ - HuggingFace│    │ - Table      │
+│ - Replies    │    │ - bioRxiv API│    │ - Local ONNX │    │ - AI agent   │
 └─────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
 ```
 
----
-
-## Embedding Backends
-
-PaperTrail supports multiple embedding backends. Choose based on your needs:
-
-| Backend | Model | Dimensions | Speed | Quality | API Key |
-|---------|-------|-----------|-------|---------|---------|
-| **OpenAI** (default) | `text-embedding-3-small` | 1536 | Fast | Excellent | `OPENAI_API_KEY` |
-| **HuggingFace** | `BAAI/bge-small-en-v1.5` | 384 | Fast | Very Good | `HF_TOKEN` (optional) |
-| **Local** | `BAAI/bge-small-en-v1.5` | 384 | Medium | Very Good | None required |
-
-The embedding backend is auto-detected based on available API keys. You can also override it explicitly with the `--backend` flag.
+- **Multi-strategy enrichment cascade** — page scraping → DOI lookup (OpenAlex, Crossref) → bioRxiv/medRxiv API → title search → Google fallback. Handles Nature, arXiv, Cell, Science, OpenReview, and 30+ domains.
+- **Junk title rejection** — automatically filters out erratum, corrigendum, correspondence, and site boilerplate
+- **Dead link detection** — removes papers with 404/error pages
+- **Hierarchical clustering on UMAP projections** — 3 levels with LLM-generated labels (HF → OpenAI fallback)
+- **Automated weekly pipeline** via GitHub Actions — scrape, enrich, embed, build, deploy to GitHub Pages
 
 ---
 
 ## Quick Start
 
-### 1. Install
+### Option 1: Automated (Fork & Configure)
 
-=== "With OpenAI embeddings (recommended)"
-    ```bash
-    pip install papertrail-lab[openai]
-    ```
+1. **Fork** this repository
+2. **Edit** `config.yml` with your Slack channels
+3. **Add** `SLACK_BOT_TOKEN` as a GitHub Actions secret
+4. The pipeline runs weekly and deploys to GitHub Pages
 
-=== "With HuggingFace embeddings"
-    ```bash
-    pip install papertrail-lab[huggingface]
-    ```
+See [Deployment Guide](getting-started/quickstart.md) for details.
 
-=== "With local embeddings (no API keys)"
-    ```bash
-    pip install papertrail-lab[local]
-    ```
-
-=== "With all backends"
-    ```bash
-    pip install papertrail-lab[all]
-    ```
-
-### 2. Configure
-
-Set your API tokens as environment variables:
-
-=== "OpenAI"
-    ```bash
-    export SLACK_BOT_TOKEN="xoxb-your-token-here"
-    export OPENAI_API_KEY="sk-..."
-    ```
-
-=== "HuggingFace"
-    ```bash
-    export SLACK_BOT_TOKEN="xoxb-your-token-here"
-    export HF_TOKEN="hf_..."
-    ```
-
-=== "Local (no API keys needed)"
-    ```bash
-    export SLACK_BOT_TOKEN="xoxb-your-token-here"
-    ```
-
-### 3. Run the Pipeline
+### Option 2: CLI
 
 ```bash
-# Step 1: Scrape papers from Slack
-papertrail scrape -o papers_raw.json
+# Install
+pip install papertrail-lab[all]
 
-# Step 2: Enrich with metadata
-papertrail enrich papers_raw.json -o papers_enriched.json
+# Run the full pipeline
+papertrail run-pipeline -c config.yml -o build
 
-# Step 3: Compute embeddings and projections
-papertrail embed papers_enriched.json -o papers_final.json --backend openai
-
-# Step 4: Build the interactive dashboard
-papertrail build papers_final.json -o dashboard.html
+# Or step by step:
+papertrail scrape --token $SLACK_BOT_TOKEN -c CHANNEL_ID -o raw.json
+papertrail enrich raw.json -o enriched.json
+papertrail embed enriched.json -o final.json
+papertrail build final.json -o dashboard.html
 ```
 
-Then open `dashboard.html` in your browser to explore your papers!
+### Option 3: Python API
 
-### 4. Search Papers
+```python
+from papertrail.pipeline import run_pipeline
 
-```bash
-papertrail search -q "transformer attention mechanisms" -k 5
+run_pipeline(config_path="config.yml", output_dir="build")
+```
+
+---
+
+## Configuration
+
+Edit `config.yml` to set up your instance:
+
+```yaml
+title: "PaperTrail — My Lab"
+slack_workspace_url: "https://mylab.slack.com"
+
+channels:
+  papers-dl: C0123Q7PGGP
+  general: CP40S009F
+
+embedding_backend: tfidf  # or openai, huggingface
+openalex_email: "user@example.com"
+schedule: "0 2 * * 0"  # Weekly Sunday 2am UTC
 ```
 
 ---
 
 ## Next Steps
 
-- **[Installation Guide](getting-started/installation.md)** — Detailed setup instructions
-- **[Configuration](getting-started/configuration.md)** — API tokens and environment setup
-- **[Quick Start](getting-started/quickstart.md)** — Step-by-step walkthrough
-- **[User Guide](guide/scraping.md)** — In-depth usage documentation
-- **[API Reference](api/scraper.md)** — Python API documentation
-- **[Koo Lab Demo](examples/koo-lab.md)** — Real-world example and use case
-
----
-
-## Development
-
-Interested in contributing? Set up the development environment:
-
-```bash
-git clone https://github.com/bschilder/PaperTrail.git
-cd PaperTrail
-pip install -e ".[dev]"
-
-# Run tests
-pytest
-
-# Serve docs locally
-mkdocs serve
-```
-
-See [Contributing](contributing.md) for more information.
+- **[Dashboard Guide](guide/dashboard.md)** — Full walkthrough of all UI features
+- **[Installation](getting-started/installation.md)** — Detailed setup
+- **[Scraping Guide](guide/scraping.md)** — Slack integration details
+- **[Enrichment Guide](guide/enriching.md)** — Metadata resolution strategies
+- **[Embeddings Guide](guide/embeddings.md)** — Backend comparison
+- **[API Reference](api/scraper.md)** — Python API docs
+- **[Koo Lab Example](examples/koo-lab.md)** — Real-world deployment
+- **[Contributing](contributing.md)** — Development setup
 
 ---
 
 ## License
 
-MIT License. See [LICENSE](https://github.com/bschilder/PaperTrail/blob/main/LICENSE) for details.
+MIT License. See [LICENSE](https://github.com/bschilder/PaperTrail/blob/main/LICENSE).
