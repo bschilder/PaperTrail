@@ -4393,16 +4393,32 @@
             if (scaleByMode === 'engagement') return Math.max(basePointSize * 0.7, Math.min(basePointSize * 3, basePointSize + applyTransform(paper.engagement || 0, 5) * basePointSize * 2));
             if (scaleByMode === 'year') return Math.max(basePointSize * 0.7, Math.min(basePointSize * 3, basePointSize + applyTransform((paper.year || 2020) - 2015, 10) * basePointSize * 2));
             if (scaleByMode === 'relevance' && semanticQuery) {
-                const score = semanticScores.get(paper.title) || 0;
-                return Math.max(3, Math.min(10, score * 10));
+                const raw = semanticScores.get(paper.title) || 0;
+                const score = normalizeSemanticScore(raw);
+                return Math.max(basePointSize * 0.5, basePointSize + score * basePointSize * 2);
             }
             return 4;
         }
 
+        // Cache for normalized semantic scores
+        let _semanticScoreRange = { min: 0, max: 1 };
+
+        function normalizeSemanticScore(raw) {
+            const range = _semanticScoreRange.max - _semanticScoreRange.min;
+            if (range < 0.01) return raw > 0 ? 1 : 0;
+            return Math.max(0, Math.min(1, (raw - _semanticScoreRange.min) / range));
+        }
+
         function getPointColor(paper) {
             if (semanticQuery) {
-                const score = semanticScores.get(paper.title) || 0;
-                return interpolateColor([50, 50, 120], [255, 80, 80], score);
+                const raw = semanticScores.get(paper.title) || 0;
+                const score = normalizeSemanticScore(raw);
+                // Cool blue (low) → warm yellow (mid) → hot red (high)
+                if (score < 0.5) {
+                    return interpolateColor([30, 40, 80], [60, 180, 220], score * 2);
+                } else {
+                    return interpolateColor([60, 180, 220], [255, 60, 60], (score - 0.5) * 2);
+                }
             }
 
             if (colorByMode === 'channel' && paper.channels && paper.channels.length > 0) {
@@ -6888,7 +6904,13 @@
                             semanticScores.set(paper.title, Math.max(0, sim));
                         }
                     });
-                    console.log('Semantic search: embedding-based');
+                    // Compute score range for normalization
+                    const scores = Array.from(semanticScores.values());
+                    scores.sort((a, b) => a - b);
+                    // Use percentile range to avoid outlier compression
+                    _semanticScoreRange.min = scores[Math.floor(scores.length * 0.05)] || 0;
+                    _semanticScoreRange.max = scores[Math.floor(scores.length * 0.95)] || 1;
+                    console.log(`Semantic search: embedding-based, range ${_semanticScoreRange.min.toFixed(3)}-${_semanticScoreRange.max.toFixed(3)}`);
                     renderMap();
                     return;
                 }
@@ -6907,7 +6929,11 @@
                 });
                 semanticScores.set(paper.title, Math.min(1, score / (queryTerms.length * 3)));
             });
-            console.log('Semantic search: BM25 fallback');
+            const scores = Array.from(semanticScores.values());
+            scores.sort((a, b) => a - b);
+            _semanticScoreRange.min = scores[Math.floor(scores.length * 0.05)] || 0;
+            _semanticScoreRange.max = scores[Math.floor(scores.length * 0.95)] || 1;
+            console.log(`Semantic search: BM25 fallback, range ${_semanticScoreRange.min.toFixed(3)}-${_semanticScoreRange.max.toFixed(3)}`);
             renderMap();
         }
 
