@@ -267,7 +267,7 @@ def _extract_ids(url: str) -> dict[str, str]:
     # DOI — explicit in URL
     doi_match = re.search(r'(10\.\d{4,}/[^\s,\]>]+)', url)
     if doi_match:
-        doi = doi_match.group(1).rstrip('.').rstrip('/')
+        doi = re.sub(r'\.(pdf|html|xml|full)$', '', doi_match.group(1)).rstrip('.').rstrip('/')
         ids["doi"] = doi
         if '10.1101/' in doi or '10.64898/' in doi:
             ids["biorxiv_doi"] = doi

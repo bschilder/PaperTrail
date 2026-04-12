@@ -43484,66 +43484,6 @@
   },
   {
     "channel": "papers-genomics",
-    "shared_by": "Masayuki Nagai",
-    "timestamp": "2025-12-22T18:16:18.130339+00:00",
-    "first_shared": "2025-12-22T18:16:18.130339+00:00",
-    "slack_url": "https://koolab.slack.com/archives/C015BQ2BDF0/p1766427378130339",
-    "url": "https://www.nature.com/nmeth/articles?type=method-to-watch",
-    "text": "Here is a list of methods to watch from Nat Method this year",
-    "reactions_count": 0,
-    "reply_count": 1,
-    "reaction_details": {},
-    "channels": [
-      "papers-genomics"
-    ],
-    "projections": {
-      "pca": [
-        -0.005555678158998489,
-        -0.05743507295846939
-      ],
-      "tsne": [
-        -27.962764739990234,
-        6.514650821685791
-      ],
-      "umap": [
-        3.0982024669647217,
-        10.238751411437988
-      ],
-      "pca3d": [
-        -0.005555678158998489,
-        -0.05743507295846939,
-        -0.015043962746858597
-      ],
-      "tsne3d": [
-        -3.5441970825195312,
-        -5.6031813621521,
-        12.79352855682373
-      ],
-      "umap3d": [
-        10.5321683883667,
-        -0.8957338333129883,
-        9.483328819274902
-      ]
-    },
-    "cluster_id": 2,
-    "cluster_label": "Self-Supervised Learning",
-    "cluster_levels": [
-      {
-        "id": 2,
-        "label": "Self-Supervised Learning"
-      },
-      {
-        "id": 1,
-        "label": "Learning Methods"
-      },
-      {
-        "id": 2,
-        "label": "Model Explanations"
-      }
-    ]
-  },
-  {
-    "channel": "papers-genomics",
     "shared_by": "Peter Koo",
     "timestamp": "2025-12-22T04:07:23.592959+00:00",
     "first_shared": "2025-12-22T04:07:23.592959+00:00",
@@ -81972,7 +81912,21 @@
         "id": 24,
         "label": "Code Development"
       }
-    ]
+    ],
+    "title": "Evidence for the role of transcription factors in the co-transcriptional regulation of intron retention",
+    "authors": [
+      "Fahad Ullah",
+      "Saira Jabeen",
+      "Maayan Salton",
+      "Anireddy S. N. Reddy",
+      "Asa Ben\u2010Hur"
+    ],
+    "year": 2023,
+    "journal": "Genome biology",
+    "abstract": "Source code available at https://github.com/fahadahaf/chromir.",
+    "doi": "10.1186/s13059-023-02885-1",
+    "cited_by_count": 21,
+    "openalex_url": "https://openalex.org/W4353074871"
   },
   {
     "channel": "papers-genomics",
@@ -133181,66 +133135,6 @@
   },
   {
     "channel": "random",
-    "shared_by": "Peter Koo",
-    "timestamp": "2026-01-30T16:07:21.142259+00:00",
-    "first_shared": "2026-01-30T16:07:21.142259+00:00",
-    "slack_url": "https://koolab.slack.com/archives/CP40S02RX/p1769789241142259",
-    "url": "https://arxiv.org/auth/endorse?x=DJJICN",
-    "text": "[*Help*] can anyone who's registered as an endorser for the q-bio.GN (Genomics) subject class of arXiv give me an endorsement so i can post something? Thanks!",
-    "reactions_count": 0,
-    "reply_count": 0,
-    "reaction_details": {},
-    "channels": [
-      "random"
-    ],
-    "projections": {
-      "pca": [
-        0.008281402289867401,
-        -0.05203578993678093
-      ],
-      "tsne": [
-        6.3731160163879395,
-        -20.02507781982422
-      ],
-      "umap": [
-        0.7246853113174438,
-        10.04024887084961
-      ],
-      "pca3d": [
-        0.008281402289867401,
-        -0.05203578993678093,
-        -0.03202303498983383
-      ],
-      "tsne3d": [
-        3.858227252960205,
-        6.565474033355713,
-        8.996170043945312
-      ],
-      "umap3d": [
-        7.992443561553955,
-        -0.18933890759944916,
-        7.964874744415283
-      ]
-    },
-    "cluster_id": 1,
-    "cluster_label": "Foundation Models",
-    "cluster_levels": [
-      {
-        "id": 1,
-        "label": "Foundation Models"
-      },
-      {
-        "id": 13,
-        "label": "Genetic Disease"
-      },
-      {
-        "id": 23,
-        "label": "Clinical Embeddings"
-      }
-    ]
-  },
-  {
-    "channel": "random",
     "shared_by": "Pablo Mantilla Puccetti",
     "timestamp": "2026-01-27T18:53:14.356319+00:00",
     "first_shared": "2026-01-27T18:53:14.356319+00:00",
@@ -139912,66 +139806,6 @@
       {
         "id": 27,
         "label": "Neural Training"
-      }
-    ]
-  },
-  {
-    "channel": "random",
-    "shared_by": "Antonio Majdandzic",
-    "timestamp": "2021-09-03T20:55:16.006300+00:00",
-    "first_shared": "2021-09-03T20:55:16.006300+00:00",
-    "slack_url": "https://koolab.slack.com/archives/CP40S02RX/p1630702516006300",
-    "url": "https://physicstoday.scitation.org/do/10.1063/PT.6.1.20180822a/full/?amp",
-    "text": "Great story on a scientific dispute in the computational community, caused by an algorithm mistake, about the existence of water's second critical point. A bit of background information: Water has 3 major phases: gas, liquid and ice, also a critical point where all the three phases merge (for non-room pressures and temperatures). My former PI (Stanley) proposed that water has a second critical point, involving exotic liquid phases. Two computational groups, form Princeton and Berkley, were competing to prove or disprove his theory....",
-    "reactions_count": 0,
-    "reply_count": 0,
-    "reaction_details": {},
-    "channels": [
-      "random"
-    ],
-    "projections": {
-      "pca": [
-        0.0011668046936392784,
-        -0.051120344549417496
-      ],
-      "tsne": [
-        -7.250925540924072,
-        22.10677719116211
-      ],
-      "umap": [
-        1.5431069135665894,
-        7.261407375335693
-      ],
-      "pca3d": [
-        0.0011668046936392784,
-        -0.051120344549417496,
-        -0.033236660063266754
-      ],
-      "tsne3d": [
-        -4.16882848739624,
-        2.2743980884552,
-        19.976512908935547
-      ],
-      "umap3d": [
-        9.126921653747559,
-        1.0881518125534058,
-        8.717806816101074
-      ]
-    },
-    "cluster_id": 4,
-    "cluster_label": "AI Research Automation",
-    "cluster_levels": [
-      {
-        "id": 4,
-        "label": "AI Research Automation"
-      },
-      {
-        "id": 12,
-        "label": "AI Automation"
-      },
-      {
-        "id": 7,
-        "label": "AI Agents"
       }
     ]
   },
