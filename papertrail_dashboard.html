@@ -3691,21 +3691,38 @@
             }, 10);
         }
 
-        function selectTopicOnMap(label) {
+        function selectTopicOnMap(label, hierLevel, cid) {
             document.getElementById('topicActionPopup').classList.remove('visible');
             document.getElementById('mapToggle').click();
-            const lbl = label.toLowerCase();
             selectedPapers.clear();
             const matched = [];
-            allPapers.forEach((p, idx) => {
-                if ((p.cluster_label || '').toLowerCase().includes(lbl)) {
-                    selectedPapers.add(idx);
-                    matched.push(p);
-                }
-            });
-            if (matched.length > 0) {
-                showDetailPanel(matched.slice(0, 50));
+
+            // Exact match by hierarchy ID if available
+            if (cid && typeof cid === 'string' && cid.includes('_')) {
+                const [lvlStr, idStr] = cid.replace(/^L/, '').split('_');
+                const lvl = parseInt(lvlStr);
+                const id = parseInt(idStr);
+                allPapers.forEach((p, idx) => {
+                    if (p.cluster_levels && p.cluster_levels[lvl] && p.cluster_levels[lvl].id === id) {
+                        selectedPapers.add(idx);
+                        matched.push(p);
+                    }
+                });
+            } else {
+                // Fallback: label match across all levels
+                const lbl = label.toLowerCase();
+                allPapers.forEach((p, idx) => {
+                    if ((p.cluster_label || '').toLowerCase() === lbl) {
+                        selectedPapers.add(idx);
+                        matched.push(p);
+                    } else if (p.cluster_levels?.some(l => (l.label || '').toLowerCase() === lbl)) {
+                        selectedPapers.add(idx);
+                        matched.push(p);
+                    }
+                });
             }
+
+            if (matched.length > 0) showDetailPanel(matched.slice(0, 50));
             renderMap();
         }
 
@@ -6837,18 +6854,40 @@
                 const card = document.createElement('div');
                 card.className = 'paper-card';
 
-                // Build tags
+                // Build cluster tags with colors
+                const l0id = paper.cluster_levels?.[0]?.id ?? paper.cluster_id ?? 0;
+                const l0color = getClusterColorById(l0id, 0);
+                const clusterTag = paper.cluster_label
+                    ? `<span class="card-tag" style="background:${l0color}22;color:${l0color};border:1px solid ${l0color}44;cursor:pointer;" onclick="event.stopPropagation();showTopicInfo('${esc(paper.cluster_label).replace(/'/g, "\\'")}')">${esc(paper.cluster_label)}</span>`
+                    : '';
+                // Subtopic tags
+                const subtopicTags = (paper.cluster_levels || []).slice(1).map((lvl, li) => {
+                    const sc = getClusterColorById(lvl.id, li + 1);
+                    return `<span class="card-tag" style="background:${sc}18;color:${sc};border:1px solid ${sc}33;font-size:9px;cursor:pointer;" onclick="event.stopPropagation();showTopicInfo('${esc(lvl.label).replace(/'/g, "\\'")}', ${li+1})">${esc(lvl.label)}</span>`;
+                }).join('');
+
                 const channelTags = (paper.channels || []).map(ch =>
-                    `<span class="card-tag channel-tag">${channelDisplayName(ch)}</span>`
+                    `<span class="card-tag channel-tag" style="cursor:pointer;" onclick="event.stopPropagation();showChannelInfo('${esc(ch).replace(/'/g, "\\'")}')">${channelDisplayName(ch)}</span>`
                 ).join('');
 
                 const personTag = paper.shared_by
-                    ? `<span class="card-tag person-tag">${personDisplay(paper.shared_by)}</span>`
+                    ? `<span class="card-tag person-tag" style="cursor:pointer;" onclick="event.stopPropagation();showContributorProfile('${esc(paper.shared_by).replace(/'/g, "\\'")}')">${personDisplay(paper.shared_by)}</span>`
                     : '';
 
-                const clusterTag = paper.cluster_label
-                    ? `<span class="card-tag cluster-tag">${paper.cluster_label}</span>`
-                    : '';
+                // Link icons (same style as table)
+                const PAPER_ICON = `<svg width="14" height="14" viewBox="0 0 16 16" fill="#64b5f6" style="vertical-align:middle;"><path d="M4 1h5l4 4v9a1 1 0 01-1 1H4a1 1 0 01-1-1V2a1 1 0 011-1zm4.5 0v4H13L8.5 1z"/></svg>`;
+                const linkIcons = `<span style="display:inline-flex;gap:6px;align-items:center;">
+                    ${paper.url ? `<a href="${esc(paper.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()">${PAPER_ICON}</a>` : ''}
+                    ${paper.slack_url ? `<a href="${esc(paper.slack_url)}" target="_blank" title="View in Slack" onclick="event.stopPropagation()">${SLACK_ICON_SVG}</a>` : ''}
+                    ${paper.doi ? `<a href="https://doi.org/${esc(paper.doi)}" target="_blank" title="DOI" onclick="event.stopPropagation()" style="font-size:10px;color:#64b5f6;">DOI</a>` : ''}
+                </span>`;
+
+                // Abstract with show all toggle
+                const abstractId = `abs_${i}`;
+                const hasLongAbstract = (paper.abstract || '').length > 200;
+                const abstractHTML = paper.abstract
+                    ? `<span id="${abstractId}_short">${esc(paper.abstract.substring(0, 200))}${hasLongAbstract ? `... <a href="#" onclick="event.preventDefault();document.getElementById('${abstractId}_short').style.display='none';document.getElementById('${abstractId}_full').style.display='inline';" style="color:#64b5f6;font-size:10px;">Show all</a>` : ''}</span><span id="${abstractId}_full" style="display:none;">${esc(paper.abstract)} <a href="#" onclick="event.preventDefault();document.getElementById('${abstractId}_full').style.display='none';document.getElementById('${abstractId}_short').style.display='inline';" style="color:#64b5f6;font-size:10px;">Show less</a></span>`
+                    : '<span style="color:#555;">N/A</span>';
 
                 card.innerHTML = `
                     <div class="card-header">
@@ -6856,14 +6895,17 @@
                             <input type="checkbox" class="paper-checkbox" data-idx="${allIdx}" checked>
                         </div>
                         <div class="card-body">
-                            <div class="card-title">${esc(paper.title) || 'Untitled'}</div>
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+                                <div class="card-title" style="flex:1;">${esc(paper.title) || 'Untitled'}</div>
+                                ${linkIcons}
+                            </div>
                             <div class="card-meta">
-                                ${paper.year || ''} &middot; ${(paper.cited_by_count || 0)} cites
+                                ${paper.year || ''} &middot; ${paper.journal || ''} &middot; ${(paper.cited_by_count || 0)} cites
                             </div>
                             <div class="card-tags">
+                                ${clusterTag}${subtopicTags}
                                 ${channelTags}
                                 ${personTag}
-                                ${clusterTag}
                             </div>
                             <div class="card-details">
                                 <div class="detail-row">
@@ -6871,20 +6913,8 @@
                                     <div class="detail-value">${Array.isArray(paper.authors) ? paper.authors.join(', ') : (paper.authors || 'N/A')}</div>
                                 </div>
                                 <div class="detail-row">
-                                    <div class="detail-label">Journal</div>
-                                    <div class="detail-value">${paper.journal || 'N/A'}</div>
-                                </div>
-                                <div class="detail-row">
                                     <div class="detail-label">Abstract</div>
-                                    <div class="detail-value">${(paper.abstract || 'N/A').substring(0, 200)}${(paper.abstract || '').length > 200 ? '...' : ''}</div>
-                                </div>
-                                <div class="detail-row">
-                                    <div class="detail-label">Links</div>
-                                    <div class="detail-value">
-                                        ${paper.url ? `<a href="${paper.url}" target="_blank">Paper</a>` : ''}
-                                        ${paper.doi ? ` &middot; <a href="https://doi.org/${paper.doi}" target="_blank">DOI</a>` : ''}
-                                        ${paper.openalex_url ? ` &middot; <a href="${paper.openalex_url}" target="_blank">OpenAlex</a>` : ''}
-                                    </div>
+                                    <div class="detail-value">${abstractHTML}</div>
                                 </div>
                             </div>
                         </div>
@@ -9502,7 +9532,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
 
             // Topic action buttons
             document.getElementById('topicSelectBtn').addEventListener('click', () => {
-                if (currentTopicLabel) selectTopicOnMap(currentTopicLabel);
+                if (currentTopicLabel) selectTopicOnMap(currentTopicLabel, currentTopicHierLevel, currentTopicCid);
             });
             document.getElementById('topicInfoBtn').addEventListener('click', () => {
                 if (currentTopicLabel) showTopicInfo(currentTopicLabel, currentTopicHierLevel, currentTopicCid);
