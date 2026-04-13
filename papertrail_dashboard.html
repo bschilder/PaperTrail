@@ -2326,9 +2326,7 @@
                 </div>
                 <input type="text" class="chatbot-bar-input" id="semanticPanelInput" placeholder="Try: single cell RNA sequencing, attention mechanism, protein folding..." style="flex:1;font-size:14px;padding:9px 14px;">
                 <div style="display:flex;gap:6px;">
-                    <button class="chatbot-example-btn" style="font-size:12px;padding:6px 12px;" onclick="document.getElementById('semanticPanelInput').value='single cell RNA sequencing';triggerSemanticFromPanel();">scRNA-seq</button>
-                    <button class="chatbot-example-btn" style="font-size:12px;padding:6px 12px;" onclick="document.getElementById('semanticPanelInput').value='protein structure prediction';triggerSemanticFromPanel();">protein structure</button>
-                    <button class="chatbot-example-btn" onclick="document.getElementById('semanticPanelInput').value='attention mechanism transformer';triggerSemanticFromPanel();">attention</button>
+                    <span id="semanticExamples"></span>
                 </div>
             </div>
         </div>
@@ -2343,9 +2341,7 @@
                     <!-- results moved to body level for fixed positioning -->
                 </div>
                 <div class="chatbot-examples">
-                    <button class="chatbot-example-btn" data-query="Compare #papers-dl vs #papers-genomics">dl vs genomics</button>
-                    <button class="chatbot-example-btn" data-query="What topics are trending in the last 6 months?">trending</button>
-                    <button class="chatbot-example-btn" data-query="Who are the most active contributors and what do they focus on?">contributors</button>
+                    <span id="agentExamples"></span>
                 </div>
                 <button class="chatbot-example-btn" onclick="showChatHistory()" style="border-color:#4a4a5e;" title="View conversation history">&#x1F4AC; History</button>
                 <!-- Old inline settings removed — using body-level modal (#settingsOverlay) -->
@@ -3315,6 +3311,7 @@
 
             // Build search index for faster queries
             buildSearchIndex();
+            buildExampleButtons();
 
             filterPapers();
             drawSparkline();
@@ -3340,6 +3337,41 @@
             const df = searchIndex.docFreq[term] || 0;
             if (df === 0) return 0;
             return Math.log((searchIndex.totalDocs - df + 0.5) / (df + 0.5) + 1);
+        }
+
+        function buildExampleButtons() {
+            // Build data-driven example queries from the loaded papers
+            const channels = [...new Set(allPapers.flatMap(p => p.channels || []))].sort();
+            const clusters = [...new Set(allPapers.map(p => p.cluster_label).filter(Boolean))].sort((a, b) => {
+                const ca = allPapers.filter(p => p.cluster_label === a).length;
+                const cb = allPapers.filter(p => p.cluster_label === b).length;
+                return cb - ca;
+            });
+            const people = {};
+            allPapers.forEach(p => { if (p.shared_by) people[p.shared_by] = (people[p.shared_by] || 0) + 1; });
+            const topPeople = Object.entries(people).sort((a, b) => b[1] - a[1]);
+
+            // Semantic search examples — use top cluster labels as topics
+            const semEl = document.getElementById('semanticExamples');
+            if (semEl && clusters.length) {
+                semEl.innerHTML = clusters.slice(0, 3).map(c =>
+                    `<button class="chatbot-example-btn" style="font-size:12px;padding:6px 12px;" onclick="document.getElementById('semanticPanelInput').value='${esc(c)}';triggerSemanticFromPanel();">${esc(c)}</button>`
+                ).join('');
+            }
+
+            // Agent examples — dynamic channel compare, trending, contributors
+            const agentEl = document.getElementById('agentExamples');
+            if (agentEl) {
+                const examples = [];
+                if (channels.length >= 2) {
+                    examples.push({ query: `Compare #${channels[0]} vs #${channels[1]}`, label: `${channels[0]} vs ${channels[1]}` });
+                }
+                examples.push({ query: 'What topics are trending in the last 6 months?', label: 'trending' });
+                examples.push({ query: 'Who are the most active contributors and what do they focus on?', label: 'contributors' });
+                agentEl.innerHTML = examples.map(e =>
+                    `<button class="chatbot-example-btn" data-query="${esc(e.query)}">${esc(e.label)}</button>`
+                ).join('');
+            }
         }
 
         // ===== UI INITIALIZATION =====
