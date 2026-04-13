@@ -83,8 +83,22 @@ def run_pipeline(
             raise RuntimeError("SLACK_BOT_TOKEN not set")
 
         channels = config.get("channels", {})
+        # If no channels configured, list all public channels
         if not channels:
-            raise RuntimeError("No channels configured in config.yml")
+            logger.info("No channels configured, discovering all public channels...")
+            import requests as _req
+            resp = _req.get(
+                "https://slack.com/api/conversations.list",
+                headers={"Authorization": f"Bearer {token}"},
+                params={"types": "public_channel", "limit": 200, "exclude_archived": "true"},
+                timeout=15,
+            )
+            if resp.ok:
+                for ch in resp.json().get("channels", []):
+                    channels[ch["name"]] = ch["id"]
+                logger.info("Discovered %d public channels", len(channels))
+            else:
+                raise RuntimeError(f"Failed to list channels: {resp.status_code}")
 
         scraper = SlackPaperScraper(token=token)
         all_papers = []

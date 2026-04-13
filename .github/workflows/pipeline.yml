@@ -9,6 +9,10 @@ on:
         description: "Skip scraping, use existing data"
         type: boolean
         default: false
+      workspace:
+        description: "Workspace to build (blank = all)"
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -33,40 +37,82 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[all,dev]"
 
-      - name: Run pipeline
+      - name: Run pipelines for all workspaces
         timeout-minutes: 120
         env:
+          # All possible Slack tokens — each config references its own
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_BOT_TOKEN_STANDARDMODELBIO: ${{ secrets.SLACK_BOT_TOKEN_STANDARDMODELBIO }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           OPENALEX_EMAIL: ${{ secrets.OPENALEX_EMAIL || format('{0}@users.noreply.github.com', github.actor) }}
         run: |
           set -e
-          if [ "${{ inputs.skip_scrape }}" = "true" ] && [ -f data/papers_final.json ]; then
-            echo "Skipping scrape, using existing data"
-            papertrail -v run-pipeline -c config.yml -o build --skip-scrape --data-file data/papers_final.json
+
+          # Find config files — single workspace or all
+          if [ -n "${{ inputs.workspace }}" ]; then
+            CONFIGS="config/${{ inputs.workspace }}.yml"
+          elif [ -d config ]; then
+            CONFIGS=$(ls config/*.yml 2>/dev/null)
           else
-            papertrail -v run-pipeline -c config.yml -o build
+            CONFIGS="config.yml"
           fi
 
-      - name: Build docs
+          for cfg in $CONFIGS; do
+            echo "========================================="
+            echo "Processing: $cfg"
+            echo "========================================="
+
+            # Extract workspace name from config
+            WORKSPACE=$(python -c "import yaml; c=yaml.safe_load(open('$cfg')); url=c.get('slack_workspace_url',''); name=url.split('//')[1].split('.')[0] if '//' in url else 'dashboard'; print(name)")
+            echo "Workspace: $WORKSPACE"
+
+            # Set the correct Slack token for this workspace
+            TOKEN_SECRET=$(python -c "import yaml; c=yaml.safe_load(open('$cfg')); print(c.get('slack_token_secret', 'SLACK_BOT_TOKEN'))")
+            export SLACK_BOT_TOKEN="${!TOKEN_SECRET}"
+
+            OUTDIR="build/$WORKSPACE"
+            DATADIR="data/$WORKSPACE"
+            mkdir -p "$OUTDIR" "$DATADIR"
+
+            # Run pipeline
+            if [ "${{ inputs.skip_scrape }}" = "true" ] && [ -f "$DATADIR/papers_final.json" ]; then
+              echo "Skipping scrape, using existing data"
+              papertrail -v run-pipeline -c "$cfg" -o "$OUTDIR" --skip-scrape --data-file "$DATADIR/papers_final.json"
+            else
+              papertrail -v run-pipeline -c "$cfg" -o "$OUTDIR" || echo "WARNING: Pipeline failed for $WORKSPACE (may be missing token)"
+            fi
+
+            # Copy data for commit
+            if [ -f "$OUTDIR/papers_final.json" ]; then
+              cp "$OUTDIR/papers_final.json" "$DATADIR/papers_final.json"
+            fi
+          done
+
+      - name: Build docs + dashboards
         run: |
           mkdocs build --strict
-          # Deploy dashboard under workspace name from config
-          WORKSPACE=$(python -c "import yaml; c=yaml.safe_load(open('config.yml')); url=c.get('slack_workspace_url',''); name=url.split('//')[1].split('.')[0] if '//' in url else 'dashboard'; print(name)")
-          echo "Dashboard path: $WORKSPACE"
-          mkdir -p "site/$WORKSPACE"
-          cp build/dashboard.html "site/$WORKSPACE/index.html"
-          # Also keep /dashboard/ as redirect for backward compat
+
+          # Deploy each workspace dashboard
+          for cfg in config/*.yml; do
+            WORKSPACE=$(python -c "import yaml; c=yaml.safe_load(open('$cfg')); url=c.get('slack_workspace_url',''); name=url.split('//')[1].split('.')[0] if '//' in url else 'dashboard'; print(name)")
+            DASHBOARD="build/$WORKSPACE/dashboard.html"
+            if [ -f "$DASHBOARD" ]; then
+              mkdir -p "site/$WORKSPACE"
+              cp "$DASHBOARD" "site/$WORKSPACE/index.html"
+              echo "Deployed: site/$WORKSPACE/"
+            fi
+          done
+
+          # Backward compat redirect
           mkdir -p site/dashboard
-          echo "<meta http-equiv='refresh' content='0;url=../$WORKSPACE/'>" > site/dashboard/index.html
+          echo "<meta http-equiv='refresh' content='0;url=../koolab/'>" > site/dashboard/index.html
 
       - name: Commit updated data
         run: |
-          cp build/papers_final.json data/papers_final.json
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/papers_final.json
+          git add data/
           if ! git diff --staged --quiet; then
             git commit -m "Update paper data [pipeline]"
             git pull --rebase origin main

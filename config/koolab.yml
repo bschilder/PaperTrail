@@ -1,0 +1,45 @@
+# PaperTrail Configuration
+# Fork this repo and edit this file to set up your own PaperTrail instance.
+
+# Dashboard title shown in the navbar
+title: "PaperTrail — Koo Lab"
+
+# Slack workspace URL (for "Open in Slack" links in the dashboard)
+slack_workspace_url: "https://koolab.slack.com"
+
+# Slack channels to scrape (channel_name: channel_id)
+# Find channel IDs: open Slack, right-click channel → "View channel details" → scroll to bottom
+channels:
+  # Paper-focused channels
+  papers-dl: C0123Q7PGGP
+  papers-genomics: C015BQ2BDF0
+  papers-protein: C011SDT3KKQ
+  papers-phenomics: C084KFWEVC2
+  papers-ai-agents: C08C020L554
+  papers-health: C09U8FW4YJV
+  paper_digest_moon: C0AEX373E5Q
+  # General channels (papers shared casually)
+  general: CP40S009F
+  random: CP40S02RX
+  # Lab channels
+  koolab-core-members: C06DLQG4MF0
+  koolab-postdocs: C08NEEDBUNQ
+  koolab-grad-students: C083JM7BGMU
+  qb-experimental-core: C08MU3T9F3M
+  project-management: C08CZU9JPM5
+
+# Embedding backend: "openai", "huggingface", "local", "tfidf"
+# - openai: best quality, requires OPENAI_API_KEY secret
+# - huggingface: free tier available, requires HF_TOKEN secret
+# - tfidf: no API key needed, lightweight fallback
+embedding_backend: huggingface
+
+# Email for OpenAlex polite pool (10x faster API access)
+openalex_email: "papertrail@example.com"
+
+# Pipeline schedule (cron expression for GitHub Actions)
+# Default: every Sunday at 2am UTC
+schedule: "0 2 * * 0"
+
+# Slack bot token secret name (stored in GitHub Actions secrets)
+slack_token_secret: SLACK_BOT_TOKEN

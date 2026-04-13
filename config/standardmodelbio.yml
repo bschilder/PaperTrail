@@ -1,0 +1,16 @@
+# PaperTrail Configuration — Standard Model Bio
+# https://standardmodelbio.slack.com
+
+title: "PaperTrail — Standard Model Bio"
+slack_workspace_url: "https://standardmodelbio.slack.com"
+
+# Slack channels to scrape (channel_name: channel_id)
+# TODO: Add channel IDs from the workspace
+channels: {}
+
+embedding_backend: huggingface
+openalex_email: "papertrail@example.com"
+schedule: "0 2 * * 0"
+
+# Slack bot token secret name (stored in GitHub Actions secrets)
+slack_token_secret: SLACK_BOT_TOKEN_STANDARDMODELBIO

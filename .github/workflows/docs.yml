@@ -35,21 +35,24 @@ jobs:
 
       - name: Include dashboard if available
         run: |
-          # Deploy dashboard under workspace name from config
-          WORKSPACE=$(python -c "import yaml; c=yaml.safe_load(open('config.yml')); url=c.get('slack_workspace_url',''); name=url.split('//')[1].split('.')[0] if '//' in url else 'dashboard'; print(name)" 2>/dev/null || echo "dashboard")
-          mkdir -p "site/$WORKSPACE"
-          if [ -f data/papers_final.json ]; then
-            papertrail build data/papers_final.json -o "site/$WORKSPACE/index.html"
-            echo "Dashboard built → site/$WORKSPACE/"
-          elif [ -f papertrail_dashboard.html ]; then
-            cp papertrail_dashboard.html "site/$WORKSPACE/index.html"
-            echo "Dashboard copied → site/$WORKSPACE/"
+          # Deploy dashboards for each workspace
+          for cfg in config/*.yml; do
+            WORKSPACE=$(python -c "import yaml; c=yaml.safe_load(open('$cfg')); url=c.get('slack_workspace_url',''); name=url.split('//')[1].split('.')[0] if '//' in url else 'dashboard'; print(name)" 2>/dev/null || echo "dashboard")
+            DATAFILE="data/$WORKSPACE/papers_final.json"
+            if [ -f "$DATAFILE" ]; then
+              mkdir -p "site/$WORKSPACE"
+              papertrail build "$DATAFILE" -o "site/$WORKSPACE/index.html"
+              echo "Dashboard built → site/$WORKSPACE/"
+            fi
+          done
+          # Fallback: legacy single-file dashboard
+          if [ -f papertrail_dashboard.html ] && [ ! -f site/koolab/index.html ]; then
+            mkdir -p site/koolab
+            cp papertrail_dashboard.html site/koolab/index.html
           fi
           # Backward compat redirect
-          if [ "$WORKSPACE" != "dashboard" ]; then
-            mkdir -p site/dashboard
-            echo "<meta http-equiv='refresh' content='0;url=../$WORKSPACE/'>" > site/dashboard/index.html
-          fi
+          mkdir -p site/dashboard
+          echo "<meta http-equiv='refresh' content='0;url=../koolab/'>" > site/dashboard/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
