@@ -6854,16 +6854,16 @@
                 const card = document.createElement('div');
                 card.className = 'paper-card';
 
-                // Build cluster tags with colors
+                // Build topic + subtopic tags with consistent colored borders
                 const l0id = paper.cluster_levels?.[0]?.id ?? paper.cluster_id ?? 0;
                 const l0color = getClusterColorById(l0id, 0);
                 const clusterTag = paper.cluster_label
-                    ? `<span class="card-tag" style="background:${l0color}22;color:${l0color};border:1px solid ${l0color}44;cursor:pointer;" onclick="event.stopPropagation();showTopicInfo('${esc(paper.cluster_label).replace(/'/g, "\\'")}')">${esc(paper.cluster_label)}</span>`
+                    ? `<span class="card-tag" style="background:${l0color}22;color:${l0color};border:1px solid ${l0color}55;cursor:pointer;font-size:10px;" onclick="event.stopPropagation();showTopicInfo('${esc(paper.cluster_label).replace(/'/g, "\\'")}')">${esc(paper.cluster_label)}</span>`
                     : '';
-                // Subtopic tags
                 const subtopicTags = (paper.cluster_levels || []).slice(1).map((lvl, li) => {
-                    const sc = getClusterColorById(lvl.id, li + 1);
-                    return `<span class="card-tag" style="background:${sc}18;color:${sc};border:1px solid ${sc}33;font-size:9px;cursor:pointer;" onclick="event.stopPropagation();showTopicInfo('${esc(lvl.label).replace(/'/g, "\\'")}', ${li+1})">${esc(lvl.label)}</span>`;
+                    // Use parent (level 0) color for subtopics to show hierarchy
+                    const sc = l0color;
+                    return `<span class="card-tag" style="background:${sc}15;color:${sc};border:1px solid ${sc}40;font-size:9px;cursor:pointer;opacity:0.8;" onclick="event.stopPropagation();showTopicInfo('${esc(lvl.label).replace(/'/g, "\\'")}', ${li+1})">${esc(lvl.label)}</span>`;
                 }).join('');
 
                 const channelTags = (paper.channels || []).map(ch =>
@@ -6883,18 +6883,20 @@
                     ${paper.doi ? `<a href="https://doi.org/${esc(paper.doi)}" target="_blank" title="${esc(paper.doi)}" onclick="event.stopPropagation()">${DOI_ICON}</a>` : ''}
                 </span>`;
 
-                // Abstract with fade preview + expand
+                // Abstract with visible fade preview + expand toggle
                 const abstractId = `abs_${i}`;
                 const hasAbstract = paper.abstract && paper.abstract.length > 0;
-                const hasLongAbstract = (paper.abstract || '').length > 150;
+                const hasLongAbstract = (paper.abstract || '').length > 100;
                 const abstractHTML = hasAbstract
-                    ? `<div id="${abstractId}" style="position:relative;max-height:${hasLongAbstract ? '60px' : 'none'};overflow:hidden;transition:max-height 0.3s ease;">
-                        <div style="font-size:11px;color:#a0a0b0;line-height:1.5;">${esc(paper.abstract)}</div>
-                        ${hasLongAbstract ? `<div id="${abstractId}_fade" style="position:absolute;bottom:0;left:0;right:0;height:30px;background:linear-gradient(transparent,#1a1a2e);pointer-events:none;"></div>` : ''}
-                       </div>
-                       ${hasLongAbstract ? `<div id="${abstractId}_toggle" style="text-align:center;margin-top:2px;">
-                        <a href="#" onclick="event.preventDefault();const el=document.getElementById('${abstractId}');const fade=document.getElementById('${abstractId}_fade');const tog=this;if(el.style.maxHeight==='60px'){el.style.maxHeight='none';fade.style.display='none';tog.innerHTML='&#x25B2; Show less';}else{el.style.maxHeight='60px';fade.style.display='block';tog.innerHTML='&#x25BC; Show more';}" style="color:#64b5f6;font-size:10px;text-decoration:none;">&#x25BC; Show more</a>
-                       </div>` : ''}`
+                    ? `<div style="margin-top:6px;border-top:1px solid #2a2a3e;padding-top:6px;">
+                        <div id="${abstractId}" style="position:relative;max-height:${hasLongAbstract ? '55px' : 'none'};overflow:hidden;transition:max-height 0.4s ease;">
+                            <div style="font-size:11px;color:#a0a0b0;line-height:1.5;">${esc(paper.abstract)}</div>
+                            ${hasLongAbstract ? `<div id="${abstractId}_fade" style="position:absolute;bottom:0;left:0;right:0;height:35px;background:linear-gradient(rgba(26,26,46,0), rgba(26,26,46,1));pointer-events:none;"></div>` : ''}
+                        </div>
+                        ${hasLongAbstract ? `<div style="text-align:center;padding:4px 0;">
+                            <a href="#" id="${abstractId}_btn" onclick="event.preventDefault();event.stopPropagation();const el=document.getElementById('${abstractId}');const fade=document.getElementById('${abstractId}_fade');const btn=document.getElementById('${abstractId}_btn');if(el.style.maxHeight==='55px'||el.style.maxHeight===''){el.style.maxHeight=el.scrollHeight+'px';if(fade)fade.style.opacity='0';btn.innerHTML='&#x25B2; Show less';}else{el.style.maxHeight='55px';if(fade)fade.style.opacity='1';btn.innerHTML='&#x25BC; Show more';}" style="color:#64b5f6;font-size:10px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border:1px solid #2a2a3e;border-radius:4px;">&#x25BC; Show more</a>
+                        </div>` : ''}
+                       </div>`
                     : '';
 
                 card.innerHTML = `
