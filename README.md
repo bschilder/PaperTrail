@@ -2,9 +2,12 @@
 
 **Every paper your team shares — found and mapped.**
 
-PaperTrail automatically discovers papers shared across your Slack workspace, enriches them with metadata from OpenAlex and PubMed, computes semantic embeddings, and serves an interactive CellXGene-style dashboard with a canvas-based 2D embedding map, sortable table, and AI-powered chatbot search.
+PaperTrail automatically discovers papers shared across your Slack workspace, enriches them with metadata, computes LLM semantic embeddings, and builds an interactive visual dashboard with hierarchical topic clustering, AI-powered search, and full engagement metrics.
 
-### [Live Demo: Koo Lab Dashboard](https://bschilder.github.io/PaperTrail/koolab/)
+### Live Demos
+
+- [Koo Lab Dashboard](https://bschilder.github.io/PaperTrail/koolab/)
+- [Standard Model Bio Dashboard](https://bschilder.github.io/PaperTrail/standardmodelbio/)
 
 [Documentation](https://bschilder.github.io/PaperTrail) · [Report Bug](https://github.com/bschilder/PaperTrail/issues) · [Request Feature](https://github.com/bschilder/PaperTrail/issues)
 
@@ -12,152 +15,128 @@ PaperTrail automatically discovers papers shared across your Slack workspace, en
 
 ## Features
 
-- **Slack Scraping** — Finds papers across all configured channels by detecting DOI, arXiv, bioRxiv, PubMed, Nature, Cell, Science, OpenReview, and 30+ other scholarly URL patterns. Tracks engagement (reactions + thread replies).
-- **Multi-Strategy Metadata Enrichment** — Cascading resolution pipeline: extract identifiers from URLs, batch OpenAlex lookup, individual OpenAlex/PubMed fallback, web search, and URL-based fallbacks. Handles tricky Elsevier/Cell PIIs via PubMed E-utilities.
-- **Semantic Embeddings** — Generates embeddings via OpenAI, HuggingFace Inference API, local ONNX models (fastembed), or TF-IDF + SVD fallback (no API key needed).
-- **Interactive Dashboard** — Self-contained HTML file with canvas-based scatter plot (UMAP/t-SNE/PCA), lasso and rectangle selection, zoom/pan, color-by-cluster/channel/user/date/year/citations, sortable table view, AI chatbot with Claude API integration, and inline detail panel.
-- **CLI Pipeline** — Four-step pipeline: `scrape → enrich → embed → build`.
+### Interactive Dashboard
 
-## Dashboard
+A self-contained HTML file — no server required.
 
-The dashboard is a single self-contained HTML file that works offline. It includes:
+- **Canvas scatter plot** with UMAP/t-SNE/PCA projections (hardware-accelerated)
+- **Hierarchical topic clustering** — LLM-generated labels at 3 zoom levels
+- **Topic connection lines** — configurable thickness, opacity, curve, color
+- **8 color modes**: Cluster, Channel, Year, Citations, Engagement, Density, Contributor, Journal
+- **Embedding-based semantic search** — cosine similarity on LLM vectors (BGE-small)
+- **AI chatbot** — natural language queries with tool use (HuggingFace, Claude, OpenAI)
+- **3D WebGL view**, sortable table, leaderboard, time travel animation
+- **Smooth animations** — papers fade in/out on filter, timeline playback
+- **Dark theme**, CSV/XLSX export, keyboard shortcuts, shareable URL state
 
-- **Canvas scatter plot** with hardware-accelerated rendering for 1,000+ papers
-- **Three projection methods**: UMAP (default), t-SNE, PCA — toggle in real time
-- **Six color modes**: Cluster, Channel, User, Date, Year, Citations
-- **Lasso & rectangle selection** with inline paper list in the sidebar
-- **"Select Top N" slider** for quick filtering by citation count or relevance
-- **Sortable/filterable table view** with all metadata columns
-- **AI chatbot** (optional) powered by Claude API with `search_papers` tool use
-- **Export to Excel** with one click
-- **Dark theme** optimized for readability
+### Backend Pipeline
 
-Data is base64-encoded and embedded directly in the HTML — no server needed.
+- **Multi-strategy enrichment** — page scraping → OpenAlex → Crossref → bioRxiv API → Google fallback
+- **LLM embeddings** — HuggingFace BGE-small (384d) for projections + client-side search
+- **Hierarchical clustering** on UMAP projections with LLM-generated topic labels
+- **Dead link detection**, junk title filtering, URL normalization
+- **Automated weekly pipeline** via GitHub Actions → GitHub Pages deployment
+
+### Multi-Workspace Support
+
+Run PaperTrail across multiple Slack workspaces from a single repo:
+
+```
+config/
+├── koolab.yml              # Koo Lab workspace
+├── standardmodelbio.yml    # Standard Model Bio workspace
+└── yourlab.yml             # Add your own!
+```
+
+Each workspace gets its own data directory, dashboard, and GitHub Pages URL.
+
+---
 
 ## Quickstart
 
-### Install
+### Option 1: Fork & Configure (Recommended)
+
+1. **Fork** this repository
+2. **Create** a Slack bot app ([guide](https://bschilder.github.io/PaperTrail/guide/dashboard/))
+3. **Add** your config to `config/yourworkspace.yml`:
+   ```yaml
+   title: "PaperTrail — My Lab"
+   slack_workspace_url: "https://mylab.slack.com"
+   channels: {}  # empty = auto-discover all public channels
+   embedding_backend: huggingface
+   slack_token_secret: SLACK_BOT_TOKEN
+   ```
+4. **Set** GitHub secret: `gh secret set SLACK_BOT_TOKEN`
+5. **Trigger**: `gh workflow run pipeline.yml`
+
+Dashboard deploys to `https://<user>.github.io/PaperTrail/<workspace>/`
+
+### Option 2: CLI
 
 ```bash
 pip install papertrail-lab[all]
+
+# Full pipeline
+papertrail run-pipeline -c config/myworkspace.yml -o build/myworkspace
+
+# Or step by step
+papertrail scrape --token $SLACK_BOT_TOKEN -c CHANNEL_ID -o raw.json
+papertrail enrich raw.json -o enriched.json
+papertrail embed enriched.json -o final.json
+papertrail build final.json -o dashboard.html
 ```
 
-Or install with a specific embedding backend:
-
-```bash
-pip install papertrail-lab[openai]      # OpenAI embeddings (recommended)
-pip install papertrail-lab[huggingface] # HuggingFace Inference API
-pip install papertrail-lab[local]       # Local ONNX (no API key needed)
-```
-
-### Configure
-
-```bash
-export SLACK_BOT_TOKEN="xoxb-your-token-here"
-export OPENAI_API_KEY="sk-..."  # for OpenAI embeddings (default)
-# OR
-export HF_TOKEN="hf_..."  # for HuggingFace embeddings
-```
-
-### Run the Pipeline
-
-```bash
-# Step 1: Scrape papers from Slack
-papertrail scrape -o papers_raw.json
-
-# Step 2: Enrich with metadata
-papertrail enrich papers_raw.json -o papers_enriched.json
-
-# Step 3: Compute embeddings, projections, clusters
-papertrail embed papers_enriched.json -o papers_final.json --backend openai
-
-# Step 4: Build the interactive dashboard
-papertrail build papers_final.json -o dashboard.html
-```
-
-### Search Papers
-
-```bash
-papertrail search -q "transformer attention mechanisms" -k 5
-```
+---
 
 ## Architecture
 
 ```
-Slack Workspace
+Slack Workspaces (multiple)
       │
       ▼
 ┌─────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-│   Scraper    │───▶│   Enricher   │───▶│  Embeddings  │───▶│   Preview    │
+│   Scraper    │───▶│   Enricher   │───▶│  Embeddings  │───▶│   Dashboard  │
 │              │    │              │    │              │    │              │
-│ - Slack API  │    │ - OpenAlex   │    │ - OpenAI     │    │ - Canvas map │
-│ - URL detect │    │ - PubMed     │    │ - HuggingFace│    │ - Table view │
-│ - Engagement │    │ - Web search │    │ - Local ONNX │    │ - AI chatbot │
-│   metrics    │    │ - Fallbacks  │    │ - TF-IDF/SVD │    │ - Selection  │
+│ - Slack API  │    │ - Page scrape│    │ - HuggingFace│    │ - UMAP map   │
+│ - 30+ domains│    │ - OpenAlex   │    │ - OpenAI     │    │ - 3D view    │
+│ - Reactions  │    │ - Crossref   │    │ - Local ONNX │    │ - Table      │
+│ - Auto-join  │    │ - bioRxiv API│    │ - TF-IDF     │    │ - AI agent   │
+│              │    │ - Dead links │    │ - 3-level     │    │ - Semantic   │
+│              │    │ - Junk filter│    │   clustering  │    │   search     │
 └─────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
-```
-
-## Metadata Enrichment Cascade
-
-PaperTrail resolves paper metadata using a multi-strategy pipeline (see `skills/paper-metadata-scraper/SKILL.md` for full details):
-
-1. **Extract identifiers** from URL — DOIs, arXiv IDs, Elsevier PIIs, PMC IDs, OpenReview IDs
-2. **Batch OpenAlex lookup** — resolves up to 40 DOIs per request (fastest path)
-3. **Individual OpenAlex lookup** — DOI, arXiv DOI, or PMC ID
-4. **PubMed E-utilities** — best for Elsevier/Cell PIIs that other APIs can't handle
-5. **Web search fallback** — for OpenReview, conference proceedings, etc.
-6. **URL-based fallback** — generates readable titles from URL structure
-
-All APIs are free and require no API keys. Adding a contact email to the User-Agent header gives access to OpenAlex's polite pool (10 req/s vs 1 req/s).
-
-## Embedding Backends
-
-| Backend | Model | Dimensions | Speed | Quality | API Key Required |
-|---------|-------|-----------|-------|---------|-----------------|
-| **OpenAI** (default) | `text-embedding-3-small` | 1536 | Fast | Excellent | Yes (`OPENAI_API_KEY`) |
-| **HuggingFace** | `BAAI/bge-small-en-v1.5` | 384 | Fast | Very Good | Optional (`HF_TOKEN`) |
-| **Local** | `BAAI/bge-small-en-v1.5` | 384 | Medium | Very Good | No |
-| **TF-IDF + SVD** | N/A | 128 | Fast | Good | No |
-
-The embedding backend is auto-detected based on available API keys. Override with `--backend`.
-
-## FAISS Vector Store
-
-Embeddings are stored in a FAISS index for sub-millisecond similarity search:
-
-```python
-from papertrail.embeddings import VectorStore
-
-store = VectorStore()
-store.load("faiss_index/")
-results = store.search_text("single cell RNA sequencing", top_k=5)
-for r in results:
-    print(f"[{r['score']:.3f}] {r['title']}")
+                                              │
+                                    GitHub Actions (weekly)
+                                              │
+                                        GitHub Pages
+                                    /koolab/  /standardmodelbio/
 ```
 
 ## Project Structure
 
 ```
 PaperTrail/
+├── config/                      # Per-workspace configurations
+│   ├── koolab.yml
+│   └── standardmodelbio.yml
+├── data/                        # Per-workspace paper data
+│   ├── koolab/papers_final.json
+│   └── standardmodelbio/papers_final.json
 ├── papertrail/                  # Python package
-│   ├── __init__.py
-│   ├── scraper.py               # Slack channel scraping + URL extraction
+│   ├── scraper.py               # Slack scraping + URL extraction
 │   ├── enricher.py              # Metadata enrichment (OpenAlex + PubMed)
-│   ├── embeddings.py            # Embedding backends (OpenAI, HF, fastembed, TF-IDF)
-│   ├── projections.py           # PCA, t-SNE, UMAP projections + K-Means clustering
-│   ├── preview.py               # Interactive HTML dashboard builder
-│   ├── cli.py                   # Click CLI (papertrail scrape/enrich/embed/build/search)
-│   └── templates/
-│       └── dashboard.html       # Dashboard HTML template ({{DATA_B64}} placeholder)
-├── skills/                      # Claude Code / Cowork skill files
-│   ├── papertrail-pipeline/     # Full pipeline skill
-│   │   └── SKILL.md
-│   └── paper-metadata-scraper/  # Metadata resolution cascade skill
-│       └── SKILL.md
+│   ├── enrich_cascade.py        # Multi-strategy enrichment cascade
+│   ├── embeddings.py            # Embedding backends
+│   ├── projections.py           # Projections + hierarchical clustering
+│   ├── pipeline.py              # Automated pipeline runner
+│   ├── preview.py               # Dashboard builder
+│   ├── cli.py                   # CLI commands
+│   └── templates/dashboard.html # Dashboard template (~10K lines)
+├── .github/workflows/
+│   ├── pipeline.yml             # Weekly pipeline + deploy
+│   ├── docs.yml                 # Documentation deploy
+│   └── ci.yml                   # Tests
 ├── docs/                        # MkDocs documentation
-├── tests/                       # Unit tests
-├── pyproject.toml               # Package config and dependencies
-└── papertrail_dashboard.html    # Pre-built dashboard (Koo Lab, 1,072 papers)
+└── pyproject.toml               # Package config
 ```
 
 ## Development
@@ -165,12 +144,8 @@ PaperTrail/
 ```bash
 git clone https://github.com/bschilder/PaperTrail.git
 cd PaperTrail
-pip install -e ".[dev]"
-
-# Run tests
+pip install -e ".[all,dev]"
 pytest
-
-# Serve docs locally
 mkdocs serve
 ```
 
