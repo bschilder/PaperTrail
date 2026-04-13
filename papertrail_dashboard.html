@@ -2134,17 +2134,9 @@
         }
 
         .card-details {
-            display: none;
             font-size: 11px;
             color: #a0a0a0;
-            padding-top: 6px;
-            border-top: 1px solid #3a3a4e;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .card-details.visible {
-            display: block;
+            padding-top: 4px;
         }
 
         .detail-row {
@@ -6946,12 +6938,7 @@
                     renderMap();
                 });
 
-                card.addEventListener('click', (e) => {
-                    if (e.target.type !== 'checkbox') {
-                        const details = card.querySelector('.card-details');
-                        details.classList.toggle('visible');
-                    }
-                });
+                // Card click — no-op (details always visible, links handle their own clicks)
 
                 content.appendChild(card);
             });
