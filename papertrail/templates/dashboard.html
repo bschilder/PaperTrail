@@ -6935,7 +6935,25 @@
                     renderMap();
                 });
 
-                // Card click — no-op (details always visible, links handle their own clicks)
+                // Card click — toggle expand/collapse of authors+abstract
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('a') || e.target.type === 'checkbox') return;
+                    const el = card.querySelector('[id^="detail_"]');
+                    if (!el) return;
+                    const fade = card.querySelector('[id$="_fade"]');
+                    const btn = card.querySelector('[id$="_btn"]');
+                    if (!el.dataset.open) {
+                        el.style.maxHeight = el.scrollHeight + 'px';
+                        el.dataset.open = '1';
+                        if (fade) fade.style.opacity = '0';
+                        if (btn) btn.innerHTML = '&#x25B2; Show less';
+                    } else {
+                        el.style.maxHeight = '55px';
+                        delete el.dataset.open;
+                        if (fade) fade.style.opacity = '1';
+                        if (btn) btn.innerHTML = '&#x25BC; Show more';
+                    }
+                });
 
                 content.appendChild(card);
             });
