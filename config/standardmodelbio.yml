@@ -13,4 +13,4 @@ openalex_email: "papertrail@example.com"
 schedule: "0 2 * * 0"
 
 # Slack bot token secret name (stored in GitHub Actions secrets)
-slack_token_secret: SLACK_BOT_TOKEN_STANDARDMODELBIO
+slack_token_secret: SLACKBOT_STANDARDMODELBIO_TOKEN

@@ -40,9 +40,9 @@ jobs:
       - name: Run pipelines for all workspaces
         timeout-minutes: 120
         env:
-          # All possible Slack tokens — each config references its own
+          # Slack tokens — each config references its own via slack_token_secret
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_BOT_TOKEN_STANDARDMODELBIO: ${{ secrets.SLACK_BOT_TOKEN_STANDARDMODELBIO }}
+          SLACKBOT_STANDARDMODELBIO_TOKEN: ${{ secrets.SLACKBOT_STANDARDMODELBIO_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           OPENALEX_EMAIL: ${{ secrets.OPENALEX_EMAIL || format('{0}@users.noreply.github.com', github.actor) }}
