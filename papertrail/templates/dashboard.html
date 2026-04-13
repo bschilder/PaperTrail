@@ -6874,20 +6874,28 @@
                     ? `<span class="card-tag person-tag" style="cursor:pointer;" onclick="event.stopPropagation();showContributorProfile('${esc(paper.shared_by).replace(/'/g, "\\'")}')">${personDisplay(paper.shared_by)}</span>`
                     : '';
 
-                // Link icons (same style as table)
+                // Link icons
                 const PAPER_ICON = `<svg width="14" height="14" viewBox="0 0 16 16" fill="#64b5f6" style="vertical-align:middle;"><path d="M4 1h5l4 4v9a1 1 0 01-1 1H4a1 1 0 01-1-1V2a1 1 0 011-1zm4.5 0v4H13L8.5 1z"/></svg>`;
+                const DOI_ICON = `<svg width="16" height="16" viewBox="0 0 16 16" style="vertical-align:middle;"><circle cx="8" cy="8" r="7" fill="#64b5f6"/><text x="8" y="11" text-anchor="middle" font-size="7" font-weight="700" fill="#0f0f17" font-family="sans-serif">DOI</text></svg>`;
                 const linkIcons = `<span style="display:inline-flex;gap:6px;align-items:center;">
                     ${paper.url ? `<a href="${esc(paper.url)}" target="_blank" title="Open paper" onclick="event.stopPropagation()">${PAPER_ICON}</a>` : ''}
                     ${paper.slack_url ? `<a href="${esc(paper.slack_url)}" target="_blank" title="View in Slack" onclick="event.stopPropagation()">${SLACK_ICON_SVG}</a>` : ''}
-                    ${paper.doi ? `<a href="https://doi.org/${esc(paper.doi)}" target="_blank" title="DOI" onclick="event.stopPropagation()" style="font-size:10px;color:#64b5f6;">DOI</a>` : ''}
+                    ${paper.doi ? `<a href="https://doi.org/${esc(paper.doi)}" target="_blank" title="${esc(paper.doi)}" onclick="event.stopPropagation()">${DOI_ICON}</a>` : ''}
                 </span>`;
 
-                // Abstract with show all toggle
+                // Abstract with fade preview + expand
                 const abstractId = `abs_${i}`;
-                const hasLongAbstract = (paper.abstract || '').length > 200;
-                const abstractHTML = paper.abstract
-                    ? `<span id="${abstractId}_short">${esc(paper.abstract.substring(0, 200))}${hasLongAbstract ? `... <a href="#" onclick="event.preventDefault();document.getElementById('${abstractId}_short').style.display='none';document.getElementById('${abstractId}_full').style.display='inline';" style="color:#64b5f6;font-size:10px;">Show all</a>` : ''}</span><span id="${abstractId}_full" style="display:none;">${esc(paper.abstract)} <a href="#" onclick="event.preventDefault();document.getElementById('${abstractId}_full').style.display='none';document.getElementById('${abstractId}_short').style.display='inline';" style="color:#64b5f6;font-size:10px;">Show less</a></span>`
-                    : '<span style="color:#555;">N/A</span>';
+                const hasAbstract = paper.abstract && paper.abstract.length > 0;
+                const hasLongAbstract = (paper.abstract || '').length > 150;
+                const abstractHTML = hasAbstract
+                    ? `<div id="${abstractId}" style="position:relative;max-height:${hasLongAbstract ? '60px' : 'none'};overflow:hidden;transition:max-height 0.3s ease;">
+                        <div style="font-size:11px;color:#a0a0b0;line-height:1.5;">${esc(paper.abstract)}</div>
+                        ${hasLongAbstract ? `<div id="${abstractId}_fade" style="position:absolute;bottom:0;left:0;right:0;height:30px;background:linear-gradient(transparent,#1a1a2e);pointer-events:none;"></div>` : ''}
+                       </div>
+                       ${hasLongAbstract ? `<div id="${abstractId}_toggle" style="text-align:center;margin-top:2px;">
+                        <a href="#" onclick="event.preventDefault();const el=document.getElementById('${abstractId}');const fade=document.getElementById('${abstractId}_fade');const tog=this;if(el.style.maxHeight==='60px'){el.style.maxHeight='none';fade.style.display='none';tog.innerHTML='&#x25B2; Show less';}else{el.style.maxHeight='60px';fade.style.display='block';tog.innerHTML='&#x25BC; Show more';}" style="color:#64b5f6;font-size:10px;text-decoration:none;">&#x25BC; Show more</a>
+                       </div>` : ''}`
+                    : '';
 
                 card.innerHTML = `
                     <div class="card-header">
@@ -6902,20 +6910,22 @@
                             <div class="card-meta">
                                 ${paper.year || ''} &middot; ${paper.journal || ''} &middot; ${(paper.cited_by_count || 0)} cites
                             </div>
-                            <div class="card-tags">
-                                ${clusterTag}${subtopicTags}
-                                ${channelTags}
-                                ${personTag}
+                            <div style="margin-top:6px;">
+                                <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:4px;">
+                                    <span style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.5px;min-width:45px;">Topics</span>
+                                    ${clusterTag}${subtopicTags}
+                                </div>
+                                <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:4px;">
+                                    <span style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.5px;min-width:45px;">Shared</span>
+                                    ${channelTags}${personTag}
+                                </div>
                             </div>
                             <div class="card-details">
-                                <div class="detail-row">
+                                ${(paper.authors && paper.authors.length) ? `<div class="detail-row">
                                     <div class="detail-label">Authors</div>
-                                    <div class="detail-value">${Array.isArray(paper.authors) ? paper.authors.join(', ') : (paper.authors || 'N/A')}</div>
-                                </div>
-                                <div class="detail-row">
-                                    <div class="detail-label">Abstract</div>
-                                    <div class="detail-value">${abstractHTML}</div>
-                                </div>
+                                    <div class="detail-value">${Array.isArray(paper.authors) ? paper.authors.join(', ') : paper.authors}</div>
+                                </div>` : ''}
+                                ${abstractHTML}
                             </div>
                         </div>
                     </div>
