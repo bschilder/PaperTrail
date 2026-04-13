@@ -382,8 +382,9 @@ def refine_cluster_labels_llm(
 
     hf_token = os.environ.get("HF_TOKEN")
     openai_key = os.environ.get("OPENAI_API_KEY")
+    anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
 
-    if not hf_token and not openai_key:
+    if not hf_token and not openai_key and not anthropic_key:
         logger.info("No LLM token available, using TF-IDF cluster labels")
         return None
 
@@ -460,6 +461,29 @@ def refine_cluster_labels_llm(
             )
             resp.raise_for_status()
             content = resp.json()["choices"][0]["message"]["content"]
+
+        # Fall back to Anthropic
+        if not content and anthropic_key:
+            try:
+                logger.info("Generating cluster labels via Anthropic Claude...")
+                resp = requests.post(
+                    "https://api.anthropic.com/v1/messages",
+                    headers={
+                        "Content-Type": "application/json",
+                        "x-api-key": anthropic_key,
+                        "anthropic-version": "2023-06-01",
+                    },
+                    json={
+                        "model": "claude-sonnet-4-20250514",
+                        "max_tokens": 512,
+                        "messages": [{"role": "user", "content": prompt}],
+                    },
+                    timeout=60,
+                )
+                resp.raise_for_status()
+                content = resp.json()["content"][0]["text"]
+            except Exception as anth_err:
+                logger.warning("Anthropic LLM failed: %s", anth_err)
 
         if not content:
             logger.warning("No LLM available for cluster labeling, using TF-IDF labels")

@@ -45,6 +45,7 @@ jobs:
           SLACKBOT_STANDARDMODELBIO_TOKEN: ${{ secrets.SLACKBOT_STANDARDMODELBIO_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENALEX_EMAIL: ${{ secrets.OPENALEX_EMAIL || format('{0}@users.noreply.github.com', github.actor) }}
         run: |
           set -e
