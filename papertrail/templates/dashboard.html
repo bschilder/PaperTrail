@@ -6875,18 +6875,21 @@
                     ${paper.doi ? `<a href="https://doi.org/${esc(paper.doi)}" target="_blank" title="${esc(paper.doi)}" onclick="event.stopPropagation()">${DOI_ICON}</a>` : ''}
                 </span>`;
 
-                // Abstract with visible fade preview + expand toggle
-                const abstractId = `abs_${i}`;
-                const hasAbstract = paper.abstract && paper.abstract.length > 0;
-                const hasLongAbstract = (paper.abstract || '').length > 100;
-                const abstractHTML = hasAbstract
+                // Combined authors + abstract preview with fade
+                const detailId = `detail_${i}`;
+                const authorsText = (Array.isArray(paper.authors) && paper.authors.length) ? paper.authors.join(', ') : '';
+                const abstractText = paper.abstract || '';
+                const combinedText = [authorsText, abstractText].filter(Boolean).join('\n\n');
+                const isLong = combinedText.length > 120;
+                const detailHTML = combinedText
                     ? `<div style="margin-top:6px;border-top:1px solid #2a2a3e;padding-top:6px;">
-                        <div id="${abstractId}" style="position:relative;max-height:${hasLongAbstract ? '55px' : 'none'};overflow:hidden;transition:max-height 0.4s ease;">
-                            <div style="font-size:11px;color:#a0a0b0;line-height:1.5;">${esc(paper.abstract)}</div>
-                            ${hasLongAbstract ? `<div id="${abstractId}_fade" style="position:absolute;bottom:0;left:0;right:0;height:35px;background:linear-gradient(rgba(26,26,46,0), rgba(26,26,46,1));pointer-events:none;"></div>` : ''}
+                        <div id="${detailId}" style="position:relative;max-height:${isLong ? '55px' : 'none'};overflow:hidden;transition:max-height 0.4s ease;">
+                            ${authorsText ? `<div style="font-size:10px;color:#888;line-height:1.4;margin-bottom:4px;">${esc(authorsText)}</div>` : ''}
+                            ${abstractText ? `<div style="font-size:11px;color:#a0a0b0;line-height:1.5;">${esc(abstractText)}</div>` : ''}
+                            ${isLong ? `<div id="${detailId}_fade" style="position:absolute;bottom:0;left:0;right:0;height:35px;background:linear-gradient(rgba(26,26,46,0), rgba(26,26,46,1));pointer-events:none;transition:opacity 0.3s;"></div>` : ''}
                         </div>
-                        ${hasLongAbstract ? `<div style="text-align:center;padding:4px 0;">
-                            <a href="#" id="${abstractId}_btn" onclick="event.preventDefault();event.stopPropagation();const el=document.getElementById('${abstractId}');const fade=document.getElementById('${abstractId}_fade');const btn=document.getElementById('${abstractId}_btn');if(el.style.maxHeight==='55px'||el.style.maxHeight===''){el.style.maxHeight=el.scrollHeight+'px';if(fade)fade.style.opacity='0';btn.innerHTML='&#x25B2; Show less';}else{el.style.maxHeight='55px';if(fade)fade.style.opacity='1';btn.innerHTML='&#x25BC; Show more';}" style="color:#64b5f6;font-size:10px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border:1px solid #2a2a3e;border-radius:4px;">&#x25BC; Show more</a>
+                        ${isLong ? `<div style="text-align:center;padding:3px 0;">
+                            <a href="#" id="${detailId}_btn" onclick="event.preventDefault();event.stopPropagation();const el=document.getElementById('${detailId}');const fade=document.getElementById('${detailId}_fade');const btn=document.getElementById('${detailId}_btn');if(!el.dataset.open){el.style.maxHeight=el.scrollHeight+'px';el.dataset.open='1';if(fade)fade.style.opacity='0';btn.innerHTML='&#x25B2; Show less';}else{el.style.maxHeight='55px';delete el.dataset.open;if(fade)fade.style.opacity='1';btn.innerHTML='&#x25BC; Show more';}" style="color:#64b5f6;font-size:10px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border:1px solid #2a2a3e;border-radius:4px;">&#x25BC; Show more</a>
                         </div>` : ''}
                        </div>`
                     : '';
@@ -6897,30 +6900,24 @@
                             <input type="checkbox" class="paper-checkbox" data-idx="${allIdx}" checked>
                         </div>
                         <div class="card-body">
-                            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
-                                <div class="card-title" style="flex:1;">${esc(paper.title) || 'Untitled'}</div>
+                            <div class="card-title">${esc(paper.title) || 'Untitled'}</div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin:3px 0;">
+                                <div class="card-meta" style="flex:1;">
+                                    ${paper.year || ''} &middot; ${paper.journal || ''} &middot; ${(paper.cited_by_count || 0)} cites
+                                </div>
                                 ${linkIcons}
                             </div>
-                            <div class="card-meta">
-                                ${paper.year || ''} &middot; ${paper.journal || ''} &middot; ${(paper.cited_by_count || 0)} cites
-                            </div>
-                            <div style="margin-top:6px;">
-                                <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:4px;">
-                                    <span style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.5px;min-width:45px;">Topics</span>
+                            <div style="margin-top:4px;">
+                                <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:3px;">
+                                    <span style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.5px;min-width:42px;">Topics</span>
                                     ${clusterTag}${subtopicTags}
                                 </div>
-                                <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:4px;">
-                                    <span style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.5px;min-width:45px;">Shared</span>
+                                <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                                    <span style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.5px;min-width:42px;">Shared</span>
                                     ${channelTags}${personTag}
                                 </div>
                             </div>
-                            <div class="card-details">
-                                ${(paper.authors && paper.authors.length) ? `<div class="detail-row">
-                                    <div class="detail-label">Authors</div>
-                                    <div class="detail-value">${Array.isArray(paper.authors) ? paper.authors.join(', ') : paper.authors}</div>
-                                </div>` : ''}
-                                ${abstractHTML}
-                            </div>
+                            ${detailHTML}
                         </div>
                     </div>
                 `;
