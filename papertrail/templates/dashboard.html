@@ -8414,6 +8414,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     <div class="ai-response">${smartResult.html}</div>
                     ${smartResult.papers ? `<div style="padding:6px 14px;font-size:11px;color:#555;">${smartResult.papers.length} papers found</div>` : ''}`;
                 if (smartResult.action) smartResult.action();
+                saveChatEntry(query, smartResult.title + ': ' + (smartResult.html || '').replace(/<[^>]+>/g, '').substring(0, 200), smartResult.papers);
                 return;
             }
 
@@ -8495,9 +8496,11 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                                 </div>
                                 <div class="ai-response">${smartResult.html}</div>`;
                             if (smartResult.action) smartResult.action();
+                            saveChatEntry(query, smartResult.title, smartResult.papers);
                         } else {
                             const localResults = searchPapers(query);
                             const shown = Math.min(localResults.length, 20);
+                            saveChatEntry(query, `Keyword search: ${shown} results`, localResults.slice(0, 5));
                             const stopwords = new Set(['compare','vs','versus','and','with','the','what','who','how','are','is','in','on','for','from','about','most','this','that']);
                             const keywords = query.toLowerCase().split(/[\s#]+/).filter(w => w.length > 2 && !stopwords.has(w)).join(', ');
                             renderChatResults(resultsPanel,
