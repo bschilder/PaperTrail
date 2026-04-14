@@ -8469,9 +8469,11 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                             if (smartResult.action) smartResult.action();
                         } else {
                             const localResults = searchPapers(query);
-                            const keywords = query.toLowerCase().split(/\s+/).filter(w => w.length > 2).join(', ');
+                            const shown = Math.min(localResults.length, 20);
+                            const stopwords = new Set(['compare','vs','versus','and','with','the','what','who','how','are','is','in','on','for','from','about','most','this','that']);
+                            const keywords = query.toLowerCase().split(/[\s#]+/).filter(w => w.length > 2 && !stopwords.has(w)).join(', ');
                             renderChatResults(resultsPanel,
-                                `Searched for papers matching keywords: **${keywords}**. Found ${localResults.length} results ranked by title and abstract relevance.`,
+                                `Searched for papers matching: **${keywords || query}**. Showing top ${shown} of ${localResults.length} results, ranked by relevance.`,
                                 localResults, 'local');
                         }
                         return;
@@ -8602,7 +8604,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 html += `<div style="padding:8px 14px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #2a2a3e;">
                     <div style="display:flex;align-items:center;gap:8px;">
                         <input type="checkbox" id="chatCheckAll" style="cursor:pointer;">
-                        <label for="chatCheckAll" style="font-size:12px;color:#a0a0b0;cursor:pointer;">${shown.length} papers found</label>
+                        <label for="chatCheckAll" style="font-size:12px;color:#a0a0b0;cursor:pointer;">${shown.length} papers</label>
                     </div>
                     <button id="chatShowOnMap" style="padding:5px 12px;background:#64b5f6;border:none;color:#fff;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">Highlight All</button>
                 </div>`;
