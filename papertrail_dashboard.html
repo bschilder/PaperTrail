@@ -8454,16 +8454,22 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     }
                 } catch (err) {
                     console.error('LLM agent error:', err);
-                    // Fall back to local
+                    // For credit/rate errors, silently fall back to local search
+                    const isCredits = err.message.includes('402') || err.message.includes('429') || err.message.includes('credit') || err.message.includes('depleted') || err.message.includes('rate');
+                    if (isCredits) {
+                        // Silent fallback — just run local search
+                        const localResults = searchPapers(query);
+                        renderChatResults(resultsPanel, '', localResults, 'local');
+                        appendPaperResults(resultsPanel, localResults, 'local');
+                        return;
+                    }
                     resultsPanel.innerHTML = `
                         <div class="chatbot-results-header">
                             <span style="color:#ffa726;">AI temporarily unavailable<span class="ai-mode-badge local">local fallback</span></span>
                             <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
                         </div>
                         <div style="padding:10px 14px;font-size:12px;color:#a0a0b0;line-height:1.5;">
-                            ${err.message.includes('credit balance')
-                                ? '<strong style="color:#ffa726;">Your Anthropic account needs credits.</strong> <a href="https://console.anthropic.com/settings/billing" target="_blank" style="color:#64b5f6;">Add credits here &rarr;</a><br><br>Using local search in the meantime.'
-                                : err.message.includes('401') || err.message.includes('invalid_x_api_key')
+                            ${err.message.includes('401') || err.message.includes('invalid_x_api_key')
                                     ? '<strong style="color:#ef5350;">Invalid API key.</strong> Check your key in settings (gear icon).'
                                     : `<span style="color:#888;">${esc(err.message)}</span>`
                             }
