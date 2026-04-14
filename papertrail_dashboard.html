@@ -8247,7 +8247,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                             <span class="card-tag cluster-tag" style="cursor:pointer;font-size:11px;" onclick="document.getElementById('chatbotResults').classList.remove('visible');showTopicInfo('${esc(g.label).replace(/'/g, "\\'")}')">${esc(g.label)}</span>
                             <span style="color:#888;font-size:11px;">${g.recent} recent papers</span>
                         </div>`).join('')}
-                        ${!claudeApiKey ? '<p style="margin-top:10px;font-size:11px;color:#64b5f6;">&#x2728; Connect an AI (gear icon) for deeper trend analysis with natural language understanding.</p>' : ''}`
+                        ${!claudeApiKey ? '<p style="margin-top:10px;font-size:11px;color:#64b5f6;cursor:pointer;" onclick="document.getElementById(\'chatbotSettingsBtn\').click()">&#x2728; Connect an AI (<span style="text-decoration:underline;">open settings</span>) for deeper trend analysis with natural language understanding.</p>' : ''}`
                 };
             }
 
@@ -8320,7 +8320,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                             <li><strong>summarize the landscape</strong> — full overview</li>
                             <li><strong>papers about transformers in genomics</strong> — filtered search</li>
                         </ul>
-                        <p style="color:#64b5f6;">&#x2728; Add an API key (gear icon) for AI-powered answers, web search, and multi-turn conversation.</p>`
+                        <p style="color:#64b5f6;cursor:pointer;" onclick="document.getElementById('chatbotSettingsBtn').click()">&#x2728; <span style="text-decoration:underline;">Connect an AI</span> for AI-powered answers, web search, and multi-turn conversation.</p>`
                 };
             }
 
