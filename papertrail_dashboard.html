@@ -8371,6 +8371,9 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             }
           } // end no-LLM entity handlers
 
+            // Expose handleSmartLocalQuery globally so it can be called from init block
+            window.handleSmartLocalQuery = handleSmartLocalQuery;
+
             // Smart local agent: try FIRST for structured queries (compare, trending, who)
             // Falls through to LLM for unstructured questions
             const smartResult = handleSmartLocalQuery(query);
@@ -9688,7 +9691,7 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                                 sendBtn.style.background = '';
 
                                 // Phase 3: Run the search and stream response word by word
-                                const smartResult = handleSmartLocalQuery(demoQuery);
+                                const smartResult = window.handleSmartLocalQuery?.(demoQuery);
                                 if (smartResult) {
                                     const resultsPanel = document.getElementById('chatbotResults');
                                     resultsPanel.classList.add('visible');
