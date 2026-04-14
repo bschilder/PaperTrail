@@ -8457,10 +8457,23 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                     // For credit/rate errors, silently fall back to local search
                     const isCredits = err.message.includes('402') || err.message.includes('429') || err.message.includes('credit') || err.message.includes('depleted') || err.message.includes('rate');
                     if (isCredits) {
-                        // Silent fallback — just run local search
-                        const localResults = searchPapers(query);
-                        renderChatResults(resultsPanel, '', localResults, 'local');
-                        appendPaperResults(resultsPanel, localResults, 'local');
+                        // Graceful fallback — run local search with explanation
+                        const smartResult = handleSmartLocalQuery(query);
+                        if (smartResult) {
+                            resultsPanel.innerHTML = `
+                                <div class="chatbot-results-header">
+                                    <span>${esc(smartResult.title)}<span class="ai-mode-badge local">local</span></span>
+                                    <button class="chatbot-results-close" onclick="this.closest('.chatbot-results').classList.remove('visible')">&times;</button>
+                                </div>
+                                <div class="ai-response">${smartResult.html}</div>`;
+                            if (smartResult.action) smartResult.action();
+                        } else {
+                            const localResults = searchPapers(query);
+                            const keywords = query.toLowerCase().split(/\s+/).filter(w => w.length > 2).join(', ');
+                            renderChatResults(resultsPanel,
+                                `Searched for papers matching keywords: **${keywords}**. Found ${localResults.length} results ranked by title and abstract relevance.`,
+                                localResults, 'local');
+                        }
                         return;
                     }
                     resultsPanel.innerHTML = `
