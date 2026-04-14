@@ -8371,8 +8371,9 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
             }
           } // end no-LLM entity handlers
 
-            // Smart local agent: ONLY when no LLM available
-            const smartResult = (!claudeApiKey && !hfToken) ? handleSmartLocalQuery(query) : null;
+            // Smart local agent: try FIRST for structured queries (compare, trending, who)
+            // Falls through to LLM for unstructured questions
+            const smartResult = handleSmartLocalQuery(query);
             if (smartResult) {
                 const resultsPanel = document.getElementById('chatbotResults');
                 resultsPanel.innerHTML = '';
