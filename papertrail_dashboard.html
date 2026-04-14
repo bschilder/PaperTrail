@@ -8269,6 +8269,31 @@ Be insightful and analytical. Don't just list papers — provide genuine analysi
                 };
             }
 
+            // "contributors" / "most active" / "who shares"
+            if (/contributor|most active|who share|who post|top share/i.test(q)) {
+                const people = {};
+                const peopleClusters = {};
+                allPapers.forEach(p => {
+                    if (!p.shared_by) return;
+                    people[p.shared_by] = (people[p.shared_by] || 0) + 1;
+                    if (p.cluster_label) {
+                        if (!peopleClusters[p.shared_by]) peopleClusters[p.shared_by] = {};
+                        peopleClusters[p.shared_by][p.cluster_label] = (peopleClusters[p.shared_by][p.cluster_label] || 0) + 1;
+                    }
+                });
+                const top = Object.entries(people).sort((a, b) => b[1] - a[1]).slice(0, 8);
+                return {
+                    title: 'Most Active Contributors',
+                    html: top.map(([name, count]) => {
+                        const topics = Object.entries(peopleClusters[name] || {}).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([t]) => t).join(', ');
+                        return `<div style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+                            <div><span style="cursor:pointer;color:#bb86fc;" onclick="showContributorProfile('${esc(name).replace(/'/g, "\\'")}')">${esc(name)}</span> <span style="color:#666;">— ${topics || 'various'}</span></div>
+                            <strong style="color:#64b5f6;">${count} papers</strong>
+                        </div>`;
+                    }).join('')
+                };
+            }
+
             // "most cited" / "top papers" / "best papers"
             if (/most cited|top papers|best papers|influential/i.test(q)) {
                 const top = [...allPapers].sort((a,b) => (b.cited_by_count||0)-(a.cited_by_count||0)).slice(0, 5);
