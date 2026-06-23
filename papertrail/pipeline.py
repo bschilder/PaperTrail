@@ -208,10 +208,16 @@ def run_pipeline(
     logger.info("Enriched %d additional papers via title search", fill_count)
 
     # Remove dead links (untitled papers with 404/error pages)
-    from papertrail.enrich_cascade import remove_dead_links
+    from papertrail.enrich_cascade import apply_url_fallback_titles, remove_dead_links
     dead_count = remove_dead_links(all_papers)
     if dead_count:
         logger.info("Removed %d dead links → %d papers", dead_count, len(all_papers))
+
+    # Give any still-untitled papers a readable title derived from their URL,
+    # so bot-blocked/paywalled papers we keep don't render as "(no title)".
+    titled = apply_url_fallback_titles(all_papers)
+    if titled:
+        logger.info("Applied URL-based fallback titles to %d papers", titled)
 
     with open(enriched_path, "w") as f:
         json.dump(all_papers, f, indent=2)

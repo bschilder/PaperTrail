@@ -155,8 +155,13 @@ jobs:
           git add -f data/
           if ! git diff --staged --quiet; then
             git commit -m "Update paper data [pipeline]"
-            git pull --rebase origin main
-            git push
+            # Reconcile against the branch we're running on (main for the cron,
+            # the PR branch for test runs). -X theirs keeps THIS run's freshly
+            # built data on the rare conflict where another run pushed data
+            # while we were building. Only data/ is regenerated, so this is safe.
+            BRANCH="${GITHUB_REF_NAME}"
+            git pull --rebase -X theirs origin "$BRANCH" || git rebase --abort
+            git push origin "HEAD:${BRANCH}"
           fi
 
       - name: Upload Pages artifact

@@ -613,6 +613,70 @@ def remove_dead_links(papers: list[dict]) -> int:
     return removed
 
 
+# Titles that mean "we never got a real one" and should be replaced.
+_MISSING_TITLES = {"", "untitled", "unknown title", "(no title)", "none", "null"}
+
+
+def _needs_title(title: str | None) -> bool:
+    """True if a paper has no usable title and should get a URL-derived fallback."""
+    t = (title or "").strip().lower()
+    if t in _MISSING_TITLES:
+        return True
+    if t.startswith("preparing to download"):
+        return True
+    return t in JUNK_TITLES
+
+
+def derive_title_from_url(url: str) -> str:
+    """Build a human-readable title from a URL when no real title is available.
+
+    Examples:
+        arxiv.org/abs/2401.12345               -> "arXiv:2401.12345"
+        host/rhaister-manuscript.pdf           -> "Rhaister Manuscript"
+        host/blog/sft_rl_opd                   -> "Sft Rl Opd"
+        sciencedirect.com/.../pii/S00928674..  -> "sciencedirect.com" (opaque id)
+    """
+    m = re.search(r"arxiv\.org/(?:abs|pdf|html)/(\d+\.\d+(?:v\d+)?)", url, re.I)
+    if m:
+        return f"arXiv:{m.group(1)}"
+
+    parsed = urlparse(url)
+    host = (parsed.netloc or "").lower()
+    if host.startswith("www."):
+        host = host[len("www."):]
+
+    segments = [s for s in parsed.path.split("/") if s]
+    last = segments[-1] if segments else ""
+    last = re.sub(r"\.(pdf|html?|full|abstract)$", "", last, flags=re.I)
+
+    # Opaque identifiers (ScienceDirect PIIs, hashes, numeric ids) aren't readable.
+    is_opaque = bool(re.fullmatch(r"[A-Za-z]?\d{5,}[A-Za-z0-9]*", last)) or bool(
+        last and re.fullmatch(r"[0-9.]+", last)
+    )
+    if last and not is_opaque:
+        words = [w for w in re.split(r"[-_+]+", last) if w]
+        readable = " ".join(words).strip()
+        if readable:
+            return readable.title()
+
+    return host or url
+
+
+def apply_url_fallback_titles(papers: list[dict]) -> int:
+    """Fill missing/junk titles with a readable title derived from the URL (in-place).
+
+    Returns the number of titles filled.
+    """
+    filled = 0
+    for p in papers:
+        if _needs_title(p.get("title")):
+            url = p.get("url") or p.get("paper_url") or ""
+            if url:
+                p["title"] = derive_title_from_url(url)
+                filled += 1
+    return filled
+
+
 def enrich_papers_cascade(
     papers: list[dict],
     email: str = "papertrail@example.com",
