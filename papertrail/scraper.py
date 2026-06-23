@@ -146,12 +146,12 @@ BLOG_PATH_HINTS = (
 )
 
 # Hosts that wrap a real paper URL behind a redirect/shortener — resolve before matching.
+# Deliberately excludes t.co (Twitter) and lnkd.in (LinkedIn): they are high-volume
+# in chat but resolve to excluded social destinations, so resolving them is wasted work.
 REDIRECT_HOSTS = {
     "share.google",
-    "t.co",
     "bit.ly",
     "tinyurl.com",
-    "lnkd.in",
     "buff.ly",
     "ow.ly",
     "rb.gy",
@@ -607,22 +607,29 @@ class SlackPaperScraper:
     def _resolve_redirect(self, url: str) -> str | None:
         """Follow a redirect/shortener URL to its final destination.
 
-        Returns the resolved URL, or None if it could not be resolved.
-        Network failures are swallowed so scraping never aborts on a bad link.
+        Uses a cheap HEAD with a short timeout (these run inline during scraping,
+        so they must stay fast) and caches results within the instance. Returns
+        the resolved URL, or None if it could not be resolved. Network failures
+        are swallowed so scraping never aborts on a bad link.
         """
+        cache = self.__dict__.setdefault("_redirect_cache", {})
+        if url in cache:
+            return cache[url]
+        result: str | None = None
         try:
-            resp = requests.get(
+            resp = requests.head(
                 url,
-                timeout=10,
+                timeout=5,
                 allow_redirects=True,
                 headers={"User-Agent": "Mozilla/5.0 (PaperTrail/1.0)"},
             )
             final = resp.url
             if final and final != url:
-                return final
+                result = final
         except requests.RequestException as e:
             logger.debug("Could not resolve redirect %s: %s", url, e)
-        return None
+        cache[url] = result
+        return result
 
     def is_paper_url(self, url: str) -> bool:
         """
