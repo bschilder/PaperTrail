@@ -44,3 +44,4 @@ site/
 # Jupyter
 .ipynb_checkpoints/
 screenshots/
+.vercel

@@ -109,6 +109,45 @@ jobs:
           mkdir -p site/dashboard
           echo "<meta http-equiv='refresh' content='0;url=../koolab/'>" > site/dashboard/index.html
 
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          set -e
+
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "VERCEL_TOKEN not set — skipping Vercel deploy (GitHub Pages deploy still runs)."
+            exit 0
+          fi
+
+          npm install --global vercel@latest
+
+          # Assemble a prebuilt static site via Vercel's Build Output API (v3).
+          # Using --prebuilt + VERCEL_PROJECT_ID pins the deploy to the
+          # "papertrail" project and skips any Vercel-side build step.
+          OUT=.vercel/output/static
+          rm -rf .vercel/output
+          mkdir -p "$OUT"
+          echo '{ "version": 3 }' > .vercel/output/config.json
+
+          # Lab-picker landing page at the root (reads config/*.yml + data counts)
+          python scripts/build_landing.py --out "$OUT/index.html"
+
+          # One dashboard per workspace at /<slug>/
+          for cfg in config/*.yml; do
+            WORKSPACE=$(python -c "import yaml; c=yaml.safe_load(open('$cfg')); url=c.get('slack_workspace_url',''); name=url.split('//')[1].split('.')[0] if '//' in url else 'dashboard'; print(name)")
+            DASHBOARD="build/$WORKSPACE/dashboard.html"
+            if [ -f "$DASHBOARD" ]; then
+              mkdir -p "$OUT/$WORKSPACE"
+              cp "$DASHBOARD" "$OUT/$WORKSPACE/index.html"
+              echo "Staged for Vercel: /$WORKSPACE/"
+            fi
+          done
+
+          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN" --yes
+
       - name: Commit updated data
         run: |
           git config user.name "github-actions[bot]"
