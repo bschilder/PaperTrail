@@ -566,18 +566,27 @@ def _clean_title(title: str) -> str:
 # ── Batch enrichment ────────────────────────────────────────────
 
 def is_dead_link(url: str) -> bool:
-    """Check if a URL returns a 404 or error page."""
+    """Check if a URL is genuinely dead (the resource does not exist).
+
+    Only a true 404/410 (or an explicit "not found" body) counts as dead.
+    403 (bot-blocked publisher), 401 (paywall), 429 (rate limited), and 5xx
+    are NOT dead — they are real papers we simply can't fetch as a bot, and
+    deleting them is the main cause of undercounting. Network failures are
+    treated as "not dead" (conservative — keep the paper).
+    """
     try:
         resp = requests.get(url, timeout=10, allow_redirects=True,
                            headers={**HEADERS, "User-Agent": "Mozilla/5.0 (PaperTrail/1.0)"})
-        if resp.status_code >= 400:
+        if resp.status_code in (404, 410):
             return True
-        body = resp.text[:3000].lower()
-        if any(s in body for s in ['page not found', 'error 404', 'does not exist',
-                                    'no forum found', 'this page isn', 'we can\'t find']):
-            return True
-    except:
-        return True
+        # Only inspect the body of otherwise-OK responses for soft-404 pages.
+        if resp.status_code < 400:
+            body = resp.text[:3000].lower()
+            if any(s in body for s in ['page not found', 'error 404', 'does not exist',
+                                        'no forum found', 'this page isn', 'we can\'t find']):
+                return True
+    except requests.RequestException:
+        return False
     return False
 
 

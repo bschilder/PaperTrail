@@ -81,8 +81,81 @@ PAPER_DOMAINS = {
     # Other preprint/publication platforms
     "ssrn.com",
     "paperswitchcode.com",
+    "paperswithcode.com",
     "openreview.net",
     "arxiv-vanity.com",
+    "chemrxiv.org",
+    "osf.io",
+    "researchsquare.com",
+    "semanticscholar.org",
+    "huggingface.co",  # HF papers (huggingface.co/papers/...)
+
+    # Elsevier/Cell papers actually live on ScienceDirect
+    "sciencedirect.com",
+
+    # Major medical journals
+    "nejm.org",
+    "thelancet.com",
+    "bmj.com",
+    "jamanetwork.com",
+    "annals.org",
+
+    # More publishers / open access
+    "mdpi.com",
+    "frontiersin.org",
+    "jmlr.org",
+    "sagepub.com",
+    "ahajournals.org",
+    "journals.aps.org",  # Physical Review
+    "iopscience.iop.org",
+    "royalsocietypublishing.org",
+
+    # ML / CS conference proceedings
+    "aclanthology.org",
+    "proceedings.neurips.cc",
+    "papers.nips.cc",
+    "proceedings.mlr.press",
+    "openaccess.thecvf.com",
+    "dl.acm.org",
+    "ieeexplore.ieee.org",
+}
+
+# Hosts whose links are research blogs / model or benchmark announcements.
+# These aren't traditional papers but the team shares them as primary research.
+BLOG_HOSTS = {
+    "openai.com",
+    "blog.google",
+    "deepmind.google",
+    "ai.meta.com",
+    "anthropic.com",
+    "huggingface.co",
+    "distill.pub",
+    "substack.com",
+}
+
+# URL path fragments that signal a research blog post / write-up / announcement.
+BLOG_PATH_HINTS = (
+    "/blog/",
+    "/blogs/",
+    "/posts/",
+    "/post/",
+    "/field-notes/",
+    "/research",
+    "/index/",  # openai.com/index/<announcement>
+    "/article",
+)
+
+# Hosts that wrap a real paper URL behind a redirect/shortener — resolve before matching.
+REDIRECT_HOSTS = {
+    "share.google",
+    "t.co",
+    "bit.ly",
+    "tinyurl.com",
+    "lnkd.in",
+    "buff.ly",
+    "ow.ly",
+    "rb.gy",
+    "shorturl.at",
 }
 
 # Patterns to exclude from paper URL detection
@@ -90,6 +163,10 @@ EXCLUDE_PATTERNS = [
     r"slack\.com",
     r"youtu(?:\.be|be\.com)",
     r"twitter\.com|x\.com",
+    r"linkedin\.com",
+    r"facebook\.com",
+    r"instagram\.com",
+    r"reddit\.com",
     r"github\.com/?$",  # Plain GitHub homepage
     r"imgur\.com",
     r"imgur\.com/\w{5,7}$",  # Imgur image links
@@ -510,12 +587,42 @@ class SlackPaperScraper:
                 # Clean up common artifacts
                 url = url.rstrip(".,;:)'\">")
 
+                # Resolve redirect/shortener links to their real destination first,
+                # so wrapped papers (e.g. share.google/... → nature.com/...) are caught.
+                host = urlparse(url.lower()).netloc
+                if host.startswith("www."):
+                    host = host[len("www."):]
+                if host in REDIRECT_HOSTS:
+                    resolved = self._resolve_redirect(url)
+                    if resolved:
+                        url = resolved
+
                 # Check if it's a paper URL
                 if self.is_paper_url(url):
                     normalized = self.normalize_url(url)
                     all_urls.add(normalized)
 
         return sorted(list(all_urls))
+
+    def _resolve_redirect(self, url: str) -> str | None:
+        """Follow a redirect/shortener URL to its final destination.
+
+        Returns the resolved URL, or None if it could not be resolved.
+        Network failures are swallowed so scraping never aborts on a bad link.
+        """
+        try:
+            resp = requests.get(
+                url,
+                timeout=10,
+                allow_redirects=True,
+                headers={"User-Agent": "Mozilla/5.0 (PaperTrail/1.0)"},
+            )
+            final = resp.url
+            if final and final != url:
+                return final
+        except requests.RequestException as e:
+            logger.debug("Could not resolve redirect %s: %s", url, e)
+        return None
 
     def is_paper_url(self, url: str) -> bool:
         """
@@ -538,15 +645,31 @@ class SlackPaperScraper:
 
         # Check for known paper domains
         parsed = urlparse(url.lower())
-        domain = parsed.netloc.lstrip("www.")
+        domain = parsed.netloc
+        if domain.startswith("www."):
+            domain = domain[len("www."):]
+        path = parsed.path
 
-        # Check exact match or subdomain match
+        # Check exact match or subdomain match against known paper domains
         for paper_domain in self._paper_domains:
             if domain == paper_domain or domain.endswith(f".{paper_domain}"):
                 return True
 
-        # Also check if URL contains a DOI
+        # URL contains a DOI
         if re.search(r"10\.\d{4,}/[^\s>]+", url):
+            return True
+
+        # Direct PDF on any host (manuscripts, reports, slide decks of papers)
+        if path.endswith(".pdf"):
+            return True
+
+        # Research blogs / model or benchmark announcements
+        for blog_host in BLOG_HOSTS:
+            if domain == blog_host or domain.endswith(f".{blog_host}"):
+                return True
+        if domain.endswith(".github.io") and any(h in path for h in BLOG_PATH_HINTS):
+            return True
+        if any(h in path for h in BLOG_PATH_HINTS):
             return True
 
         return False
