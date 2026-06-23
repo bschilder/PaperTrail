@@ -6,8 +6,9 @@ PaperTrail automatically discovers papers shared across your Slack workspace, en
 
 ### Live Demos
 
-- [Koo Lab Dashboard](https://bschilder.github.io/PaperTrail/koolab/)
-- [Standard Model Bio Dashboard](https://bschilder.github.io/PaperTrail/standardmodelbio/)
+- **Landing page** (lab picker): [papertrail-xi.vercel.app](https://papertrail-xi.vercel.app)
+- Koo Lab Dashboard — [Vercel](https://papertrail-xi.vercel.app/koolab/) · [GitHub Pages](https://bschilder.github.io/PaperTrail/koolab/)
+- Standard Model Bio Dashboard — [Vercel](https://papertrail-xi.vercel.app/standardmodelbio/) · [GitHub Pages](https://bschilder.github.io/PaperTrail/standardmodelbio/)
 
 [Documentation](https://bschilder.github.io/PaperTrail) · [Report Bug](https://github.com/bschilder/PaperTrail/issues) · [Request Feature](https://github.com/bschilder/PaperTrail/issues)
 
@@ -35,7 +36,7 @@ A self-contained HTML file — no server required.
 - **LLM embeddings** — HuggingFace BGE-small (384d) for projections + client-side search
 - **Hierarchical clustering** on UMAP projections with LLM-generated topic labels
 - **Dead link detection**, junk title filtering, URL normalization
-- **Automated weekly pipeline** via GitHub Actions → GitHub Pages deployment
+- **Automated weekly pipeline** via GitHub Actions → deploys to **both Vercel and GitHub Pages**
 
 ### Multi-Workspace Support
 
@@ -48,7 +49,9 @@ config/
 └── yourlab.yml             # Add your own!
 ```
 
-Each workspace gets its own data directory, dashboard, and GitHub Pages URL.
+Each workspace gets its own data directory and dashboard, published at
+`/<workspace>/` on both the Vercel app and GitHub Pages. A generated landing
+page (`scripts/build_landing.py`) links to every workspace dashboard.
 
 ---
 
@@ -69,7 +72,10 @@ Each workspace gets its own data directory, dashboard, and GitHub Pages URL.
 4. **Set** GitHub secret: `gh secret set SLACK_BOT_TOKEN`
 5. **Trigger**: `gh workflow run pipeline.yml`
 
-Dashboard deploys to `https://<user>.github.io/PaperTrail/<workspace>/`
+Dashboard deploys to both `https://<project>.vercel.app/<workspace>/` and
+`https://<user>.github.io/PaperTrail/<workspace>/`. For Vercel deployment, also
+set the `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` secrets (see
+[Configuration → Deployment](https://bschilder.github.io/PaperTrail/getting-started/configuration/)).
 
 ### Option 2: CLI
 
@@ -105,10 +111,12 @@ Slack Workspaces (multiple)
 │              │    │ - Junk filter│    │   clustering  │    │   search     │
 └─────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
                                               │
-                                    GitHub Actions (weekly)
+                                    GitHub Actions (weekly cron)
                                               │
-                                        GitHub Pages
-                                    /koolab/  /standardmodelbio/
+                                  ┌───────────┴───────────┐
+                                  ▼                       ▼
+                               Vercel               GitHub Pages
+                          /koolab/  /standardmodelbio/  (+ lab-picker landing)
 ```
 
 ## Project Structure
@@ -132,9 +140,11 @@ PaperTrail/
 │   ├── cli.py                   # CLI commands
 │   └── templates/dashboard.html # Dashboard template (~10K lines)
 ├── .github/workflows/
-│   ├── pipeline.yml             # Weekly pipeline + deploy
+│   ├── pipeline.yml             # Weekly pipeline + deploy (Vercel + GitHub Pages)
 │   ├── docs.yml                 # Documentation deploy
 │   └── ci.yml                   # Tests
+├── scripts/
+│   └── build_landing.py         # Generates the lab-picker landing page
 ├── docs/                        # MkDocs documentation
 └── pyproject.toml               # Package config
 ```

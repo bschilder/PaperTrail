@@ -4,7 +4,11 @@
 
 PaperTrail automatically discovers papers shared across your Slack workspace, enriches them with metadata, computes semantic embeddings, and builds an interactive visual dashboard with hierarchical topic clustering, AI-powered search, and full engagement metrics.
 
-### [Live Demo: Koo Lab Dashboard](https://bschilder.github.io/PaperTrail/koolab/)
+### Live Demos
+
+- **Landing page** (lab picker): [papertrail-xi.vercel.app](https://papertrail-xi.vercel.app)
+- Koo Lab — [Vercel](https://papertrail-xi.vercel.app/koolab/) · [GitHub Pages](https://bschilder.github.io/PaperTrail/koolab/)
+- Standard Model Bio — [Vercel](https://papertrail-xi.vercel.app/standardmodelbio/) · [GitHub Pages](https://bschilder.github.io/PaperTrail/standardmodelbio/)
 
 - **GitHub**: [bschilder/PaperTrail](https://github.com/bschilder/PaperTrail)
 - **PyPI**: [papertrail-lab](https://pypi.org/project/papertrail-lab/)
@@ -58,7 +62,7 @@ Slack Workspace
 - **Junk title rejection** — automatically filters out erratum, corrigendum, correspondence, and site boilerplate
 - **Dead link detection** — removes papers with 404/error pages
 - **Hierarchical clustering on UMAP projections** — 3 levels with LLM-generated labels (HF → OpenAI fallback)
-- **Automated weekly pipeline** via GitHub Actions — scrape, enrich, embed, build, deploy to GitHub Pages
+- **Automated weekly pipeline** via GitHub Actions — scrape, enrich, embed, build, deploy to **both Vercel and GitHub Pages**
 
 ---
 
@@ -69,9 +73,10 @@ Slack Workspace
 1. **Fork** this repository
 2. **Edit** `config.yml` with your Slack channels
 3. **Add** `SLACK_BOT_TOKEN` as a GitHub Actions secret
-4. The pipeline runs weekly and deploys to GitHub Pages
+4. *(Optional)* Add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` secrets to also deploy to Vercel
+5. The pipeline runs weekly (Sunday 2am UTC) and deploys to Vercel + GitHub Pages
 
-See [Deployment Guide](getting-started/quickstart.md) for details.
+See [Configuration → Deployment](getting-started/configuration.md#deployment) for details.
 
 ### Option 2: CLI
 
