@@ -566,18 +566,27 @@ def _clean_title(title: str) -> str:
 # ── Batch enrichment ────────────────────────────────────────────
 
 def is_dead_link(url: str) -> bool:
-    """Check if a URL returns a 404 or error page."""
+    """Check if a URL is genuinely dead (the resource does not exist).
+
+    Only a true 404/410 (or an explicit "not found" body) counts as dead.
+    403 (bot-blocked publisher), 401 (paywall), 429 (rate limited), and 5xx
+    are NOT dead — they are real papers we simply can't fetch as a bot, and
+    deleting them is the main cause of undercounting. Network failures are
+    treated as "not dead" (conservative — keep the paper).
+    """
     try:
         resp = requests.get(url, timeout=10, allow_redirects=True,
                            headers={**HEADERS, "User-Agent": "Mozilla/5.0 (PaperTrail/1.0)"})
-        if resp.status_code >= 400:
+        if resp.status_code in (404, 410):
             return True
-        body = resp.text[:3000].lower()
-        if any(s in body for s in ['page not found', 'error 404', 'does not exist',
-                                    'no forum found', 'this page isn', 'we can\'t find']):
-            return True
-    except:
-        return True
+        # Only inspect the body of otherwise-OK responses for soft-404 pages.
+        if resp.status_code < 400:
+            body = resp.text[:3000].lower()
+            if any(s in body for s in ['page not found', 'error 404', 'does not exist',
+                                        'no forum found', 'this page isn', 'we can\'t find']):
+                return True
+    except requests.RequestException:
+        return False
     return False
 
 
@@ -602,6 +611,70 @@ def remove_dead_links(papers: list[dict]) -> int:
     removed = before - len(papers)
     logger.info("Removed %d dead links", removed)
     return removed
+
+
+# Titles that mean "we never got a real one" and should be replaced.
+_MISSING_TITLES = {"", "untitled", "unknown title", "(no title)", "none", "null"}
+
+
+def _needs_title(title: str | None) -> bool:
+    """True if a paper has no usable title and should get a URL-derived fallback."""
+    t = (title or "").strip().lower()
+    if t in _MISSING_TITLES:
+        return True
+    if t.startswith("preparing to download"):
+        return True
+    return t in JUNK_TITLES
+
+
+def derive_title_from_url(url: str) -> str:
+    """Build a human-readable title from a URL when no real title is available.
+
+    Examples:
+        arxiv.org/abs/2401.12345               -> "arXiv:2401.12345"
+        host/rhaister-manuscript.pdf           -> "Rhaister Manuscript"
+        host/blog/sft_rl_opd                   -> "Sft Rl Opd"
+        sciencedirect.com/.../pii/S00928674..  -> "sciencedirect.com" (opaque id)
+    """
+    m = re.search(r"arxiv\.org/(?:abs|pdf|html)/(\d+\.\d+(?:v\d+)?)", url, re.I)
+    if m:
+        return f"arXiv:{m.group(1)}"
+
+    parsed = urlparse(url)
+    host = (parsed.netloc or "").lower()
+    if host.startswith("www."):
+        host = host[len("www."):]
+
+    segments = [s for s in parsed.path.split("/") if s]
+    last = segments[-1] if segments else ""
+    last = re.sub(r"\.(pdf|html?|full|abstract)$", "", last, flags=re.I)
+
+    # Opaque identifiers (ScienceDirect PIIs, hashes, numeric ids) aren't readable.
+    is_opaque = bool(re.fullmatch(r"[A-Za-z]?\d{5,}[A-Za-z0-9]*", last)) or bool(
+        last and re.fullmatch(r"[0-9.]+", last)
+    )
+    if last and not is_opaque:
+        words = [w for w in re.split(r"[-_+]+", last) if w]
+        readable = " ".join(words).strip()
+        if readable:
+            return readable.title()
+
+    return host or url
+
+
+def apply_url_fallback_titles(papers: list[dict]) -> int:
+    """Fill missing/junk titles with a readable title derived from the URL (in-place).
+
+    Returns the number of titles filled.
+    """
+    filled = 0
+    for p in papers:
+        if _needs_title(p.get("title")):
+            url = p.get("url") or p.get("paper_url") or ""
+            if url:
+                p["title"] = derive_title_from_url(url)
+                filled += 1
+    return filled
 
 
 def enrich_papers_cascade(
