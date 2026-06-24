@@ -51,6 +51,117 @@ def _normalize_pdf_url(url: str) -> str:
     return url
 
 
+def _is_pdf_url(url: str) -> bool:
+    """True if the URL path points at a PDF (ignoring query string)."""
+    return urlparse(url).path.lower().endswith(".pdf")
+
+
+def _looks_like_title(s: str) -> bool:
+    """Heuristic: is this line a plausible paper title (not a header/filename)?"""
+    s = (s or "").strip()
+    if not (15 <= len(s) <= 250):
+        return False
+    low = s.lower()
+    if low.startswith("microsoft word") or low.endswith((".pdf", ".docx", ".doc", ".tex")):
+        return False
+    if re.search(r"@|https?://|arxiv:|doi:|^\d+$", low):
+        return False
+    # Legal/boilerplate notices that often sit above the title
+    if any(w in low for w in (
+        "permission", "copyright", "©", "rights reserved", "licensed under",
+        "all rights", "preprint", "under review", "submitted to",
+    )):
+        return False
+    # Author lines: an ampersand joining names, or "Last, First; ..." style lists
+    if " & " in s or ";" in s:
+        return False
+    letters = sum(c.isalpha() for c in s)
+    return letters >= len(s) * 0.5
+
+
+def _parse_pdf_title(text: str, meta_title: str = "") -> str:
+    """Title from PDF metadata if usable, else the first title-like line of text."""
+    if _looks_like_title(meta_title):
+        return meta_title.strip()
+    for line in (text or "").splitlines()[:25]:
+        if _looks_like_title(line):
+            return line.strip()
+    return ""
+
+
+def _parse_pdf_abstract(text: str) -> str:
+    """Extract the abstract section from extracted PDF text.
+
+    Looks for an "Abstract" heading at the start of a line and captures text up
+    to the next section marker (Introduction / Keywords / Index Terms).
+    """
+    m = re.search(r"(?im)^[ \t]*abstract\b[ \t]*[:.\-—]?[ \t]*", text or "")
+    if not m:
+        return ""
+    rest = text[m.end():]
+    term = re.search(
+        r"(?im)^[ \t]*(?:\d+\.?\s+)?(?:introduction|keywords|index terms)\b",
+        rest,
+    )
+    if term:
+        rest = rest[:term.start()]
+    else:
+        kw = re.search(r"(?i)\bkeywords\b\s*[:.]", rest)
+        if kw:
+            rest = rest[:kw.start()]
+    return re.sub(r"\s+", " ", rest).strip()[:3000].strip()
+
+
+def _titles_match(a: str, b: str) -> bool:
+    """True if two titles share enough tokens to be the same paper.
+
+    Used to validate an unreliable PDF-extracted title against an OpenAlex hit
+    before adopting OpenAlex's (clean) metadata — guards against the title
+    search returning an unrelated paper for a garbage query.
+    """
+    ta = set(re.findall(r"[a-z0-9]+", (a or "").lower()))
+    tb = set(re.findall(r"[a-z0-9]+", (b or "").lower()))
+    if not ta or not tb:
+        return False
+    return len(ta & tb) / min(len(ta), len(tb)) >= 0.6
+
+
+def extract_pdf_metadata(url: str) -> dict[str, Any]:
+    """Download a PDF and parse its title/abstract from the text (best-effort).
+
+    Returns {} on any failure (network, non-PDF, parse error) so enrichment
+    never aborts on a bad link. Requires PyMuPDF (imported lazily).
+    """
+    try:
+        resp = requests.get(
+            url, timeout=20, allow_redirects=True,
+            headers={"User-Agent": "Mozilla/5.0 (PaperTrail/1.0)"},
+        )
+        if resp.status_code >= 400:
+            return {}
+        ctype = resp.headers.get("content-type", "").lower()
+        if "pdf" not in ctype and not _is_pdf_url(resp.url):
+            return {}
+        import fitz  # PyMuPDF
+
+        doc = fitz.open(stream=resp.content, filetype="pdf")
+        text = "\n".join(doc[i].get_text() for i in range(min(3, doc.page_count)))
+        meta_title = (doc.metadata or {}).get("title", "") or ""
+        doc.close()
+    except Exception as e:  # noqa: BLE001 — network/parse failures must not abort enrichment
+        logger.debug("PDF parse failed for %s: %s", url[:60], e)
+        return {}
+
+    out: dict[str, Any] = {}
+    title = _parse_pdf_title(text, meta_title)
+    abstract = _parse_pdf_abstract(text)
+    if title and not _is_junk_title(title):
+        out["title"] = title
+    if abstract:
+        out["abstract"] = abstract
+    return out
+
+
 def enrich_url(url: str, email: str = "papertrail@example.com") -> dict[str, Any]:
     """
     Enrich a paper URL using a multi-strategy cascade.
@@ -117,6 +228,23 @@ def enrich_url(url: str, email: str = "papertrail@example.com") -> dict[str, Any
         if oa and oa.get("abstract"):
             result = {**result, **{k: v for k, v in oa.items() if v and not result.get(k)}}
             logger.debug("Enriched via title→OpenAlex: %s", url[:60])
+            return result
+
+    # Strategy 3b: Parse the PDF itself (arbitrary-host PDFs the page scrape missed)
+    if (not result.get("title") or not result.get("abstract")) and _is_pdf_url(url):
+        pdf_meta = extract_pdf_metadata(url)
+        # The abstract is extracted from this URL's own PDF, so it's correctly
+        # attributed — take it directly.
+        if pdf_meta.get("abstract") and not result.get("abstract"):
+            result["abstract"] = pdf_meta["abstract"]
+        # PDF-extracted titles are unreliable (legal banners, author lines, body
+        # text surface first), so only adopt one if OpenAlex confirms the match.
+        if pdf_meta.get("title") and not result.get("title"):
+            oa = _lookup_openalex_title(pdf_meta["title"], email)
+            if oa and oa.get("title") and _titles_match(pdf_meta["title"], oa["title"]):
+                result = {**result, **{k: v for k, v in oa.items() if v and not result.get(k)}}
+        if result.get("title") and result.get("abstract"):
+            logger.debug("Enriched via PDF parse: %s", url[:60])
             return result
 
     # Strategy 4: Google search as last resort
