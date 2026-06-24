@@ -5,7 +5,23 @@ from papertrail.enrich_cascade import (
     _coerce_llm_meta,
     _llm_extract_metadata,
     _parse_llm_json,
+    _sanitize_for_api,
 )
+
+
+def test_sanitize_strips_control_chars_and_keeps_text():
+    raw = "Hello\x00 world\x07\nLine\ttwo"
+    out = _sanitize_for_api(raw)
+    assert "\x00" not in out and "\x07" not in out
+    assert "Hello" in out and "world" in out
+    assert "\n" in out and "\t" in out  # legitimate whitespace preserved
+
+
+def test_sanitize_drops_lone_surrogates():
+    raw = "ok\ud800text"  # lone surrogate from bad decoding
+    out = _sanitize_for_api(raw)
+    assert "ok" in out and "text" in out
+    out.encode("utf-8")  # must be encodable (would raise on a surrogate)
 
 
 def test_parse_llm_json_plain():
