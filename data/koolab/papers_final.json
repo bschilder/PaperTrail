@@ -15,7 +15,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "2026.06.22.733870V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.09543619304895401,
@@ -1849,7 +1849,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Lopez Paz Discovering Causal Signals Cvpr 2017 Paper",
+    "title": "",
     "projections": {
       "pca": [
         -0.16733703017234802,
@@ -13851,7 +13851,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Pdf",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -29447,7 +29447,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Samaudio",
+    "title": "",
     "projections": {
       "pca": [
         -0.15878601372241974,
@@ -35400,7 +35400,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Early Science Acceleration Experiments With Gpt 5",
+    "title": "",
     "projections": {
       "pca": [
         -0.18457098305225372,
@@ -35847,7 +35847,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Current Llms Seem To Rarely Detect Cot Tampering",
+    "title": "",
     "projections": {
       "pca": [
         -0.1971641331911087,
@@ -46804,7 +46804,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Modular Manifolds",
+    "title": "",
     "abstract": "A geometric framework for co-designing neural net optimizers with manifold constraints.",
     "projections": {
       "pca": [
@@ -48626,7 +48626,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Why Language Models Hallucinate",
+    "title": "",
     "projections": {
       "pca": [
         -0.20933908224105835,
@@ -61929,7 +61929,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Takeaways From Our Recent Work On Sae Probing",
+    "title": "",
     "projections": {
       "pca": [
         -0.13091424107551575,
@@ -67900,7 +67900,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Forum",
+    "title": "Generalization through variance: how noise shapes inductive biases in diffusion models",
     "projections": {
       "pca": [
         -0.2370680868625641,
@@ -68331,6 +68331,10 @@
       0.0322,
       -0.0013,
       -0.0135
+    ],
+    "abstract": "How diffusion models generalize beyond their training set is not known, and is somewhat mysterious given two facts: the optimum of the denoising score matching (DSM) objective usually used to train diffusion models is the score function of the training distribution; and the networks usually used to learn the score function are expressive enough to learn this score to high accuracy. We claim that a certain feature of the DSM objective\u2014the fact that its target is not the training distribution&#x27;s score, but a noisy quantity only equal to it in expectation\u2014strongly impacts whether and to what extent diffusion models generalize. In this paper, we develop a mathematical theory that partly explains this &#x27;generalization through variance&#x27; phenomenon. Our theoretical analysis exploits a physics-inspired path integral approach to compute the distributions typically learned by a few paradigmatic under- and overparameterized diffusion models. We find that the distributions diffusion models effectively learn to sample from resemble their training distributions, but with `gaps&#x27; filled in, and that this inductive bias is due to the covariance structure of the noisy target used during training. We also characterize how this inductive bias interacts with feature-related inductive biases.",
+    "authors": [
+      "John Vastola"
     ]
   },
   {
@@ -73876,7 +73880,7 @@
       "papers-dl",
       "papers-ai-agents"
     ],
-    "title": "Ai Coscientist",
+    "title": "",
     "projections": {
       "pca": [
         -0.21501252055168152,
@@ -74777,7 +74781,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "2024.10.29.620913V2",
+    "title": "",
     "projections": {
       "pca": [
         -0.08682774007320404,
@@ -90827,7 +90831,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Pdf",
+    "title": "",
     "projections": {
       "pca": [
         -0.17864872515201569,
@@ -94467,7 +94471,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Peering Into The Unseen Protein Universe",
+    "title": "",
     "projections": {
       "pca": [
         -0.05511188134551048,
@@ -123316,7 +123320,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Rohbeck24A",
+    "title": "",
     "projections": {
       "pca": [
         0.008454802446067333,
@@ -126980,7 +126984,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Wcbicml2023 Paper102",
+    "title": "",
     "projections": {
       "pca": [
         -0.0746518075466156,
@@ -136145,7 +136149,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Information Based Objective Functions For Active",
+    "title": "",
     "projections": {
       "pca": [
         -0.24700893461704254,
@@ -137497,7 +137501,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Chinchilla S Wild Implications",
+    "title": "",
     "projections": {
       "pca": [
         -0.025656353682279587,
@@ -150779,7 +150783,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.059135857969522476,
@@ -170415,7 +170419,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Pdf",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -173143,7 +173147,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Pdf",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -174038,7 +174042,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Stablelm Tuned Alpha Chat",
+    "title": "",
     "projections": {
       "pca": [
         -0.19450852274894714,
@@ -175416,7 +175420,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -188658,7 +188662,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "General Purpose Pre Trained Models",
+    "title": "",
     "projections": {
       "pca": [
         -0.13643576204776764,
@@ -210606,7 +210610,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "A284Df1155Ec3E67286080500Df36A9A Paper",
+    "title": "",
     "projections": {
       "pca": [
         -0.19466161727905273,
@@ -211957,7 +211961,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Noether Networks Neurips 2021 Cr",
+    "title": "",
     "projections": {
       "pca": [
         -0.23224018514156342,
@@ -218328,7 +218332,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Certivited",
+    "title": "",
     "projections": {
       "pca": [
         -0.25328272581100464,
@@ -234746,7 +234750,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Pdf",
+    "title": "",
     "projections": {
       "pca": [
         -0.18435528874397278,
@@ -250647,7 +250651,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "2021.02.26.433129V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.08428936451673508,
@@ -258818,7 +258822,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Pdf",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -260170,7 +260174,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Pdf",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -264276,7 +264280,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Main Unadv",
+    "title": "",
     "projections": {
       "pca": [
         -0.2968428432941437,
@@ -268814,7 +268818,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "pnas.org",
+    "title": "",
     "projections": {
       "pca": [
         0.0037474536802619696,
@@ -280637,7 +280641,7 @@
     "channels": [
       "papers-dl"
     ],
-    "title": "Denoising Diffusion20",
+    "title": "",
     "projections": {
       "pca": [
         -0.22591516375541687,
@@ -286582,7 +286586,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2026.06.02.729723V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.13606534898281097,
@@ -287029,7 +287033,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         0.05532937869429588,
@@ -289807,7 +289811,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(26)00508 8",
+    "title": "",
     "projections": {
       "pca": [
         0.1892091929912567,
@@ -290256,7 +290260,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.20160280168056488,
@@ -293498,7 +293502,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.21776100993156433,
@@ -297646,7 +297650,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(25)00352 6",
+    "title": "",
     "projections": {
       "pca": [
         0.21263636648654938,
@@ -301813,7 +301817,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2026.03.17.712488V1",
+    "title": "",
     "projections": {
       "pca": [
         0.06130428612232208,
@@ -302262,7 +302266,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.1673389971256256,
@@ -303642,7 +303646,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2026.03.24.713871V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.10227560997009277,
@@ -305463,7 +305467,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S1097 2765(26)00067 5",
+    "title": "Erratum",
     "year": 2000,
     "journal": "Molecular Cell",
     "doi": "10.1016/s1097-2765(00)00096-4",
@@ -306839,7 +306843,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.005496569909155369,
@@ -310058,7 +310062,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "journals.biologists.com",
+    "title": "",
     "projections": {
       "pca": [
         0.11344978213310242,
@@ -311930,7 +311934,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(25)01482 5",
+    "title": "",
     "projections": {
       "pca": [
         0.02783595770597458,
@@ -313739,7 +313743,17 @@
       -0.061,
       0.0463,
       0.0085
-    ]
+    ],
+    "abstract": "Using various biochemical assays that identify transcription factor (TF) binding and histone modifications, cis-regulatory elements (CREs) can be annotated in a genome-wide manner. However, these assays are descriptive and require functional validation. To the best of our knowledge, no technology can simultaneously analyze the regulatory function and epigenomic modifications of a specific sequence. Here, we develop an enrichment followed by epigenomic profiling massively parallel reporter assay (e2MPRA). This technique uses lentivirus to enrich for the integration of specific CREs into the genome and applies MPRA, Cut&Tag or ATAC-seq on them enabling simultaneous, high-throughput analysis of regulatory activity, protein binding, and epigenetic modification. We demonstrate that e2MPRA can dissect the epigenetic functions of TF motifs arranged within synthetic enhancers and evaluate the effects of sequence perturbation on epigenetic states. In summary, e2MPRA advances our understanding of the regulatory code, its effect on the epigenome and how its alteration leads to phenotypic effects.",
+    "authors": [
+      "Zicong Zhang",
+      "Ilias Georgakopoulos-Soares",
+      "Guillaume Bourque",
+      "Nadav Ahituv",
+      "Fumitaka Inoue"
+    ],
+    "year": 2026,
+    "doi": "10.1038/s41467-026-68422-3"
   },
   {
     "channel": "papers-genomics",
@@ -314187,7 +314201,32 @@
       -0.0401,
       0.0733,
       -0.0296
-    ]
+    ],
+    "abstract": "Most evolutionary studies on pancreatic cancer rely on bulk sequencing, yet clonal evolution happens at the single-cell level. We used single-nucleus DNA sequencing to study 137,491 single nuclei from 24 pancreatic neoplasms reflecting various clinical scenarios. We found higher frequencies of somatic alterations to driver genes that bulk studies indicate; many manifest as copy number alterations and account for the majority of spatial heterogeneity. In pancreatic cancers with canonical KRAS oncogenic mutations, we found likely varied dependence on the genotype that may signify differential response to KRAS inhibition. In pancreatic cancers with germline heterozygous BRCA2 mutations, we discovered varied mechanisms and timing of inactivation of the wild-type allele that sculpted differential evolutionary trajectories. Inactivation of tumor-intrinsic response to transforming growth factor-\u03b2 happens through various mechanisms, takes place after oncogenesis and coincides with invasion and metastasis, reflecting increasing selective pressure for the phenotype later in pancreatic ductal adenocarcinoma development.",
+    "authors": [
+      "Haochen Zhang",
+      "Palash Sashittal",
+      "Elias-Ramzey Karnoub",
+      "Akhil Jakatdar",
+      "Shigeaki Umeda",
+      "Jungeui Hong",
+      "Anne Marie Noronha",
+      "Agustin Cardenas",
+      "Amanda Erakky",
+      "Caitlin A. McIntyre",
+      "Akimasa Hayashi",
+      "Nicolas LeComte",
+      "Marc Hilmi",
+      "W. Park",
+      "Nan Pang",
+      "Eileen M. O\u2019Reilly",
+      "Alice C. Wei",
+      "Benjamin J. Raphael",
+      "Christine A. Iacobuzio-Donahue"
+    ],
+    "year": 2026,
+    "doi": "10.1038/s41588-025-02468-9",
+    "cited_by_count": 3
   },
   {
     "channel": "papers-genomics",
@@ -316016,7 +316055,22 @@
       -0.0269,
       0.0639,
       -0.0286
-    ]
+    ],
+    "authors": [
+      "Jun Zhang",
+      "Ju Cheng Zhang",
+      "Shaoxuan Tang",
+      "Chuancheng Liu",
+      "Yushan Cai",
+      "Hao Zeng",
+      "Xiangjie Meng",
+      "Bei Liu",
+      "Yang Zhang",
+      "Yu Wang"
+    ],
+    "year": 2026,
+    "doi": "10.1038/s41587-026-03007-5",
+    "cited_by_count": 2
   },
   {
     "channel": "papers-genomics",
@@ -319216,7 +319270,34 @@
       -0.0178,
       0.0398,
       -0.0503
-    ]
+    ],
+    "abstract": "Promoters are the core regulatory elements of all genes. Their activity ensures the correct transcription level of each individual gene, which is essential for cellular homeostasis and responses to a wide range of signals. One of the major challenges in genomics is to build computational models that accurately predict genome-wide gene expression from the sequences of regulatory elements1. Here we present promoter activity regulatory model (PARM), a cell-type-specific deep-learning model trained on specially designed massively parallel reporter assays (MPRAs) that query human promoter sequences. PARM is experimentally and computationally lightweight so that cell-type-specific and condition-specific models can be generated that reliably predict autonomous promoter activity across the genome from the DNA sequence alone. PARM can also design purely synthetic strong promoters. We leveraged PARM to systematically identify binding sites of transcription factors that probably contribute to the activity of each natural human promoter and to detect the rewiring of these regulatory interactions after various stimuli to the cells. We also uncovered and experimentally confirmed substantial positional preferences of transcription factors that differ between activating and repressive regulatory functions and a complex grammar of motif\u2013motif interactions. Our approach provides a highly economic strategy towards a deeper understanding of the dynamic regulation of human promoters by transcription factors. PARM is a deep-learning model trained on data from massively parallel reporter assays to help predict promoter activity in different human cell types, design synthetic promoters and identify key features of regulatory promoter grammar.",
+    "authors": [
+      "Luc\u00eda Barbadilla-Mart\u00ednez",
+      "Noud H.M. Klaassen",
+      "Vin\u00edcius H. Franceschini-Santos",
+      "Jeremie Breda",
+      "Hatice Y\u00fccel",
+      "Miguel Hern\u00e1ndez-Quiles",
+      "Tijs van Lieshout",
+      "Carlos G. Urzua Traslavi\u00f1a",
+      "Minh Chau Luong Boi",
+      "Maryam Akbarzadeh",
+      "Celia Hermana-Garcia-Agullo",
+      "Sebastian Gregoricchio",
+      "Marcel A. De Haas",
+      "Roy Straver",
+      "Sarah Derks",
+      "Wilbert Zwart",
+      "Emile E. Voest",
+      "Lude Franke",
+      "Michiel Vermeulen",
+      "Jeroen de\u00a0Ridder",
+      "Bas van Steensel"
+    ],
+    "year": 2026,
+    "doi": "10.1038/s41586-025-10093-z",
+    "cited_by_count": 3
   },
   {
     "channel": "papers-genomics",
@@ -320150,7 +320231,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.044801924377679825,
@@ -321499,7 +321580,18 @@
       -0.0146,
       0.0293,
       -0.0298
-    ]
+    ],
+    "abstract": "Accurately annotating cell types is essential for extracting biological insight from single-cell RNA sequencing data. Although cell types are naturally organized into hierarchical ontologies, most computational models do not explicitly incorporate this structure into their training objectives. Here, we introduce a hierarchical cross-entropy loss that aligns model objectives with biological structure. Applied to architectures ranging from linear models to transformers, this simple modification improves out-of-distribution performance by 12-15% without added computational cost. Critically, we underscore the need to focus on new data generation that improves the connectivity among annotated cell types. Our work suggests that this is likely to yield more generalizable algorithms than would solely increasing model complexity.",
+    "authors": [
+      "Sebastiano Cultrera di Montesano",
+      "Davide D\u2019Ascenzo",
+      "Srivatsan Raghavan",
+      "Ava P. Amini",
+      "Peter Winter",
+      "Lorin Crawford"
+    ],
+    "year": 2026,
+    "doi": "10.1038/s43588-025-00945-z"
   },
   {
     "channel": "papers-genomics",
@@ -322408,7 +322500,52 @@
       -0.0688,
       0.0437,
       -0.0161
-    ]
+    ],
+    "abstract": "Environmental differences in genetic effect sizes, namely, gene\u2013environment interactions, may uncover the genetic encoding of phenotypic plasticity1\u20133. We provide a cross-population atlas of gene\u2013environment interactions comprising 440,210 individuals from European and Japanese populations, with replication in 539,794 individuals from diverse populations. By decomposing the contributions from age, sex and lifestyles, we delineate the aetiology of these gene\u2013environment interactions, including a reverse-causality from a disease-related dietary change. Genome-wide analyses uncovered missing heritability and trait\u2013trait relationships connected by the synergistic effects of genome and environments, which systematically affected polygenic prediction accuracy and cross-population portability. Single-cell projection revealed aging shift of pathways and cell types responsible for genetic regulation. Omics-level gene\u2013environment analyses identified multiple sex-discordant genetic effects in lipid metabolism, informing clinical trial failures for genetically supported drug development. Our comprehensive gene\u2013environment study decodes the dynamics of genetic associations, offering insights into complex trait biology, personalized medicine and drug development. A large cross-population atlas of gene\u2013environment interactions reveals how age, sex and lifestyle shape genetic effects, heritability, prediction accuracy and disease biology, with implications for personalized medicine and drug development.",
+    "authors": [
+      "Shinichi Namba",
+      "Kyuto Sonehara",
+      "Yuriko N. Koyanagi",
+      "Takezo Kikuchi",
+      "Takafumi Ojima",
+      "Ryuya Edahiro",
+      "Go Sato",
+      "Taiki Yamaji",
+      "Yoshihiko Tomofuji",
+      "Hiroyuki Ueda",
+      "Kenichi Yamamoto",
+      "Yosuke Ogawa",
+      "Ken Suzuki",
+      "Akinori Kanai",
+      "Shinichi Higashiue",
+      "Shuzo Kobayashi",
+      "Hiroki Yamaguchi",
+      "Yasunobu Nagata",
+      "Yasushi Okazaki",
+      "Naoyuki Matsumoto",
+      "Kenta Motomura",
+      "Hidenobu Koga",
+      "Asahi Hishida",
+      "Hiroaki Ikezaki",
+      "Megumi Hara",
+      "Mako Nagayoshi",
+      "Isao Oze",
+      "Shiori Nakano",
+      "the BioBank Japan Project",
+      "Yoshiya Oda",
+      "Yutaka Suzuki",
+      "Motoki Iwasaki",
+      "Norie Sawada",
+      "Keitaro Matsuo",
+      "Takayuki Morisaki",
+      "T. Yamauchi",
+      "Takashi Kadowaki",
+      "Koichi Matsuda",
+      "Yukinori Okada"
+    ],
+    "year": 2026,
+    "doi": "10.1038/s41586-025-10054-6",
+    "cited_by_count": 6
   },
   {
     "channel": "papers-genomics",
@@ -322856,7 +322993,26 @@
       -0.0125,
       0.1139,
       -0.0165
-    ]
+    ],
+    "abstract": "Deciphering the cis-regulatory logic underlying cell type identity remains a key challenge in biology. Single-cell chromatin accessibility (scATAC-seq) atlases enable training of sequence-to-function (S2F) deep learning models to decode enhancer logic. Yet, optimal criteria for constructing training datasets, i.e., the number of cells and ATAC fragments, remain unclear. Moreover, the suitability of different scATAC-seq platforms for such models has not been systematically tested. We introduce HyDrop v2, an improved custom droplet scATAC-seq method, and perform the first benchmark of scATAC-seq platforms focusing on its capacity to train S2F models and its capacity to yield TF footprints in different species. We show that lower fragment counts can be compensated for by increased cell numbers. S2F models trained on custom or commercial data perform comparably in enhancer prediction, sequence explainability, and transcription factor footprinting. We demonstrate that integrating data from different scATAC-seq platforms enables large-scale, cost-efficient atlas construction for deep learning-based regulatory modeling. Generating high-quality training data for machine learning is costly. Here, authors include sequence-to-function modeling in benchmarking of custom and commercial droplet-based scATAC platforms, and release a new Drosophila embryo atlas along with a new mouse cortex atlas, assessed for model interpretability.",
+    "authors": [
+      "Hannah Dickm\u00e4nken",
+      "Marta Wojno",
+      "Lukas Mahieu",
+      "Koen Theunis",
+      "Eren Can Ek\u015fi",
+      "Valerie Christiaens",
+      "Niklas Kempynck",
+      "Florian De Rop",
+      "Natalie Roels",
+      "Katina I. Spanier",
+      "Roel Vandepoel",
+      "Gert Hulselmans",
+      "Suresh Poovathingal",
+      "Stein Aerts"
+    ],
+    "year": 2026,
+    "doi": "10.1038/s41467-026-68742-4"
   },
   {
     "channel": "papers-genomics",
@@ -323333,7 +323489,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2026.01.20.700496V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.10029888153076172,
@@ -324701,7 +324857,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2026.01.14.699402.Full",
+    "title": "",
     "projections": {
       "pca": [
         -0.14779818058013916,
@@ -325148,7 +325304,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(25)01300 5",
+    "title": "",
     "projections": {
       "pca": [
         0.10972010344266891,
@@ -326029,7 +326185,19 @@
       0.0011,
       0.0546,
       -0.0457
-    ]
+    ],
+    "abstract": "Revealing the underlying cell-state landscape from single-cell data requires overcoming the critical obstacles of batch integration, denoising and dimensionality reduction. Here we present CONCORD, a unified framework that simultaneously addresses these challenges within a single self-supervised model. At its core, CONCORD implements a probabilistic sampling strategy that corrects batch effects through dataset-aware sampling and enhances biological resolution through hard-negative sampling. Using only a minimalist neural network with a single hidden layer and contrastive learning, CONCORD surpasses state-of-the-art performance without relying on deep architectures, auxiliary losses or external supervision. It seamlessly integrates data across batches, technologies and even species to generate high-resolution cell atlases. The resulting latent representations are denoised and biologically meaningful, capturing gene coexpression programs, revealing detailed lineage trajectories and preserving both local geometric relationships and global topological structures. We demonstrate CONCORD's broad applicability across diverse datasets, establishing it as a general-purpose framework for learning unified, high-fidelity representations of cellular identity and dynamics.",
+    "authors": [
+      "Qin Zhu",
+      "Zuzhi Jiang",
+      "Binyamin Zuckerman",
+      "Leor S. Weinberger",
+      "Matt Thomson",
+      "Zev J. Gartner"
+    ],
+    "year": 2026,
+    "doi": "10.1038/s41587-025-02950-z",
+    "cited_by_count": 2
   },
   {
     "channel": "papers-genomics",
@@ -326479,7 +326647,21 @@
       -0.0227,
       0.0607,
       -0.051
-    ]
+    ],
+    "authors": [
+      "Mengzhou Hu",
+      "Sahar Alkhairy",
+      "Ingoo Lee",
+      "Rudolf Pillich",
+      "Dylan Fong",
+      "Kevin R. Smith",
+      "Robin E. Bachelder",
+      "Trey Ideker",
+      "Dexter Pratt"
+    ],
+    "year": 2024,
+    "doi": "10.1038/s41592-024-02525-x",
+    "cited_by_count": 77
   },
   {
     "channel": "papers-genomics",
@@ -326929,7 +327111,29 @@
       -0.0273,
       0.0461,
       0.016
-    ]
+    ],
+    "authors": [
+      "Kshitij Rai",
+      "Ronan W. O\u2019Connell",
+      "Trenton C. Piepergerdes",
+      "Yiduo Wang",
+      "Lucas B. C. Brown",
+      "K Samra",
+      "Jack A. Wilson",
+      "Shujian Lin",
+      "Thomas H. Zhang",
+      "Eduardo M. Ramos",
+      "Andrew Sun",
+      "Bryce Kille",
+      "Kristen D. Curry",
+      "Jason W. Rocks",
+      "Todd J. Treangen",
+      "Pankaj Mehta",
+      "Caleb J. Bashor"
+    ],
+    "year": 2026,
+    "doi": "10.1038/s41586-025-09933-9",
+    "cited_by_count": 6
   },
   {
     "channel": "papers-genomics",
@@ -326945,7 +327149,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         0.014897970482707024,
@@ -327825,7 +328029,23 @@
       0.0022,
       0.0665,
       -0.0114
-    ]
+    ],
+    "abstract": "Gene-set analysis seeks to identify the biological mechanisms underlying groups of genes with shared functions. Large language models (LLMs) have recently shown promise in generating functional descriptions for input gene sets but may produce factually incorrect statements, commonly referred to as hallucinations in LLMs. Here we present GeneAgent, an LLM-based AI agent for gene-set analysis that reduces hallucinations by autonomously interacting with biological databases to verify its own output. Evaluation of 1,106 gene sets collected from different sources demonstrates that GeneAgent is consistently more accurate than GPT-4 by a significant margin. We further applied GeneAgent to seven novel gene sets derived from mouse B2905 melanoma cell lines. Expert review confirmed that GeneAgent produces more relevant and comprehensive functional descriptions than GPT-4, providing valuable insights into gene functions and expediting knowledge discovery.",
+    "authors": [
+      "Zhizheng Wang",
+      "Qiao Jin",
+      "Chih-Hsuan Wei",
+      "Shubo Tian",
+      "Po\u2010Ting Lai",
+      "Qingqing Zhu",
+      "Chi\u2010Ping Day",
+      "Christina Ross",
+      "Robert Leaman",
+      "Zhiyong Lu"
+    ],
+    "year": 2025,
+    "doi": "10.1038/s41592-025-02748-6",
+    "cited_by_count": 37
   },
   {
     "channel": "papers-genomics",
@@ -329700,7 +329920,62 @@
       -0.0191,
       0.0823,
       0.0433
-    ]
+    ],
+    "abstract": "Abstract Mammalian genomes contain millions of regulatory elements that control the complex patterns of gene expression 1 . Previously, the ENCODE consortium mapped biochemical signals across hundreds of cell types and tissues and integrated these data to develop a registry containing 0.9 million human and 300,000 mouse candidate cis -regulatory elements (cCREs) annotated with potential functions 2 . Here we have expanded the registry to include 2.37 million human and 967,000 mouse cCREs, leveraging new ENCODE datasets and enhanced computational methods. This expanded registry covers hundreds of unique cell and tissue types, providing a comprehensive understanding of gene regulation. Functional characterization data from assays such as STARR-seq 3 , massively parallel reporter assay 4 , CRISPR perturbation 5,6 and transgenic mouse assays 7 have profiled more than 90% of human cCREs, revealing complex regulatory functions. We identified thousands of novel silencer cCREs and demonstrated their dual enhancer and silencer roles in different cellular contexts. Integrating the registry with other ENCODE annotations facilitates genetic variation interpretation and trait-associated gene identification, exemplified by the identification of KLF1 as a novel causal gene for red blood cell traits. This expanded registry is a valuable resource for studying the regulatory genome and its impact on health and disease.",
+    "authors": [
+      "J. Russell Moore",
+      "Henry E. Pratt",
+      "Kaili Fan",
+      "Nishigandha Phalke",
+      "Jonathan A. D. Fisher",
+      "Shaimae I. Elhajjajy",
+      "Gregory Andrews",
+      "Mingshi Gao",
+      "Nicole Shedd",
+      "Y. Fu",
+      "Matthew C Lacadie",
+      "Jair Meza",
+      "Mansi Khandpekar",
+      "Mohit Ganna",
+      "Eva Choudhury",
+      "Ross Swofford",
+      "Huong Phan",
+      "C. J. Ram\u00edrez",
+      "Maxwell Campbell",
+      "Mary E. Likhite",
+      "Nina Farrell",
+      "Annika K. Weimer",
+      "Anusri Pampari",
+      "Vivekanandan Ramalingam",
+      "Fairlie Reese",
+      "Beatrice Borsari",
+      "Xuezhu Yu",
+      "Eve S. Wattenberg",
+      "Marina Ruiz-Romero",
+      "Milad Razavi-Mohseni",
+      "Jinrui Xu",
+      "Timur R. Galeev",
+      "Andr\u00e9s Colubri",
+      "M Beer",
+      "Roderic Guig\u00f3",
+      "M. Gerstein",
+      "J Engreitz",
+      "Mats Ljungman",
+      "Timothy E. Reddy",
+      "Michael P. Snyder",
+      "Charles B. Epstein",
+      "Elizabeth Gaskell",
+      "B Bernstein",
+      "Diane E. Dickel",
+      "Axel Visel",
+      "L Pennacchio",
+      "Ali Mortazavi",
+      "Anshul Kundaje",
+      "Zhiping Weng"
+    ],
+    "year": 2026,
+    "doi": "10.1038/s41586-025-09909-9",
+    "cited_by_count": 25
   },
   {
     "channel": "papers-genomics",
@@ -332453,7 +332728,103 @@
       -0.0509,
       0.0768,
       0.0009
-    ]
+    ],
+    "abstract": "to map and analyse the 4D nucleome in widely used H1 human embryonic stem cells and immortalized fibroblasts (HFFc6). We produced and integrated diverse genomic datasets of the 4D nucleome, each contributing unique observations, which enabled us to assemble extensive catalogues of more than 140,000 looping interactions per cell type, to generate detailed classifications and annotations of chromosomal domain types and their subnuclear positions, and to obtain single-cell 3D models of the nuclear environment of all genes including their long-range interactions with distal elements. Through extensive benchmarking, we describe the unique strengths of different genomic assays for studying the 4D nucleome, providing guidelines for future studies. Three-dimensional models of population-based and individual cell-to-cell variation in genome structure showed connections between chromosome folding, nuclear organization, chromatin looping, gene transcription and DNA replication. Finally, we demonstrate the use of computational methods to predict genome folding from DNA sequence, which will facilitate the discovery of potential effects of genetic variants, including variants associated with disease, on genome structure and function.",
+    "authors": [
+      "Job Dekker",
+      "Bet\u00fcl Akg\u00f6l Oksuz",
+      "Yang Zhang",
+      "Ye Wang",
+      "Miriam K. Minsk",
+      "Shuzhen Kuang",
+      "Liyan Yang",
+      "Johan H. Gibcus",
+      "Nils Krietenstein",
+      "Oliver J. Rando",
+      "Jie Xu",
+      "Derek H. Janssens",
+      "Steven Henikoff",
+      "Alexander Kukalev",
+      "Andr\u00e9a Willemin",
+      "Warren Winick\u2010Ng",
+      "Rieke Kempfer",
+      "Ana Pombo",
+      "Miao Yu",
+      "Pradeep Kumar",
+      "Liguo Zhang",
+      "Andrew S. Belmont",
+      "Takayo Sasaki",
+      "Tom van Schaik",
+      "Laura Brueckner",
+      "Daan Peric\u2010Hupkes",
+      "Bas van Steensel",
+      "Ping Wang",
+      "Haoxi Chai",
+      "Minji Kim",
+      "Y Ruan",
+      "Ran Zhang",
+      "Sofia A. Quinodoz",
+      "Prashant Bhat",
+      "Mitchell Guttman",
+      "Wenxin Zhao",
+      "Shu Chien",
+      "Yuan Liu",
+      "Sergey V. Venev",
+      "Dariusz Plewczy\u0144ski",
+      "Ibai Irastorza Azcarate",
+      "Dominik Szab\u00f3",
+      "Christoph J. Thieme",
+      "Teresa Szczepi\u0144ska",
+      "Mateusz Chili\u0144ski",
+      "Kaustav Sengupta",
+      "Mattia Conte",
+      "Andrea Esposito",
+      "Alex Abraham",
+      "Ruochi Zhang",
+      "Yuchuan Wang",
+      "Xingzhao Wen",
+      "Qiuyang Wu",
+      "Yang Yang",
+      "Jie Liu",
+      "Lorenzo Boninsegna",
+      "Asl\u0131 Y\u0131ld\u0131r\u0131m",
+      "Yuxiang Zhan",
+      "Andrea M. Chiariello",
+      "Simona Bianco",
+      "Lindsay Lee",
+      "Ming Hu",
+      "Yun Li",
+      "R. Jordan Barnett",
+      "Ashley L. Cook",
+      "Daniel J. Emerson",
+      "Claire Marchal",
+      "Peiyao Zhao",
+      "Peter J. Park",
+      "B. Alver",
+      "Andrew J. Schroeder",
+      "Rahi Navelkar",
+      "Clara Bakker",
+      "William Ronchetti",
+      "Shannon Ehmsen",
+      "Alexander Veit",
+      "Nils Gehlenborg",
+      "Ting Wang",
+      "Daofeng Li",
+      "Xiaotao Wang",
+      "Mario Nicodemi",
+      "Bing Ren",
+      "Sheng Zhong",
+      "Jennifer E. Phillips\u2010Cremins",
+      "David M. Gilbert",
+      "Katherine S. Pollard",
+      "Frank Alber",
+      "Jian Ma",
+      "William Stafford Noble",
+      "Feng Yue"
+    ],
+    "year": 2025,
+    "doi": "10.1038/s41586-025-09890-3",
+    "cited_by_count": 26
   },
   {
     "channel": "papers-genomics",
@@ -334754,7 +335125,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "Articles",
+    "title": "",
     "projections": {
       "pca": [
         -0.2152717411518097,
@@ -343389,7 +343760,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.24609658122062683,
@@ -356108,7 +356479,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "Callback",
+    "title": "",
     "projections": {
       "pca": [
         -0.09808961302042007,
@@ -357486,7 +357857,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S1097 2765(24)00913 4",
+    "title": "",
     "projections": {
       "pca": [
         -0.14403586089611053,
@@ -357933,7 +358304,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(25)00686 5",
+    "title": "",
     "projections": {
       "pca": [
         -0.13647009432315826,
@@ -362071,7 +362442,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.03295856714248657,
@@ -368493,7 +368864,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "Standardmodel Genomic Foundation Model",
+    "title": "",
     "projections": {
       "pca": [
         0.17670588195323944,
@@ -379873,7 +380244,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -380323,7 +380694,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2025.07.25.666754V1",
+    "title": "",
     "projections": {
       "pca": [
         0.0313723050057888,
@@ -380773,7 +381144,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -381222,7 +381593,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -381671,7 +382042,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.21081146597862244,
@@ -384825,7 +385196,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.024999432265758514,
@@ -386195,7 +386566,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(25)00750 0",
+    "title": "",
     "projections": {
       "pca": [
         -0.2105942964553833,
@@ -390339,7 +390710,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.05039020627737045,
@@ -392159,7 +392530,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -401342,7 +401713,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S2666 979X(25)00036 9",
+    "title": "",
     "projections": {
       "pca": [
         -0.08387777954339981,
@@ -402266,7 +402637,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -411006,7 +411377,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(25)00449 0",
+    "title": "",
     "projections": {
       "pca": [
         -0.026487652212381363,
@@ -412848,7 +413219,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2025.04.27.650894.Full",
+    "title": "",
     "projections": {
       "pca": [
         -0.06412732601165771,
@@ -413772,7 +414143,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2025.04.28.651097V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.009625354781746864,
@@ -414219,7 +414590,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -416058,7 +416429,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.23362192511558533,
@@ -416966,7 +417337,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -417416,7 +417787,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(25)00352 6",
+    "title": "",
     "projections": {
       "pca": [
         0.02418001927435398,
@@ -421522,7 +421893,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.20593905448913574,
@@ -424268,7 +424639,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.07646014541387558,
@@ -424715,7 +425086,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.22165250778198242,
@@ -428345,7 +428716,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S2666 979X(25)00062 X",
+    "title": "",
     "projections": {
       "pca": [
         -0.1353262960910797,
@@ -428794,7 +429165,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.1724986732006073,
@@ -435247,7 +435618,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "Mdd 0 White Paper",
+    "title": "",
     "projections": {
       "pca": [
         -0.078922800719738,
@@ -438010,7 +438381,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.1714164912700653,
@@ -439368,7 +439739,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.039999812841415405,
@@ -441656,7 +442027,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -443487,7 +443858,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.16613943874835968,
@@ -445294,7 +445665,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(24)01435 1",
+    "title": "",
     "projections": {
       "pca": [
         -0.1067836657166481,
@@ -448040,7 +448411,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(24)01268 6",
+    "title": "",
     "projections": {
       "pca": [
         -0.1517726182937622,
@@ -451213,7 +451584,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2024.12.30.630826V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.10516465455293655,
@@ -452130,7 +452501,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S2666 979X(24)00352 5",
+    "title": "",
     "projections": {
       "pca": [
         -0.00854234304279089,
@@ -452579,7 +452950,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.16764558851718903,
@@ -454877,7 +455248,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "Yan Nbt 2024",
+    "title": "",
     "projections": {
       "pca": [
         -0.20242249965667725,
@@ -461261,7 +461632,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.051516421139240265,
@@ -462172,7 +462543,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.06829999387264252,
@@ -472225,7 +472596,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "Pdf",
+    "title": "",
     "projections": {
       "pca": [
         -0.0040348367765545845,
@@ -473606,7 +473977,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(24)01211 X",
+    "title": "",
     "projections": {
       "pca": [
         -0.008856534026563168,
@@ -481457,7 +481828,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2024.11.01.621087V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.08231529593467712,
@@ -481906,7 +482277,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(24)01070 5",
+    "title": "",
     "projections": {
       "pca": [
         -0.1460733860731125,
@@ -482813,7 +483184,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2024.10.24.619766V1",
+    "title": "",
     "projections": {
       "pca": [
         0.12382257729768753,
@@ -486893,7 +487264,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.12726284563541412,
@@ -487804,7 +488175,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.11682391911745071,
@@ -497426,7 +497797,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -500164,7 +500535,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2024.09.16.613342V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.023699475452303886,
@@ -503808,7 +504179,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -507939,7 +508310,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674%2824%2900829 8",
+    "title": "",
     "projections": {
       "pca": [
         0.07823693007230759,
@@ -511122,7 +511493,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(24)00645 7",
+    "title": "",
     "projections": {
       "pca": [
         -0.20559455454349518,
@@ -512479,7 +512850,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2024.08.11.607362V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.06459107249975204,
@@ -513837,7 +514208,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.20593905448913574,
@@ -517947,7 +518318,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.20593905448913574,
@@ -519775,7 +520146,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(24)00645 7",
+    "title": "",
     "projections": {
       "pca": [
         -0.14906424283981323,
@@ -521134,7 +521505,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         0.01889774389564991,
@@ -524323,7 +524694,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0002 9297(24)00165 4",
+    "title": "",
     "projections": {
       "pca": [
         -0.15890765190124512,
@@ -525230,7 +525601,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S1097 2765(24)00222 3",
+    "title": "",
     "projections": {
       "pca": [
         -0.14046232402324677,
@@ -525677,7 +526048,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(24)00461 6",
+    "title": "",
     "projections": {
       "pca": [
         0.033749621361494064,
@@ -527265,7 +527636,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.041407547891139984,
@@ -528630,7 +529001,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "Pdf",
+    "title": "",
     "projections": {
       "pca": [
         -0.19657042622566223,
@@ -529077,7 +529448,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "Chatnt A Multimodal Conversational Agent For Dna Rna And Protein Tasks",
+    "title": "",
     "projections": {
       "pca": [
         0.05085187405347824,
@@ -530441,7 +530812,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2024.04.15.589472V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.08532726764678955,
@@ -532257,7 +532628,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         0.04902664199471474,
@@ -535443,7 +535814,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "ojs.aaai.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.1872328370809555,
@@ -537262,7 +537633,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.29648467898368835,
@@ -540902,7 +541273,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2024.02.22.580842V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.10337027162313461,
@@ -544227,7 +544598,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2024.01.25.577262V2",
+    "title": "",
     "projections": {
       "pca": [
         -0.08848963677883148,
@@ -547457,7 +547828,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(23)01438 1",
+    "title": "",
     "projections": {
       "pca": [
         -0.13619454205036163,
@@ -549734,7 +550105,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.24953116476535797,
@@ -551547,7 +551918,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S1097 2765(23)00966 8",
+    "title": "",
     "projections": {
       "pca": [
         -0.15176431834697723,
@@ -561569,7 +561940,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -571697,7 +572068,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         0.08528486639261246,
@@ -573053,7 +573424,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S2666 979X(23)00224 0",
+    "title": "",
     "projections": {
       "pca": [
         0.10274650156497955,
@@ -579938,7 +580309,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.1550220102071762,
@@ -580385,7 +580756,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S2405 4712(23)00186 2",
+    "title": "",
     "projections": {
       "pca": [
         -0.12139970064163208,
@@ -581292,7 +581663,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.2079641968011856,
@@ -586806,7 +587177,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2023.06.15.545194V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.10060542821884155,
@@ -587711,7 +588082,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2023.06.06.543925V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.15319101512432098,
@@ -595148,7 +595519,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2022.11.09.515833V1",
+    "title": "",
     "projections": {
       "pca": [
         0.07545079290866852,
@@ -596976,7 +597347,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(23)00161 7",
+    "title": "",
     "projections": {
       "pca": [
         0.00860764179378748,
@@ -599265,7 +599636,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.20593905448913574,
@@ -600183,7 +600554,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.02366110496222973,
@@ -603841,7 +604212,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "linkinghub.elsevier.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.1414460688829422,
@@ -605207,7 +605578,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.0703161209821701,
@@ -611105,7 +611476,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2022.12.21.521373V1",
+    "title": "",
     "projections": {
       "pca": [
         0.003031034953892231,
@@ -611552,7 +611923,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.026850717142224312,
@@ -613820,7 +614191,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.20325157046318054,
@@ -616065,7 +616436,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.21833497285842896,
@@ -619904,7 +620275,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2022.10.28.513978V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.10216306149959564,
@@ -620351,7 +620722,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.10291162878274918,
@@ -629918,7 +630289,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2022.08.05.502903V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.06488797813653946,
@@ -635818,7 +636189,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "peerj.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.09336433559656143,
@@ -637174,7 +637545,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2022.06.15.496201V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.10913600772619247,
@@ -640364,7 +640735,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2022.05.20.492818V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.16889342665672302,
@@ -642188,7 +642559,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "Science.Abl4290Another",
+    "title": "",
     "projections": {
       "pca": [
         -0.12594451010227203,
@@ -646254,7 +646625,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2021.05.29.446316V2",
+    "title": "",
     "projections": {
       "pca": [
         0.03927198424935341,
@@ -649454,7 +649825,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2022.02.26.482133V1",
+    "title": "",
     "projections": {
       "pca": [
         0.15484055876731873,
@@ -650351,7 +650722,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         0.05738772451877594,
@@ -651705,7 +652076,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(22)00003 4",
+    "title": "",
     "projections": {
       "pca": [
         0.08228069543838501,
@@ -653061,7 +653432,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.011366233229637146,
@@ -654866,7 +655237,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.1332750767469406,
@@ -656701,7 +657072,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "pnas.org",
+    "title": "",
     "projections": {
       "pca": [
         0.12269040942192078,
@@ -657148,7 +657519,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         0.12084289640188217,
@@ -657595,7 +657966,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "pnas.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.07219009846448898,
@@ -660778,7 +661149,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.20593905448913574,
@@ -661673,7 +662044,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(21)01279 4",
+    "title": "",
     "projections": {
       "pca": [
         -0.218971386551857,
@@ -662568,7 +662939,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "Lipics Wabi 2020 2",
+    "title": "",
     "projections": {
       "pca": [
         -0.17219620943069458,
@@ -663920,7 +664291,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2021.10.29.466407V1",
+    "title": "",
     "projections": {
       "pca": [
         0.009537811391055584,
@@ -667572,7 +667943,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "Scholar Url",
+    "title": "",
     "projections": {
       "pca": [
         -0.11928984522819519,
@@ -675757,7 +676128,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "V1 Covered",
+    "title": "",
     "projections": {
       "pca": [
         -0.0016889988910406828,
@@ -678493,7 +678864,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S0092 8674(21)00942 9",
+    "title": "",
     "projections": {
       "pca": [
         -0.19765590131282806,
@@ -679857,7 +680228,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.26637816429138184,
@@ -680304,7 +680675,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -683492,7 +683863,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -686179,7 +686550,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -687540,7 +687911,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.20593905448913574,
@@ -687987,7 +688358,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2021.02.10.430606V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.09158767014741898,
@@ -689844,7 +690215,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "E2026754118.Short",
+    "title": "",
     "projections": {
       "pca": [
         -0.12823230028152466,
@@ -690291,7 +690662,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.006990272086113691,
@@ -691186,7 +691557,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "721720V3.Full.Pdf Html",
+    "title": "",
     "projections": {
       "pca": [
         -0.1748780608177185,
@@ -692089,7 +692460,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2021.04.29.441979V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.18210235238075256,
@@ -694819,7 +695190,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2021.04.17.440295V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.0795433297753334,
@@ -696651,7 +697022,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.2611396908760071,
@@ -697098,7 +697469,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "Gr.260851.120.Full",
+    "title": "",
     "projections": {
       "pca": [
         -0.1956380009651184,
@@ -699814,7 +700185,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2021.04.05.438382V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.08201940357685089,
@@ -703929,7 +704300,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "pnas.org",
+    "title": "",
     "projections": {
       "pca": [
         0.02877105213701725,
@@ -704376,7 +704747,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.20593905448913574,
@@ -706191,7 +706562,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.23606465756893158,
@@ -706638,7 +707009,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2090.Full",
+    "title": "",
     "projections": {
       "pca": [
         0.144409641623497,
@@ -708459,7 +708830,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.21159255504608154,
@@ -712072,7 +712443,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         0.18535438179969788,
@@ -713415,7 +713786,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -714310,7 +714681,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "Scholar Url",
+    "title": "",
     "projections": {
       "pca": [
         -0.12469609081745148,
@@ -717967,7 +718338,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2021.02.08.430070V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.09330890327692032,
@@ -719330,7 +719701,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -720225,7 +720596,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.041336268186569214,
@@ -724280,7 +724651,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "pnas.org",
+    "title": "",
     "projections": {
       "pca": [
         0.02877105213701725,
@@ -724727,7 +725098,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.20593905448913574,
@@ -726082,7 +726453,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2020.11.26.400739V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.11948566138744354,
@@ -727446,7 +727817,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.20593905448913574,
@@ -728799,7 +729170,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2020.10.16.342857V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.057346079498529434,
@@ -729696,7 +730067,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.20593905448913574,
@@ -733030,7 +733401,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.17730078101158142,
@@ -733477,7 +733848,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -734382,7 +734753,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "2020 4",
+    "title": "",
     "projections": {
       "pca": [
         0.11040080338716507,
@@ -736183,7 +736554,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "364976.Full",
+    "title": "",
     "projections": {
       "pca": [
         -0.16117511689662933,
@@ -736630,7 +737001,7 @@
     "channels": [
       "papers-genomics"
     ],
-    "title": "S1097 2765(20)30352 X",
+    "title": "",
     "projections": {
       "pca": [
         -0.1359879970550537,
@@ -741630,7 +742001,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "2025 Nabla Jam2",
+    "title": "",
     "projections": {
       "pca": [
         -0.05956320837140083,
@@ -742999,7 +743370,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "Boltzgen",
+    "title": "",
     "projections": {
       "pca": [
         0.0342954620718956,
@@ -744348,7 +744719,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.18438531458377838,
@@ -749364,7 +749735,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "S0092 8674(25)00855 4",
+    "title": "",
     "projections": {
       "pca": [
         -0.13552455604076385,
@@ -751213,7 +751584,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "2025.08.01.668221V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.0866839811205864,
@@ -754893,7 +755264,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "Technical Report",
+    "title": "",
     "projections": {
       "pca": [
         0.03380603343248367,
@@ -758558,7 +758929,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "P 163085988",
+    "title": "",
     "projections": {
       "pca": [
         0.010090398602187634,
@@ -763591,7 +763962,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -781538,7 +781909,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "Boltz1",
+    "title": "",
     "projections": {
       "pca": [
         0.05207730829715729,
@@ -788865,7 +789236,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "nature.com",
+    "title": "Nature",
     "abstract": "First published in 1869, Nature is the world\u2019s leading multidisciplinary science journal. Nature publishes the finest peer-reviewed research that drives ground-breaking discovery, and is read by thought-leaders and decision-makers around the world.",
     "projections": {
       "pca": [
@@ -792967,7 +793338,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "Esm3",
+    "title": "",
     "projections": {
       "pca": [
         -0.002136767376214266,
@@ -796150,7 +796521,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "2023.04.17.536962V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.08546745032072067,
@@ -797512,7 +797883,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.08342372626066208,
@@ -799360,7 +799731,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "2024.03.07.584001V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.09200344979763031,
@@ -800264,7 +800635,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -806221,7 +806592,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "2023.12.13.571462V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.1780308037996292,
@@ -808980,7 +809351,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "S2405 4712(23)00272 7",
+    "title": "",
     "projections": {
       "pca": [
         -0.13332922756671906,
@@ -809427,7 +809798,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "2023.11.09.566187V1",
+    "title": "",
     "projections": {
       "pca": [
         0.010051250457763672,
@@ -813523,7 +813894,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "2023.09.20.558720V1.Full.Pdf Html",
+    "title": "",
     "projections": {
       "pca": [
         0.23957395553588867,
@@ -824988,7 +825359,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "2022.04.26.489314V2",
+    "title": "",
     "projections": {
       "pca": [
         -0.09866505861282349,
@@ -830954,7 +831325,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "Ingraham2022",
+    "title": "",
     "projections": {
       "pca": [
         -0.010377016849815845,
@@ -831403,7 +831774,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "Diffusion Preprint 12012022",
+    "title": "",
     "projections": {
       "pca": [
         0.02337445691227913,
@@ -836453,7 +836824,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         0.11552152782678604,
@@ -836903,7 +837274,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "ieeexplore.ieee.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.2755146324634552,
@@ -849254,7 +849625,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "2021.07.18.452833V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.08579003810882568,
@@ -852927,7 +853298,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "2021.04.25.441334V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.08216225355863571,
@@ -854727,7 +855098,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -864285,7 +864656,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "2020.07.31.231381V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.109002985060215,
@@ -866542,7 +866913,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "2020.06.13.148718V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.10333376377820969,
@@ -868369,7 +868740,7 @@
     "channels": [
       "papers-protein"
     ],
-    "title": "pnas.org",
+    "title": "",
     "projections": {
       "pca": [
         0.02877105213701725,
@@ -871078,7 +871449,7 @@
     "channels": [
       "papers-phenomics"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.01710755005478859,
@@ -871982,7 +872353,7 @@
     "channels": [
       "papers-phenomics"
     ],
-    "title": "Papers.Cfm",
+    "title": "",
     "projections": {
       "pca": [
         -0.16322928667068481,
@@ -872431,7 +872802,7 @@
     "channels": [
       "papers-phenomics"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.06759963184595108,
@@ -873329,7 +873700,7 @@
     "channels": [
       "papers-phenomics"
     ],
-    "title": "Dawn Of A New Era Of Primary Prevention",
+    "title": "",
     "projections": {
       "pca": [
         -0.0673367828130722,
@@ -879289,7 +879660,7 @@
     "channels": [
       "papers-phenomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         0.03575493022799492,
@@ -881556,7 +881927,7 @@
     "channels": [
       "papers-phenomics"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.20593905448913574,
@@ -893881,7 +894252,7 @@
     "channels": [
       "papers-ai-agents"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.05215851590037346,
@@ -904996,7 +905367,7 @@
     "channels": [
       "papers-ai-agents"
     ],
-    "title": "2025.07.01.662467V1",
+    "title": "",
     "projections": {
       "pca": [
         -0.08001264929771423,
@@ -909081,7 +909452,7 @@
     "channels": [
       "papers-ai-agents"
     ],
-    "title": "Paper",
+    "title": "",
     "projections": {
       "pca": [
         -0.12194971740245819,
@@ -909987,7 +910358,7 @@
     "channels": [
       "papers-ai-agents"
     ],
-    "title": "biorxiv.org",
+    "title": "",
     "projections": {
       "pca": [
         0.005463059525936842,
@@ -914557,7 +914928,7 @@
     "channels": [
       "papers-ai-agents"
     ],
-    "title": "A Practical Guide To Building Agents",
+    "title": "",
     "projections": {
       "pca": [
         -0.25007832050323486,
@@ -918669,7 +919040,7 @@
     "channels": [
       "papers-ai-agents"
     ],
-    "title": "Pdf",
+    "title": "",
     "projections": {
       "pca": [
         -0.14114834368228912,
@@ -919118,7 +919489,7 @@
     "channels": [
       "papers-ai-agents"
     ],
-    "title": "arXiv:2503.00096v2",
+    "title": "BixBench: a Comprehensive Benchmark for LLM-based Agents in Computational Biology",
     "projections": {
       "pca": [
         -0.18877890706062317,
@@ -919549,7 +919920,23 @@
       0.0507,
       -0.0667,
       -0.0095
-    ]
+    ],
+    "abstract": "Large Language Models (LLMs) and LLM-based agents show great promise in accelerating scientific research. Existing benchmarks for measuring this potential and guiding future development continue to evolve from pure recall and rote knowledge tasks, towards more practical work such as literature review and experimental planning. Bioinformatics is a domain where fully autonomous AI-driven discovery may be near, but no extensive benchmarks for measuring progress have been introduced to date. We therefore present the Bioinformatics Benchmark (BixBench), a dataset comprising over 50 real-world scenarios of practical biological data analysis with nearly 300 associated open-answer questions designed to measure the ability of LLM-based agents to explore biological datasets, perform long, multi-step analytical trajectories, and interpret the nuanced results of those analyses. We evaluate the performance of two frontier LLMs (GPT-4o and Claude 3.5 Sonnet) using a custom agent framework we open source. We find that even the latest frontier models only achieve 17% accuracy in the open-answer regime, and no better than random in a multiple-choice setting. By exposing the current limitations of frontier models, we hope BixBench can spur the development of agents capable of conducting rigorous bioinformatic analysis and accelerate scientific discovery.",
+    "authors": [
+      "Mitchener, Ludovico",
+      "Laurent, Jon M",
+      "Andonian, Alex",
+      "Tenmann, Benjamin",
+      "Narayanan, Siddharth",
+      "Wellawatte, Geemi P",
+      "White, Andrew",
+      "Sani, Lorenzo",
+      "Rodriques, Samuel G"
+    ],
+    "year": 2025,
+    "journal": "arXiv (Cornell University)",
+    "doi": "10.48550/arxiv.2503.00096",
+    "cited_by_count": 10
   },
   {
     "channel": "papers-ai-agents",
@@ -922315,7 +922702,7 @@
     "channels": [
       "papers-health"
     ],
-    "title": "S0092 8674(26)00458 7",
+    "title": "",
     "projections": {
       "pca": [
         -0.15046998858451843,
@@ -926871,7 +927258,7 @@
     "channels": [
       "papers-health"
     ],
-    "title": "S0092 8674(26)00099 1",
+    "title": "",
     "projections": {
       "pca": [
         -0.1305677592754364,
@@ -930490,7 +930877,7 @@
     "channels": [
       "papers-health"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.21574395895004272,
@@ -933732,7 +934119,7 @@
     "channels": [
       "papers-health"
     ],
-    "title": "S0092 8674(25)01312 1",
+    "title": "",
     "projections": {
       "pca": [
         -0.07933879643678665,
@@ -936001,7 +936388,7 @@
     "channels": [
       "general"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.1041981652379036,
@@ -936450,7 +936837,7 @@
     "channels": [
       "general"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.12778934836387634,
@@ -937811,7 +938198,7 @@
     "channels": [
       "general"
     ],
-    "title": "2025.06.25.661532V2.Supplementary Material",
+    "title": "",
     "projections": {
       "pca": [
         -0.02631755918264389,
@@ -939173,7 +939560,7 @@
     "channels": [
       "general"
     ],
-    "title": "S0092 8674(25)00675 0",
+    "title": "",
     "projections": {
       "pca": [
         0.07971806079149246,
@@ -940522,7 +940909,7 @@
     "channels": [
       "general"
     ],
-    "title": "Diffusion",
+    "title": "",
     "projections": {
       "pca": [
         -0.24049243330955505,
@@ -940971,7 +941358,7 @@
     "channels": [
       "general"
     ],
-    "title": "Generative%20Ai%20In%20%20Nlp%202025",
+    "title": "",
     "projections": {
       "pca": [
         -0.22657757997512817,
@@ -941420,7 +941807,7 @@
     "channels": [
       "general"
     ],
-    "title": "Karstenkreis Genai Vision 2025",
+    "title": "",
     "projections": {
       "pca": [
         -0.22146357595920563,
@@ -941869,7 +942256,7 @@
     "channels": [
       "general"
     ],
-    "title": "Day 1 Fundamentals Biwei%20Huangpdf",
+    "title": "",
     "projections": {
       "pca": [
         -0.20078103244304657,
@@ -942318,7 +942705,7 @@
     "channels": [
       "general"
     ],
-    "title": "Day 1 Fundamentals Richard Willis",
+    "title": "",
     "projections": {
       "pca": [
         -0.20006206631660461,
@@ -942767,7 +943154,7 @@
     "channels": [
       "general"
     ],
-    "title": "Day 2 Fundamentals Chi Jin",
+    "title": "",
     "projections": {
       "pca": [
         -0.19319824874401093,
@@ -943216,7 +943603,7 @@
     "channels": [
       "general"
     ],
-    "title": "Day 2 Fundamentals Ishan Misra",
+    "title": "",
     "projections": {
       "pca": [
         -0.19939164817333221,
@@ -943665,7 +944052,7 @@
     "channels": [
       "general"
     ],
-    "title": "Oxml%202025%20Practical%20Tutorial%20Deep%20Learning%20And%20Representation%20Learning",
+    "title": "",
     "projections": {
       "pca": [
         -0.2112564891576767,
@@ -945478,7 +945865,7 @@
       "general",
       "random"
     ],
-    "title": "Mml Book",
+    "title": "",
     "projections": {
       "pca": [
         -0.2588275372982025,
@@ -946849,7 +947236,7 @@
     "channels": [
       "general"
     ],
-    "title": "Designing Dna With Tunable Regulatory Activity Using Discrete Diffusion 73Fqrrajt2Fd5W6",
+    "title": "",
     "projections": {
       "pca": [
         0.06951858848333359,
@@ -949094,7 +949481,7 @@
     "channels": [
       "general"
     ],
-    "title": "Breaking Superconductor News",
+    "title": "",
     "projections": {
       "pca": [
         -0.13007648289203644,
@@ -950907,7 +951294,7 @@
     "channels": [
       "general"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.057890743017196655,
@@ -956765,7 +957152,7 @@
     "channels": [
       "general"
     ],
-    "title": "Sagt",
+    "title": "",
     "projections": {
       "pca": [
         -0.17602847516536713,
@@ -958560,7 +958947,7 @@
     "channels": [
       "general"
     ],
-    "title": "Ag 8",
+    "title": "",
     "projections": {
       "pca": [
         -0.025485331192612648,
@@ -959907,7 +960294,7 @@
     "channels": [
       "general"
     ],
-    "title": "20 1316",
+    "title": "",
     "projections": {
       "pca": [
         -0.25948068499565125,
@@ -960354,7 +960741,7 @@
     "channels": [
       "general"
     ],
-    "title": "Graduate",
+    "title": "",
     "projections": {
       "pca": [
         -0.08261315524578094,
@@ -961249,7 +961636,7 @@
     "channels": [
       "general"
     ],
-    "title": "S0092 8674(16)30328 2",
+    "title": "",
     "projections": {
       "pca": [
         0.08717439323663712,
@@ -967132,7 +967519,7 @@
     "channels": [
       "general"
     ],
-    "title": "Machine Learning And Deep Learning",
+    "title": "",
     "projections": {
       "pca": [
         -0.3013407588005066,
@@ -973435,7 +973822,7 @@
     "channels": [
       "random"
     ],
-    "title": "S0092 8674(24)01091 2",
+    "title": "",
     "projections": {
       "pca": [
         -0.1352699249982834,
@@ -975232,7 +975619,7 @@
     "channels": [
       "random"
     ],
-    "title": "Lila Sciences Said In Talks For Funds At 8 5 Billion Valuation",
+    "title": "",
     "projections": {
       "pca": [
         -0.10361431539058685,
@@ -978377,7 +978764,7 @@
     "channels": [
       "random"
     ],
-    "title": "2026.04.26.720920.Full",
+    "title": "",
     "projections": {
       "pca": [
         0.16944092512130737,
@@ -981071,7 +981458,7 @@
     "channels": [
       "random"
     ],
-    "title": "Anthropic Acquires Startup Coefficient Bio 400 Million",
+    "title": "",
     "projections": {
       "pca": [
         -0.06407826393842697,
@@ -981968,7 +982355,7 @@
     "channels": [
       "random"
     ],
-    "title": "Identifying Systemic Bottlenecks",
+    "title": "",
     "projections": {
       "pca": [
         -0.14205117523670197,
@@ -990981,7 +991368,7 @@
     "channels": [
       "random"
     ],
-    "title": "Endorse",
+    "title": "",
     "projections": {
       "pca": [
         -0.04228704050183296,
@@ -993683,7 +994070,7 @@
     "channels": [
       "random"
     ],
-    "title": "Highly Opinionated Advice On How To Write Ml Papers",
+    "title": "",
     "projections": {
       "pca": [
         -0.22561484575271606,
@@ -998192,7 +998579,7 @@
     "channels": [
       "random"
     ],
-    "title": "Alphaevolve On Google Cloud",
+    "title": "",
     "projections": {
       "pca": [
         -0.15143069624900818,
@@ -1002243,7 +1002630,7 @@
     "channels": [
       "random"
     ],
-    "title": "Everything About Transformers",
+    "title": "",
     "abstract": "A visual, intuitive deep dive into transformer architecture: history, design choices, and the why behind attention, masking, and positional encoding.",
     "projections": {
       "pca": [
@@ -1005393,7 +1005780,7 @@
     "channels": [
       "random"
     ],
-    "title": "How To Become A Mechanistic Interpretability Researcher",
+    "title": "",
     "projections": {
       "pca": [
         -0.19217552244663239,
@@ -1009439,7 +1009826,7 @@
     "channels": [
       "random"
     ],
-    "title": "Distribution Shift",
+    "title": "",
     "projections": {
       "pca": [
         -0.2674989104270935,
@@ -1012597,7 +1012984,7 @@
     "channels": [
       "random"
     ],
-    "title": "Unethical Ai Research Reddit Under Fire",
+    "title": "",
     "projections": {
       "pca": [
         -0.2093818634748459,
@@ -1014404,7 +1014791,7 @@
     "channels": [
       "random"
     ],
-    "title": "Hit The Vintage Store And Get Yourself",
+    "title": "",
     "projections": {
       "pca": [
         -0.15170323848724365,
@@ -1016203,7 +1016590,7 @@
     "channels": [
       "random"
     ],
-    "title": "mdpi.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.21955181658267975,
@@ -1017546,7 +1017933,7 @@
     "channels": [
       "random"
     ],
-    "title": "Exclusive Nsf Starts Vetting All Grants Comply Trump S Orders",
+    "title": "",
     "projections": {
       "pca": [
         -0.14840608835220337,
@@ -1020007,7 +1020394,7 @@
     "channels": [
       "random"
     ],
-    "title": "Trump Hits Nih Devastating Freezes Meetings Travel Communications And Hiring",
+    "title": "",
     "projections": {
       "pca": [
         -0.13440734148025513,
@@ -1021849,7 +1022236,7 @@
     "channels": [
       "random"
     ],
-    "title": "Distinguishing Real From Invented",
+    "title": "",
     "projections": {
       "pca": [
         -0.2958855926990509,
@@ -1030983,7 +1031370,7 @@
     "channels": [
       "random"
     ],
-    "title": "An Extremely Opinionated Annotated List Of My Favourite 1",
+    "title": "",
     "projections": {
       "pca": [
         -0.19950242340564728,
@@ -1031430,7 +1031817,7 @@
     "channels": [
       "random"
     ],
-    "title": "C8Hpr",
+    "title": "",
     "projections": {
       "pca": [
         -0.17567332088947296,
@@ -1032332,7 +1032719,7 @@
     "channels": [
       "random"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.17284919321537018,
@@ -1033230,7 +1033617,7 @@
     "channels": [
       "random"
     ],
-    "title": "Li Tuobang",
+    "title": "",
     "projections": {
       "pca": [
         -0.098308265209198,
@@ -1033679,7 +1034066,7 @@
     "channels": [
       "random"
     ],
-    "title": "The Impact Of Aiml In Drug Discovery",
+    "title": "",
     "projections": {
       "pca": [
         -0.06667601317167282,
@@ -1037273,7 +1037660,7 @@
     "channels": [
       "random"
     ],
-    "title": "Old",
+    "title": "",
     "projections": {
       "pca": [
         -0.2438136339187622,
@@ -1038170,7 +1038557,7 @@
     "channels": [
       "random"
     ],
-    "title": "S0092 8674(24)00304 0",
+    "title": "",
     "projections": {
       "pca": [
         -0.11938733607530594,
@@ -1039067,7 +1039454,7 @@
     "channels": [
       "random"
     ],
-    "title": "Critical Linux Backdoor Xz Utils Discovered What To Know",
+    "title": "",
     "projections": {
       "pca": [
         -0.15634112060070038,
@@ -1049385,7 +1049772,7 @@
     "channels": [
       "random"
     ],
-    "title": "Introducing Prxlife",
+    "title": "",
     "projections": {
       "pca": [
         -0.04930698499083519,
@@ -1050740,7 +1051127,7 @@
     "channels": [
       "random"
     ],
-    "title": "github.com",
+    "title": "Show outputs below cells during interactive sessions \u00b7 Issue #183350 \u00b7 microsoft/vscode \u00b7 GitHub",
     "projections": {
       "pca": [
         -0.19466739892959595,
@@ -1054789,7 +1055176,7 @@
     "channels": [
       "random"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.1766486018896103,
@@ -1056582,7 +1056969,7 @@
     "channels": [
       "random"
     ],
-    "title": "How Ai That Powers Chatbots And Search Queries Could Discover New Drugs 11670428795",
+    "title": "",
     "projections": {
       "pca": [
         -0.12446578592061996,
@@ -1058832,7 +1059219,7 @@
     "channels": [
       "random"
     ],
-    "title": "S0092 8674(22)01253 3",
+    "title": "",
     "projections": {
       "pca": [
         -0.029429664835333824,
@@ -1060624,7 +1061011,7 @@
     "channels": [
       "random"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.03470512479543686,
@@ -1062427,7 +1062814,7 @@
     "channels": [
       "random"
     ],
-    "title": "jstor.org",
+    "title": "",
     "projections": {
       "pca": [
         -0.1905451864004135,
@@ -1062874,7 +1063261,7 @@
     "channels": [
       "random"
     ],
-    "title": "Prominent Biologist David Sabatini Out Mit After Breaching Sexual Relationship Policy",
+    "title": "",
     "projections": {
       "pca": [
         -0.029355395585298538,
@@ -1065600,7 +1065987,7 @@
     "channels": [
       "random"
     ],
-    "title": "Performance",
+    "title": "",
     "projections": {
       "pca": [
         -0.2740686237812042,
@@ -1066497,7 +1066884,7 @@
     "channels": [
       "random"
     ],
-    "title": "Academic Job Market Or Squid Game",
+    "title": "",
     "projections": {
       "pca": [
         -0.2037634551525116,
@@ -1066944,7 +1067331,7 @@
     "channels": [
       "random"
     ],
-    "title": "Full",
+    "title": "",
     "projections": {
       "pca": [
         -0.14946983754634857,
@@ -1067839,7 +1068226,7 @@
     "channels": [
       "koolab-core-members"
     ],
-    "title": "2025.09.30.679565V1.Supplementary Material",
+    "title": "",
     "projections": {
       "pca": [
         0.06447632610797882,
@@ -1068288,7 +1068675,7 @@
     "channels": [
       "koolab-core-members"
     ],
-    "title": "readwise-assets.s3.amazonaws.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.16880328953266144,

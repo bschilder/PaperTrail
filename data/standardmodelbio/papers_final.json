@@ -1815,7 +1815,7 @@
     "channels": [
       "standardmodelbio"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.16711072623729706,
@@ -3173,7 +3173,7 @@
     "channels": [
       "standardmodelbio"
     ],
-    "title": "Smb Trialmatch V1 8B Instruct",
+    "title": "",
     "projections": {
       "pca": [
         0.26665082573890686,
@@ -4070,7 +4070,7 @@
     "channels": [
       "standardmodelbio"
     ],
-    "title": "Eitc Ctc Wage Tax Wptc Notice Flyer",
+    "title": "",
     "projections": {
       "pca": [
         0.3142404854297638,
@@ -7220,7 +7220,7 @@
     "channels": [
       "standardmodelbio"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.02143469825387001,
@@ -7670,7 +7670,7 @@
     "channels": [
       "standardmodelbio"
     ],
-    "title": "Biobyte 135 Improvements To Biosecurity",
+    "title": "",
     "projections": {
       "pca": [
         0.019519833847880363,
@@ -8117,7 +8117,7 @@
     "channels": [
       "standardmodelbio"
     ],
-    "title": "Attachment",
+    "title": "",
     "projections": {
       "pca": [
         0.16183002293109894,
@@ -15757,7 +15757,7 @@
     "channels": [
       "standardmodelbio"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.03957651928067207,
@@ -16652,7 +16652,7 @@
     "channels": [
       "standardmodelbio"
     ],
-    "title": "Qwen3 Mm 4B",
+    "title": "",
     "projections": {
       "pca": [
         0.0779421329498291,
@@ -21163,7 +21163,7 @@
     "channels": [
       "standardmodelbio"
     ],
-    "title": "github.com",
+    "title": "Automatically disable copilot in dotenv files \u00b7 Issue #135 \u00b7 github/copilot.vim \u00b7 GitHub",
     "projections": {
       "pca": [
         0.3484995365142822,
@@ -26109,7 +26109,7 @@
     "channels": [
       "standardmodelbio"
     ],
-    "title": "github.com",
+    "title": "Better Error Message for SymIntArrayRef expected to contain only concrete integers \u00b7 Issue #140960 \u00b7 pytorch/pytorch \u00b7 GitHub",
     "projections": {
       "pca": [
         0.27956318855285645,
@@ -26556,7 +26556,7 @@
     "channels": [
       "standardmodelbio"
     ],
-    "title": "Deep Learning Is Applied Topology",
+    "title": "",
     "projections": {
       "pca": [
         -0.15239696204662323,
@@ -37347,7 +37347,7 @@
     "channels": [
       "standardmodelbio"
     ],
-    "title": "Hai Ai Index Report 2025",
+    "title": "",
     "projections": {
       "pca": [
         0.0764932930469513,
@@ -38731,7 +38731,7 @@
     "channels": [
       "standardmodelbio"
     ],
-    "title": "Btz342",
+    "title": "Preparing to download ...",
     "projections": {
       "pca": [
         0.1580525040626526,
@@ -40075,7 +40075,7 @@
     "channels": [
       "social-fun"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         0.2469363659620285,
@@ -40973,7 +40973,7 @@
     "channels": [
       "social-fun"
     ],
-    "title": "Nasdaqs Shame",
+    "title": "",
     "projections": {
       "pca": [
         0.16871874034404755,
@@ -41420,7 +41420,7 @@
     "channels": [
       "social-fun"
     ],
-    "title": "Did Claude 3 Opus Align Itself Via Gradient Hacking",
+    "title": "",
     "projections": {
       "pca": [
         0.08946078270673752,
@@ -42763,7 +42763,7 @@
     "channels": [
       "social-fun"
     ],
-    "title": "I Think Substrate Is Fraudulent Part",
+    "title": "",
     "projections": {
       "pca": [
         0.25984880328178406,
@@ -44110,7 +44110,7 @@
     "channels": [
       "social-fun"
     ],
-    "title": "232271307 A Difficult Case Diagnosis Made By Hallucinatory Voices",
+    "title": "",
     "projections": {
       "pca": [
         0.017098302021622658,
@@ -44557,7 +44557,7 @@
     "channels": [
       "social-fun"
     ],
-    "title": "bmj.com",
+    "title": "",
     "projections": {
       "pca": [
         0.18680985271930695,
@@ -51822,7 +51822,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "1781805778 Baseten Research Sft",
+    "title": "",
     "projections": {
       "pca": [
         0.07328519225120544,
@@ -62239,7 +62239,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "Rhaister Manuscript",
+    "title": "",
     "projections": {
       "pca": [
         0.1101774275302887,
@@ -62686,7 +62686,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "Dark14",
+    "title": "",
     "projections": {
       "pca": [
         0.22873039543628693,
@@ -67213,7 +67213,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "Esm Protein",
+    "title": "",
     "projections": {
       "pca": [
         -0.0650222972035408,
@@ -69939,7 +69939,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "arXiv:2605.18324v1",
+    "title": "Improved Baselines with Representation Autoencoders",
     "projections": {
       "pca": [
         0.16460800170898438,
@@ -70370,7 +70370,19 @@
       0.0647,
       -0.0128,
       0.035
-    ]
+    ],
+    "abstract": "Representation Autoencoders (RAE) replace traditional VAE with pretrained vision encoders. In this paper, we systematically investigate several design choices and find three insights which simplify and improve RAE. First, we study a generalized formulation where the representation is defined as sum of the last k encoder layers rather than solely the final layer. This simple change greatly improves reconstruction without encoder finetuning or specialized data (e.g., text, faces). Second, we study the prevalent assumption that RAE (using pretrained representation as encoder) replaces representation alignment (REPA), which distills the same representation to intermediate layers instead. Through large-scale empirical analysis, we uncover a surprising finding: RAE and REPA exhibit complementary working mechanisms, allowing the same representation to be used as both encoder and target for intermediate diffusion layers. Finally, the original RAE struggles with classifier-free guidance (CFG) and requires training a second, weaker diffusion model for AutoGuidance (AG). We show that REPA itself can be viewed as x-prediction in RAE latent space. By simply re-parameterizing the output of the DiT model, it can provide guidance for \"free\". Overall, RAEv2 leads to more than 10x faster convergence over the original RAE, achieving a state-of-the-art gFID of 1.06 in just 80 epochs on ImageNet-256. On FDr6, RAEv2 achieves a state-of-the-art 2.17 at just 80 epochs compared to the previous best 3.26 (800 epochs) without any post-training. This motivates EPFID@k (epochs to reach unguided gFID &lt; k) as a measure of training efficiency. RAEv2 attains an EPFID@2 of 35 epochs, versus 177 for the original RAE. We also validate our approach across diverse settings for text-to-image generation and navigation world models, showing consistent improvements. The code is available at https://raev2.github.io.",
+    "authors": [
+      "Jaskirat Singh",
+      "Boyang Zheng",
+      "Zongze Wu",
+      "Richard Zhang",
+      "Eli Shechtman",
+      "Saining Xie"
+    ],
+    "year": 2026,
+    "journal": "arXiv (Cornell University)",
+    "doi": "10.48550/arxiv.2605.18324"
   },
   {
     "channel": "area-literature",
@@ -79476,7 +79488,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "S0092 8674(26)00458 7",
+    "title": "",
     "projections": {
       "pca": [
         0.16400004923343658,
@@ -88633,7 +88645,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "S0092 8674(24)01268 6",
+    "title": "",
     "projections": {
       "pca": [
         -0.03767670318484306,
@@ -92279,7 +92291,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         0.23427604138851166,
@@ -92726,7 +92738,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.01498475857079029,
@@ -94541,7 +94553,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "arXiv:2602.10885v1",
+    "title": "Reinforcing Chain-of-Thought Reasoning with Self-Evolving Rubrics",
     "projections": {
       "pca": [
         0.2442556619644165,
@@ -94972,7 +94984,19 @@
       0.0283,
       0.0181,
       -0.0121
-    ]
+    ],
+    "abstract": "Despite chain-of-thought (CoT) playing crucial roles in LLM reasoning, directly rewarding it is difficult: training a reward model demands heavy human labeling efforts, and static RMs struggle with evolving CoT distributions and reward hacking. These challenges motivate us to seek an autonomous CoT rewarding approach that requires no human annotation efforts and can evolve gradually. Inspired by recent self-evolving training methods, we propose \\textbf{RLCER} (\\textbf{R}einforcement \\textbf{L}earning with \\textbf{C}oT Supervision via Self-\\textbf{E}volving \\textbf{R}ubrics), which enhances the outcome-centric RLVR by rewarding CoTs with self-proposed and self-evolving rubrics. We show that self-proposed and self-evolving rubrics provide reliable CoT supervision signals even without outcome rewards, enabling RLCER to outperform outcome-centric RLVR. Moreover, when used as in-prompt hints, these self-proposed rubrics further improve inference-time performance.",
+    "authors": [
+      "Leheng Sheng",
+      "Wenchang Ma",
+      "Ruixin Hong",
+      "Xiang Wang",
+      "An Zhang",
+      "Tat-Seng Chua"
+    ],
+    "year": 2026,
+    "journal": "Open MIND",
+    "doi": "10.48550/arxiv.2602.10885"
   },
   {
     "channel": "area-literature",
@@ -102338,7 +102362,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "jamanetwork.com",
+    "title": "",
     "projections": {
       "pca": [
         0.3611215054988861,
@@ -109108,7 +109132,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "arXiv:2602.19685v1",
+    "title": "PerturbDiff: Functional Diffusion for Single-Cell Perturbation Modeling",
     "projections": {
       "pca": [
         0.18084190785884857,
@@ -109539,7 +109563,19 @@
       0.1019,
       0.0028,
       -0.025
-    ]
+    ],
+    "abstract": "Building Virtual Cells that can accurately simulate cellular responses to perturbations is a long-standing goal in systems biology. A fundamental challenge is that high-throughput single-cell sequencing is destructive: the same cell cannot be observed both before and after a perturbation. Thus, perturbation prediction requires mapping unpaired control and perturbed populations. Existing models address this by learning maps between distributions, but typically assume a single fixed response distribution when conditioned on observed cellular context (e.g., cell type) and the perturbation type. In reality, responses vary systematically due to unobservable latent factors such as microenvironmental fluctuations and complex batch effects, forming a manifold of possible distributions for the same observed conditions. To account for this variability, we introduce PerturbDiff, which shifts modeling from individual cells to entire distributions. By embedding distributions as points in a Hilbert space, we define a diffusion-based generative process operating directly over probability distributions. This allows PerturbDiff to capture population-level response shifts across hidden factors. Benchmarks on established datasets show that PerturbDiff achieves state-of-the-art performance in single-cell response prediction and generalizes substantially better to unseen perturbations. See our project page (https://katarinayuan.github.io/PerturbDiff-ProjectPage/), where code and data will be made publicly available (https://github.com/DeepGraphLearning/PerturbDiff).",
+    "authors": [
+      "Xinyu Yuan",
+      "Xixian Liu",
+      "Ya Shi Zhang",
+      "Zuobai Zhang",
+      "Hongyu Guo",
+      "Jian Tang"
+    ],
+    "year": 2026,
+    "journal": "arXiv (Cornell University)",
+    "doi": "10.48550/arxiv.2602.19685"
   },
   {
     "channel": "area-literature",
@@ -110472,7 +110508,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         0.2469363659620285,
@@ -115530,7 +115566,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "S41746 026 02483 Y Reference",
+    "title": "",
     "projections": {
       "pca": [
         -0.137381449341774,
@@ -120580,7 +120616,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "S41467 023 38125 0",
+    "title": "",
     "projections": {
       "pca": [
         0.19400879740715027,
@@ -130216,7 +130252,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "Scaling Bio 006 Formation Bios Cto",
+    "title": "",
     "projections": {
       "pca": [
         0.0009381657582707703,
@@ -134286,7 +134322,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "Novelty",
+    "title": "",
     "projections": {
       "pca": [
         0.1288059949874878,
@@ -137878,7 +137914,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "Week 1 Getting Started With Conformal",
+    "title": "",
     "projections": {
       "pca": [
         0.06482625007629395,
@@ -139227,7 +139263,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "The Humanity Project",
+    "title": "",
     "projections": {
       "pca": [
         0.19202286005020142,
@@ -139674,7 +139710,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "Anthropic Economic Index January 2026 Report",
+    "title": "",
     "projections": {
       "pca": [
         0.21530430018901825,
@@ -141943,7 +141979,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "Tabular Ml Is About To Get Weird",
+    "title": "",
     "projections": {
       "pca": [
         -0.16607791185379028,
@@ -146511,7 +146547,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "nature.com",
+    "title": "Nature",
     "abstract": "First published in 1869, Nature is the world\u2019s leading multidisciplinary science journal. Nature publishes the finest peer-reviewed research that drives ground-breaking discovery, and is read by thought-leaders and decision-makers around the world.",
     "projections": {
       "pca": [
@@ -147867,7 +147903,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "An Ai Researcher In The Cathedral",
+    "title": "",
     "projections": {
       "pca": [
         0.015173224732279778,
@@ -148748,7 +148784,10 @@
       -0.0208,
       0.0623,
       -0.0094
-    ]
+    ],
+    "abstract": "The F score ranks diagnostic tests and prediction models inconsistently with their clinical utility. Moreover, the F score does not have an interpretable unit, does not allow for a comparison with a strategy assuming all are negative, and requires dichotomization of models. In contrast, standard dec \u2026",
+    "journal": "Diagnostic and prognostic research",
+    "doi": "10.1186/s41512-025-00214-7"
   },
   {
     "channel": "area-literature",
@@ -149677,7 +149716,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "Nejmcibr2502386",
+    "title": "",
     "projections": {
       "pca": [
         0.05833297222852707,
@@ -151481,7 +151520,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "The State Of Enterprise Ai 2025 Report",
+    "title": "",
     "projections": {
       "pca": [
         0.06068005412817001,
@@ -152375,7 +152414,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "The Slow Death Of Epic Systems",
+    "title": "",
     "projections": {
       "pca": [
         0.0839543342590332,
@@ -166033,7 +166072,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "Pdf",
+    "title": "",
     "projections": {
       "pca": [
         0.01068352721631527,
@@ -170610,7 +170649,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "2025.04.25.650676V1",
+    "title": "",
     "projections": {
       "pca": [
         0.07548202574253082,
@@ -181465,7 +181504,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "arXiv:2510.06557v1",
+    "title": "The Markovian Thinker: Architecture-Agnostic Linear Scaling of Reasoning",
     "projections": {
       "pca": [
         0.2029445916414261,
@@ -181896,7 +181935,20 @@
       0.0533,
       -0.0227,
       -0.0489
-    ]
+    ],
+    "abstract": "Reinforcement learning (RL) has recently become a strong recipe for training reasoning LLMs that produce long chains of thought (LongCoT). Yet the standard RL \"thinking environment\", where the state is the prompt plus all prior reasoning tokens, makes the state unbounded and forces attention-based policies to pay quadratic compute as thoughts lengthen. We revisit the environment itself. We propose Markovian Thinking, a paradigm in which the policy advances reasoning while conditioning on a constant-size state, decoupling thinking length from context size. As an immediate consequence this yields linear compute with constant memory. We instantiate this idea with Delethink, an RL environment that structures reasoning into fixed-size chunks. Within each chunk, the model thinks as usual; at the boundary, the environment resets the context and reinitializes the prompt with a short carryover. Through RL, the policy learns to write a textual state near the end of each chunk sufficient for seamless continuation of reasoning after reset. Trained in this environment, an R1-Distill 1.5B model reasons in 8K-token chunks yet thinks up to 24K tokens, matching or surpassing LongCoT-RL trained with a 24K budget. With test-time scaling, Delethink continues to improve where LongCoT plateaus. The effect of linear compute is substantial: we empirically estimate at 96K average thinking length LongCoT-RL costs 27 H100-months vs. 7 for Delethink. Analysis at RL initialization shows off-the-shelf reasoning models (1.5B-120B) often sample Markovian traces zero-shot across diverse benchmarks, providing positive samples that make RL effective at scale. Our results show that redesigning the thinking environment is a powerful lever: it enables very long reasoning without quadratic overhead and opens a path toward efficient, scalable reasoning LLMs.",
+    "authors": [
+      "Milad Aghajohari",
+      "Kamran Chitsaz",
+      "Amirhossein Kazemnejad",
+      "Sarath Chandar",
+      "Alessandro Sordoni",
+      "Aaron Courville",
+      "Siva Reddy"
+    ],
+    "year": 2025,
+    "journal": "arXiv (Cornell University)",
+    "doi": "10.48550/arxiv.2510.06557"
   },
   {
     "channel": "area-literature",
@@ -194603,7 +194655,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.018099848181009293,
@@ -195959,7 +196011,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "jamanetwork.com",
+    "title": "",
     "projections": {
       "pca": [
         -0.013228558003902435,
@@ -197325,7 +197377,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "jamanetwork.com",
+    "title": "",
     "projections": {
       "pca": [
         0.2732449769973755,
@@ -208717,7 +208769,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "Projections At The Frontier Decoding",
+    "title": "",
     "projections": {
       "pca": [
         0.211190864443779,
@@ -213232,7 +213284,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "2025.08.12.669924V1",
+    "title": "",
     "projections": {
       "pca": [
         0.20415784418582916,
@@ -215023,7 +215075,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "Pdf",
+    "title": "",
     "projections": {
       "pca": [
         0.01068352721631527,
@@ -219590,7 +219642,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "github.com",
+    "title": "Clarification on Availability of Public ECG Dataset \u00b7 Issue #8 \u00b7 PierreElias/IntroECG \u00b7 GitHub",
     "projections": {
       "pca": [
         0.36569058895111084,
@@ -221417,7 +221469,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "Pleiades",
+    "title": "",
     "projections": {
       "pca": [
         0.16792181134223938,
@@ -237014,7 +237066,7 @@
     "channels": [
       "area-literature"
     ],
-    "title": "academic.oup.com",
+    "title": "",
     "projections": {
       "pca": [
         0.2469363659620285,
@@ -239272,7 +239324,7 @@
     "channels": [
       "daily-updates"
     ],
-    "title": "mdpi.com",
+    "title": "",
     "projections": {
       "pca": [
         0.17017441987991333,
@@ -240621,7 +240673,7 @@
     "channels": [
       "daily-updates"
     ],
-    "title": "Biodocs Genedocsdb Opentargets Sections 78725Genes",
+    "title": "",
     "projections": {
       "pca": [
         -0.02046867460012436,
@@ -241068,7 +241120,7 @@
     "channels": [
       "daily-updates"
     ],
-    "title": "Biodocs Genedocsdb Opentargets Unified 78725Genes",
+    "title": "",
     "projections": {
       "pca": [
         -0.024650786072015762,
@@ -241515,7 +241567,7 @@
     "channels": [
       "daily-updates"
     ],
-    "title": "Biodocs Vardocsdb Opentargets Unified 7M",
+    "title": "",
     "projections": {
       "pca": [
         -0.02738858573138714,
@@ -242413,7 +242465,7 @@
     "channels": [
       "daily-updates"
     ],
-    "title": "github.com",
+    "title": "",
     "projections": {
       "pca": [
         0.01786731369793415,
@@ -243313,7 +243365,7 @@
     "channels": [
       "daily-updates"
     ],
-    "title": "Smb Vision V0",
+    "title": "",
     "projections": {
       "pca": [
         0.16643157601356506,
@@ -243762,7 +243814,7 @@
     "channels": [
       "daily-updates"
     ],
-    "title": "Smb Vision Vjepa2 Vitl 384 256",
+    "title": "",
     "projections": {
       "pca": [
         0.15866625308990479,
@@ -247404,7 +247456,7 @@
     "channels": [
       "daily-updates"
     ],
-    "title": "sciencedirect.com",
+    "title": "",
     "projections": {
       "pca": [
         0.24004031717777252,
@@ -251941,7 +251993,7 @@
     "channels": [
       "daily-updates"
     ],
-    "title": "S0092 8674(12)01556 5",
+    "title": "",
     "projections": {
       "pca": [
         -0.006724110338836908,
@@ -255985,7 +256037,7 @@
     "channels": [
       "daily-updates"
     ],
-    "title": "Pdf",
+    "title": "",
     "projections": {
       "pca": [
         0.03374078869819641,
@@ -257334,7 +257386,7 @@
     "channels": [
       "project-big-beautiful-database"
     ],
-    "title": "Resources Data Sharing Agreement",
+    "title": "",
     "projections": {
       "pca": [
         0.26004379987716675,
@@ -257783,7 +257835,7 @@
     "channels": [
       "project-big-beautiful-database"
     ],
-    "title": "Resources Data User Agreement",
+    "title": "",
     "projections": {
       "pca": [
         0.2526918053627014,
@@ -259137,7 +259189,7 @@
     "channels": [
       "project-big-beautiful-database"
     ],
-    "title": "41587 2021 1070 Moesm3 Esm.Xlsx",
+    "title": "",
     "projections": {
       "pca": [
         0.3101663291454315,
@@ -259584,7 +259636,7 @@
     "channels": [
       "project-big-beautiful-database"
     ],
-    "title": "41591 2018 134 Moesm3 Esm.Xlsx",
+    "title": "",
     "projections": {
       "pca": [
         0.31123727560043335,
@@ -260031,7 +260083,7 @@
     "channels": [
       "project-big-beautiful-database"
     ],
-    "title": "41591 2020 839 Moesm2 Esm.Xlsx",
+    "title": "",
     "projections": {
       "pca": [
         0.30814844369888306,
@@ -260478,7 +260530,7 @@
     "channels": [
       "project-big-beautiful-database"
     ],
-    "title": "41591 2020 860 Moesm1 Esm.Xlsx",
+    "title": "",
     "projections": {
       "pca": [
         0.31265681982040405,
@@ -260925,7 +260977,7 @@
     "channels": [
       "project-big-beautiful-database"
     ],
-    "title": "41591 2020 1044 Moesm3 Esm.Xlsx",
+    "title": "",
     "projections": {
       "pca": [
         0.30718380212783813,
@@ -261821,7 +261873,7 @@
     "channels": [
       "project-big-beautiful-database"
     ],
-    "title": "Material Transfer Agreement",
+    "title": "",
     "projections": {
       "pca": [
         0.2245526760816574,
@@ -263163,7 +263215,7 @@
     "channels": [
       "project-big-beautiful-database"
     ],
-    "title": "Uk Biobank Exemptions From The Ukb Rap By Default Policy",
+    "title": "",
     "projections": {
       "pca": [
         0.10302961617708206,
@@ -263610,7 +263662,7 @@
     "channels": [
       "project-big-beautiful-database"
     ],
-    "title": "Biobankresearchanalysisplatform Rate%20Card Current",
+    "title": "",
     "projections": {
       "pca": [
         0.19180095195770264,
@@ -264505,7 +264557,7 @@
     "channels": [
       "project-big-beautiful-database"
     ],
-    "title": "Research Analysis Platform",
+    "title": "",
     "projections": {
       "pca": [
         0.11923660337924957,
@@ -266746,7 +266798,7 @@
     "channels": [
       "project-big-beautiful-database"
     ],
-    "title": "Nrrd Iomf",
+    "title": "",
     "projections": {
       "pca": [
         0.07957400381565094,
@@ -273485,7 +273537,7 @@
     "channels": [
       "project-gen-var-former"
     ],
-    "title": "Nmeth.2659",
+    "title": "",
     "projections": {
       "pca": [
         0.19593361020088196,
@@ -273932,7 +273984,7 @@
     "channels": [
       "project-gen-var-former"
     ],
-    "title": "Url",
+    "title": "",
     "projections": {
       "pca": [
         0.06396328657865524,
@@ -281241,7 +281293,7 @@
     "channels": [
       "social-tools"
     ],
-    "title": "D00Db56Fa754A1B115B6Dd7Cb2E3C342Ee809620",
+    "title": "",
     "projections": {
       "pca": [
         0.2735389471054077,
@@ -284832,7 +284884,7 @@
     "channels": [
       "social-tools"
     ],
-    "title": "Tokenized Tokens",
+    "title": "",
     "projections": {
       "pca": [
         0.09676767885684967,
@@ -288429,7 +288481,7 @@
     "channels": [
       "social-tools"
     ],
-    "title": "Adding Arxiv And Abstracts",
+    "title": "",
     "projections": {
       "pca": [
         0.19379034638404846,
@@ -302318,7 +302370,7 @@
     "channels": [
       "social-tools"
     ],
-    "title": "Aws And Google Cloud Collaborate On Multicloud Networking",
+    "title": "",
     "projections": {
       "pca": [
         0.13753445446491241,
@@ -305009,7 +305061,7 @@
     "channels": [
       "social-tools"
     ],
-    "title": "Introducing Torchforge",
+    "title": "",
     "projections": {
       "pca": [
         0.21502210199832916,
@@ -309492,7 +309544,7 @@
     "channels": [
       "social-tools"
     ],
-    "title": "Survival Analysis Self Learning Book",
+    "title": "",
     "projections": {
       "pca": [
         -0.021204788237810135,
@@ -313530,7 +313582,7 @@
     "channels": [
       "project-data-map"
     ],
-    "title": "Sciadv.Adz2240",
+    "title": "",
     "projections": {
       "pca": [
         0.1931620091199875,
@@ -314877,7 +314929,7 @@
     "channels": [
       "project-data-map"
     ],
-    "title": "Home",
+    "title": "",
     "projections": {
       "pca": [
         0.10806147754192352,
@@ -317595,7 +317647,7 @@
     "channels": [
       "project-data-map"
     ],
-    "title": "2025.05.28 Biods 271 Fm Ehr",
+    "title": "",
     "projections": {
       "pca": [
         0.15135380625724792,
@@ -321189,7 +321241,7 @@
     "channels": [
       "area-partnerships"
     ],
-    "title": "Vbaf295",
+    "title": "",
     "projections": {
       "pca": [
         0.059404559433460236,
@@ -321638,7 +321690,7 @@
     "channels": [
       "area-partnerships"
     ],
-    "title": "Lunit Ir Deck En 2025.3Q",
+    "title": "",
     "projections": {
       "pca": [
         0.1903366893529892,
@@ -322538,7 +322590,7 @@
     "channels": [
       "area-partnerships"
     ],
-    "title": "Plexus",
+    "title": "",
     "projections": {
       "pca": [
         0.1453532874584198,
@@ -326611,7 +326663,7 @@
     "channels": [
       "project-msk-ihub"
     ],
-    "title": "Kevin Boehm",
+    "title": "",
     "projections": {
       "pca": [
         0.119785375893116,
@@ -327058,7 +327110,7 @@
     "channels": [
       "project-msk-ihub"
     ],
-    "title": "Kushal Dey",
+    "title": "",
     "projections": {
       "pca": [
         0.11877435445785522,
@@ -329301,7 +329353,7 @@
     "channels": [
       "project-msk-ihub"
     ],
-    "title": "Nikolaus Schultz",
+    "title": "",
     "projections": {
       "pca": [
         0.1734517216682434,
@@ -331098,7 +331150,7 @@
     "channels": [
       "project-mount-sinai-smb"
     ],
-    "title": "Study.Cgi",
+    "title": "",
     "projections": {
       "pca": [
         0.1964479237794876,
@@ -335583,7 +335635,7 @@
     "channels": [
       "area-news"
     ],
-    "title": "The Uaes Big Bet On Genomic Medicine",
+    "title": "",
     "projections": {
       "pca": [
         -0.06786699593067169,
@@ -336480,7 +336532,7 @@
     "channels": [
       "area-news"
     ],
-    "title": "The Citizen Scientist Revolution Empowering Patient Advocacy Groups Patients And Researchers With Ai And Multomodal Data",
+    "title": "",
     "projections": {
       "pca": [
         -0.008719504810869694,
@@ -337377,7 +337429,7 @@
     "channels": [
       "area-news"
     ],
-    "title": "Tokaido Health Raises 25M",
+    "title": "",
     "projections": {
       "pca": [
         0.1844346970319748,
@@ -341410,7 +341462,7 @@
     "channels": [
       "area-news"
     ],
-    "title": "Ai Powered Clinical Research An Integrated Solution For Pre Screening",
+    "title": "",
     "projections": {
       "pca": [
         -0.1788903772830963,
@@ -341859,7 +341911,7 @@
     "channels": [
       "area-news"
     ],
-    "title": "Bmj.S781",
+    "title": "",
     "projections": {
       "pca": [
         0.12065674364566803,
@@ -342306,7 +342358,7 @@
     "channels": [
       "area-news"
     ],
-    "title": "Rethinking Ai For Science Funding",
+    "title": "",
     "projections": {
       "pca": [
         -0.06718870252370834,
@@ -342753,7 +342805,7 @@
     "channels": [
       "area-news"
     ],
-    "title": "Damn It Theyre Good",
+    "title": "",
     "projections": {
       "pca": [
         0.1354963481426239,
@@ -344544,7 +344596,7 @@
     "channels": [
       "area-news"
     ],
-    "title": "Reigniting%20The%20Discovery%20Engine%20For%20Tomorrow%E2%80%99S%20Cures",
+    "title": "",
     "projections": {
       "pca": [
         -0.055542953312397,
@@ -347677,7 +347729,7 @@
     "channels": [
       "area-news"
     ],
-    "title": "Beyond The Ehr Building A Reliable Mortality Endpoint For Oncology Research",
+    "title": "",
     "projections": {
       "pca": [
         -0.06807831674814224,
@@ -349019,7 +349071,7 @@
     "channels": [
       "area-news"
     ],
-    "title": "From Image To Insight How Tempus Is Leveraging Ai To Advance Biomarker Screening At Scale",
+    "title": "",
     "projections": {
       "pca": [
         -0.1688719242811203,
@@ -351268,7 +351320,7 @@
     "channels": [
       "area-news"
     ],
-    "title": "Introducing Muse",
+    "title": "",
     "abstract": "Formation Bio collaborates with Sanofi and OpenAI to Introduce Muse, a first of its kind AI tool to accelerate patient recruitment in drug development.",
     "projections": {
       "pca": [
@@ -352163,7 +352215,7 @@
     "channels": [
       "area-news"
     ],
-    "title": "Research Mag Volume2",
+    "title": "",
     "projections": {
       "pca": [
         0.07131242007017136,
@@ -353058,7 +353110,7 @@
     "channels": [
       "area-news"
     ],
-    "title": "Research",
+    "title": "",
     "abstract": "Explore groundbreaking academic, peer-reviewed, and research publications about Natural Language Processing (NLP) authored by IMO Health\u2019s leading NLP scientists.",
     "projections": {
       "pca": [
@@ -353508,7 +353560,7 @@
     "channels": [
       "area-news"
     ],
-    "title": "Early Science Acceleration Experiments With Gpt 5",
+    "title": "",
     "projections": {
       "pca": [
         0.050861652940511703,
@@ -356199,7 +356251,7 @@
     "channels": [
       "area-news"
     ],
-    "title": "2025 Wharton Gbk Ai Adoption Report Full Report",
+    "title": "",
     "projections": {
       "pca": [
         0.07826700806617737,
@@ -357993,7 +358045,7 @@
     "channels": [
       "area-conferences"
     ],
-    "title": "A Playbook For Human Evidence",
+    "title": "",
     "projections": {
       "pca": [
         0.012988223694264889,
@@ -358444,7 +358496,7 @@
       "project-model-documentation",
       "area-modeling"
     ],
-    "title": "Omics Foundation Models",
+    "title": "",
     "projections": {
       "pca": [
         0.06816920638084412,
@@ -359339,7 +359391,7 @@
     "channels": [
       "project-model-documentation"
     ],
-    "title": "github.com",
+    "title": "",
     "projections": {
       "pca": [
         0.2608264982700348,
@@ -360234,7 +360286,7 @@
     "channels": [
       "project-model-documentation"
     ],
-    "title": "huggingface.co",
+    "title": "",
     "projections": {
       "pca": [
         0.2378227859735489,
@@ -360683,7 +360735,7 @@
     "channels": [
       "project-model-documentation"
     ],
-    "title": "Smb V1 1.7B",
+    "title": "",
     "projections": {
       "pca": [
         0.2339942306280136,
@@ -362028,7 +362080,7 @@
     "channels": [
       "project-model-documentation"
     ],
-    "title": "github.com",
+    "title": "",
     "projections": {
       "pca": [
         0.3356188237667084,
@@ -362475,7 +362527,7 @@
     "channels": [
       "project-model-documentation"
     ],
-    "title": "huggingface.co",
+    "title": "",
     "projections": {
       "pca": [
         0.31482452154159546,
@@ -362922,7 +362974,7 @@
     "channels": [
       "project-model-documentation"
     ],
-    "title": "Smb V1 8B",
+    "title": "",
     "projections": {
       "pca": [
         0.15366867184638977,
@@ -364715,7 +364767,7 @@
     "channels": [
       "project-model-documentation"
     ],
-    "title": "Smb V1 1.7B Structure",
+    "title": "",
     "projections": {
       "pca": [
         0.26844316720962524,
@@ -365609,7 +365661,7 @@
     "channels": [
       "project-model-documentation"
     ],
-    "title": "github.com",
+    "title": "",
     "projections": {
       "pca": [
         0.40393945574760437,
@@ -366954,7 +367006,7 @@
     "channels": [
       "project-model-documentation"
     ],
-    "title": "Config.Json",
+    "title": "",
     "projections": {
       "pca": [
         0.28973373770713806,
@@ -367403,7 +367455,7 @@
     "channels": [
       "project-model-documentation"
     ],
-    "title": ".Gitattributes",
+    "title": "",
     "projections": {
       "pca": [
         0.2764256000518799,
@@ -377811,7 +377863,7 @@
     "channels": [
       "area-modeling"
     ],
-    "title": "Bulkformer Model Variants",
+    "title": "",
     "projections": {
       "pca": [
         0.023786460980772972,
@@ -378258,7 +378310,7 @@
     "channels": [
       "area-modeling"
     ],
-    "title": "Smb V2 Modality Specific Encoders",
+    "title": "",
     "projections": {
       "pca": [
         -0.07948695123195648,
@@ -378707,7 +378759,7 @@
     "channels": [
       "area-modeling"
     ],
-    "title": "Haploformer",
+    "title": "",
     "projections": {
       "pca": [
         0.17216628789901733,
@@ -379154,7 +379206,7 @@
     "channels": [
       "area-modeling"
     ],
-    "title": "Protopheno",
+    "title": "",
     "projections": {
       "pca": [
         0.07429125159978867,
@@ -382752,7 +382804,7 @@
     "channels": [
       "area-modeling"
     ],
-    "title": "Pdf",
+    "title": "",
     "projections": {
       "pca": [
         0.1814917027950287,
@@ -383201,7 +383253,7 @@
     "channels": [
       "area-modeling"
     ],
-    "title": "X Cell V1 0316 Final",
+    "title": "",
     "projections": {
       "pca": [
         0.005705578252673149,
@@ -384096,7 +384148,7 @@
     "channels": [
       "area-modeling"
     ],
-    "title": "686Bc62A07Af928355696C6E Frame%20By%20Protege%20 %20One%20Pager",
+    "title": "",
     "projections": {
       "pca": [
         0.05032685026526451,
@@ -384543,7 +384595,7 @@
     "channels": [
       "area-modeling"
     ],
-    "title": "Introducing Protege Evaluation Datasets",
+    "title": "",
     "projections": {
       "pca": [
         -0.15927638113498688,
@@ -389522,7 +389574,7 @@
     "channels": [
       "project-signal-bridge"
     ],
-    "title": "Can Ai Make Better Decisions Than",
+    "title": "",
     "projections": {
       "pca": [
         0.0007832110277377069,
@@ -389969,7 +390021,7 @@
     "channels": [
       "area-market-intel"
     ],
-    "title": "Computational Power Limits Oncology Innovation Heres Why",
+    "title": "",
     "projections": {
       "pca": [
         0.07456877082586288,
@@ -390864,7 +390916,7 @@
     "channels": [
       "area-market-intel"
     ],
-    "title": "Qa From Proof Of Concept To Clinical Deployment How Foundation Models Are Accelerating Drug Development",
+    "title": "",
     "projections": {
       "pca": [
         -0.01588933914899826,
@@ -391311,7 +391363,7 @@
     "channels": [
       "area-market-intel"
     ],
-    "title": "Designing Smarter Trials A New Model For Clinical Development",
+    "title": "",
     "projections": {
       "pca": [
         -0.15616579353809357,
