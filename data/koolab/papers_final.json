@@ -5572,15 +5572,6 @@
       "papers-dl"
     ],
     "title": "Discrete Flow Maps",
-    "abstract": "The sequential nature of autoregressive next-token prediction imposes a fundamental speed limit on large language models. While continuous flow models offer a path to parallel generation, they traditionally demand expensive iterative integration. Flow Maps bypass this bottleneck by compressing generative trajectories into single-step mappings, theoretically enabling the generation of full text sequences from noise in a single forward pass. However, standard formulations rely on Euclidean regression losses that are geometrically ill-suited for discrete data. In this work, we resolve this conflict with Discrete Flow Maps, a framework that reconciles trajectory compression with the geometry of the probability simplex. We recast standard flow map training for the discrete domain, aligning the training dynamics with the discrete nature of language. Empirically, this strict geometric alignment allows our method to surpass previous state-of-the-art results in discrete flow modeling.",
-    "authors": [
-      "Potaptchik, Peter",
-      "Yim, Jason",
-      "Saravanan, Adhi",
-      "Holderrieth, Peter",
-      "Vanden-Eijnden, Eric",
-      "Albergo, Michael S."
-    ],
     "projections": {
       "pca": [
         -0.15797929465770721,
@@ -11574,15 +11565,6 @@
       "papers-dl"
     ],
     "title": "Distribution-Conditioned Transport",
-    "abstract": "Learning a transport model that maps a source distribution to a target distribution is a canonical problem in machine learning, but scientific applications increasingly require models that can generalize to source and target distributions unseen during training. We introduce distribution-conditioned transport (DCT), a framework that conditions transport maps on learned embeddings of source and target distributions, enabling generalization to unseen distribution pairs. DCT also allows semi-supervised learning for distributional forecasting problems: because it learns from arbitrary distribution pairs, it can leverage distributions observed at only one condition to improve transport prediction. DCT is agnostic to the underlying transport mechanism, supporting models ranging from flow matching to distributional divergence-based models (e.g. Wasserstein, MMD). We demonstrate the practical performance benefits of DCT on synthetic benchmarks and four applications in biology: batch effect transfer in single-cell genomics, perturbation prediction from mass cytometry data, learning clonal transcriptional dynamics in hematopoiesis, and modeling T-cell receptor sequence evolution.",
-    "authors": [
-      "Fishman, Nic",
-      "Gowri, Gokul",
-      "Fischer, Paolo L. B.",
-      "Zitnik, Marinka",
-      "Abudayyeh, Omar",
-      "Gootenberg, Jonathan"
-    ],
     "projections": {
       "pca": [
         -0.06763481348752975,
@@ -15223,12 +15205,6 @@
       "papers-dl"
     ],
     "title": "Power-Sex Beliefs",
-    "authors": [
-      "Kristine Chapleau",
-      "Debra L. Oswald"
-    ],
-    "year": 2011,
-    "journal": "PsycTESTS Dataset",
     "doi": "10.1037/t02865-000",
     "projections": {
       "pca": [
@@ -23946,12 +23922,6 @@
       "papers-dl"
     ],
     "title": "Recursive Language Models",
-    "abstract": "We study allowing large language models (LLMs) to process arbitrarily long prompts through the lens of inference-time scaling. We propose Recursive Language Models (RLMs), a general inference paradigm that treats long prompts as part of an external environment and allows the LLM to programmatically examine, decompose, and recursively call itself over snippets of the prompt. We find that RLMs can successfully process inputs up to two orders of magnitude beyond model context windows and, even for shorter prompts, dramatically outperform the quality of vanilla frontier LLMs and common long-context and coding scaffolds (e.g., on GPT-5 by a median across the evaluated benchmarks of $26\\%$ against compaction, $130\\%$ against CodeAct with sub-calls, and $13\\%$ against Claude Code) across four diverse long-context tasks while having comparable cost. At a small scale, we post-train the first model around the RLM. Our model, RLM-Qwen3-8B, outperforms the underlying Qwen3-8B model by $28.3\\%$ on average and even approaches the quality of vanilla GPT-5 on three long-context tasks. Code is available at https://github.com/alexzhang13/rlm.",
-    "authors": [
-      "Zhang, Alex L.",
-      "Kraska, Tim",
-      "Khattab, Omar"
-    ],
     "projections": {
       "pca": [
         -0.18765445053577423,
@@ -39520,14 +39490,6 @@
       "papers-dl"
     ],
     "title": "The Principles of Diffusion Models",
-    "abstract": "This book presents the core principles that have guided the development of diffusion models, tracing their origins and showing how diverse formulations arise from shared mathematical ideas. Diffusion modeling starts by defining a forward process that gradually corrupts data into noise, linking the data distribution to a simple prior through a continuum of intermediate distributions. The goal is to learn a reverse process that transforms noise back into data while recovering the same intermediates. We describe three complementary views. The variational view, inspired by variational autoencoders, sees diffusion as learning to remove noise step by step. The score-based view, rooted in energy-based modeling, learns the gradient of the evolving data distribution, indicating how to nudge samples toward more likely regions. The flow-based view, related to normalizing flows, treats generation as following a smooth path that moves samples from noise to data under a learned velocity field. These perspectives share a common backbone: a time-dependent velocity field whose flow transports a simple prior to the data. Sampling then amounts to solving a differential equation that evolves noise into data along a continuous trajectory. On this foundation, the book discusses guidance for controllable generation, efficient numerical solvers, and diffusion-motivated flow-map models that learn direct mappings between arbitrary times. It provides a conceptual and mathematically grounded understanding of diffusion models for readers with basic deep-learning knowledge.",
-    "authors": [
-      "Lai, Chieh-Hsin",
-      "Song, Yang",
-      "Kim, Dongjun",
-      "Mitsufuji, Yuki",
-      "Ermon, Stefano"
-    ],
     "projections": {
       "pca": [
         -0.18300095200538635,
@@ -44530,15 +44492,6 @@
       "papers-dl"
     ],
     "title": "The Diffusion Duality",
-    "abstract": "Uniform-state discrete diffusion models hold the promise of fast text generation due to their inherent ability to self-correct. However, they are typically outperformed by autoregressive models and masked diffusion models. In this work, we narrow this performance gap by leveraging a key insight: Uniform-state diffusion processes naturally emerge from an underlying Gaussian diffusion. Our method, Duo, transfers powerful techniques from Gaussian diffusion to improve both training and sampling. First, we introduce a curriculum learning strategy guided by the Gaussian process, doubling training speed by reducing variance. Models trained with curriculum learning surpass autoregressive models in zero-shot perplexity on 3 of 7 benchmarks. Second, we present Discrete Consistency Distillation, which adapts consistency distillation from the continuous to the discrete setting. This algorithm unlocks few-step generation in diffusion language models by accelerating sampling by two orders of magnitude. We provide the code, model checkpoints, and video tutorials on the project page: http://s-sahoo.github.io/duo",
-    "authors": [
-      "Sahoo, Subham Sekhar",
-      "Deschenaux, Justin",
-      "Gokaslan, Aaron",
-      "Wang, Guanghan",
-      "Chiu, Justin",
-      "Kuleshov, Volodymyr"
-    ],
     "projections": {
       "pca": [
         -0.20568232238292694,
