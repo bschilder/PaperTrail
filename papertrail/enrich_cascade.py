@@ -221,6 +221,18 @@ def _coerce_llm_meta(data: dict) -> dict[str, Any]:
     return out
 
 
+def _sanitize_for_api(text: str) -> str:
+    """Strip characters that make a JSON request body invalid for the API.
+
+    PDF/HTML extraction can yield lone surrogates or control characters; the
+    Anthropic API rejects requests whose body isn't clean UTF-8 with a 400.
+    """
+    if not text:
+        return ""
+    text = text.encode("utf-8", "ignore").decode("utf-8", "ignore")
+    return re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", " ", text)
+
+
 def _fetch_text_for_llm(url: str) -> str:
     """Fetch a URL and return plain text (PDF text or stripped HTML), capped."""
     resp = requests.get(
@@ -256,6 +268,7 @@ def _llm_extract_metadata(url: str, email: str = "papertrail@example.com") -> di
         return {}
     try:
         text = _fetch_text_for_llm(url)
+        text = _sanitize_for_api(text)
         if len(text.strip()) < 100:
             return {}
         import anthropic
@@ -269,7 +282,7 @@ def _llm_extract_metadata(url: str, email: str = "papertrail@example.com") -> di
         raw = next((b.text for b in resp.content if b.type == "text"), "")
         meta = _coerce_llm_meta(_parse_llm_json(raw))
     except Exception as e:  # noqa: BLE001 — never let the fallback abort enrichment
-        logger.debug("LLM extraction failed for %s: %s", url[:60], e)
+        logger.warning("LLM extraction failed for %s: %s", url[:60], e)
         return {}
 
     # If we got a title, try OpenAlex for clean citations/year/journal (validated).
