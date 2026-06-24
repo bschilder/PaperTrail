@@ -10,6 +10,7 @@ Strategy order:
 
 from __future__ import annotations
 
+import json
 import logging
 import re
 import time
@@ -172,6 +173,115 @@ def extract_pdf_metadata(url: str) -> dict[str, Any]:
     return out
 
 
+_LLM_PROMPT = (
+    "Extract bibliographic metadata from the text of a research paper, preprint, "
+    "or technical blog post / announcement below.\n\n"
+    "Respond with ONLY a JSON object (no markdown, no prose) of the form:\n"
+    '{"is_paper": bool, "title": str, "authors": [str], '
+    '"affiliations": [str], "abstract": str}\n\n'
+    "- abstract: the paper's abstract, or for a blog post a 1-3 sentence summary.\n"
+    "- Set is_paper=false if this is clearly NOT scholarly/technical content "
+    "(a pricing page, login page, legal notice, marketing page, error page, or "
+    "dataset/tool listing).\n"
+    "- Use only what is present in the text; never invent authors or affiliations. "
+    "Use empty arrays / empty string for anything absent.\n\n"
+    "DOCUMENT TEXT:\n"
+)
+
+
+def _parse_llm_json(raw: str) -> dict:
+    """Parse the model's reply into a dict, tolerating ```json fences/prose."""
+    s = (raw or "").strip()
+    m = re.search(r"\{.*\}", s, re.DOTALL)
+    if not m:
+        return {}
+    try:
+        return json.loads(m.group(0))
+    except json.JSONDecodeError:
+        return {}
+
+
+def _coerce_llm_meta(data: dict) -> dict[str, Any]:
+    """Turn Claude's structured extraction into our metadata dict (pure)."""
+    if not data or not data.get("is_paper"):
+        return {}
+    title = (data.get("title") or "").strip()
+    if not title:
+        return {}
+    out: dict[str, Any] = {"title": title}
+    authors = [a for a in (data.get("authors") or []) if a and a.strip()]
+    affiliations = [a for a in (data.get("affiliations") or []) if a and a.strip()]
+    abstract = (data.get("abstract") or "").strip()
+    if authors:
+        out["authors"] = authors
+    if affiliations:
+        out["affiliations"] = affiliations
+    if abstract:
+        out["abstract"] = abstract
+    return out
+
+
+def _fetch_text_for_llm(url: str) -> str:
+    """Fetch a URL and return plain text (PDF text or stripped HTML), capped."""
+    resp = requests.get(
+        url, timeout=20, allow_redirects=True,
+        headers={"User-Agent": "Mozilla/5.0 (PaperTrail/1.0)"},
+    )
+    if resp.status_code >= 400:
+        return ""
+    ctype = resp.headers.get("content-type", "").lower()
+    if "pdf" in ctype or _is_pdf_url(resp.url):
+        import fitz  # PyMuPDF
+
+        doc = fitz.open(stream=resp.content, filetype="pdf")
+        text = "\n".join(doc[i].get_text() for i in range(min(4, doc.page_count)))
+        doc.close()
+        return text
+    # HTML → text: drop scripts/styles and tags
+    html = resp.text
+    html = re.sub(r"(?is)<(script|style|noscript)[^>]*>.*?</\1>", " ", html)
+    return re.sub(r"<[^>]+>", " ", html)
+
+
+def _llm_extract_metadata(url: str, email: str = "papertrail@example.com") -> dict[str, Any]:
+    """Last-resort enrichment: have Claude read the page/PDF and extract metadata.
+
+    Gated on ANTHROPIC_API_KEY — returns {} (no network/model call) when unset,
+    so the pipeline runs fine without it. When a title is recovered, it's also
+    cross-checked against OpenAlex to pull in citations/year for indexed papers.
+    """
+    import os
+
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        return {}
+    try:
+        text = _fetch_text_for_llm(url)
+        if len(text.strip()) < 100:
+            return {}
+        import anthropic
+
+        client = anthropic.Anthropic()
+        resp = client.messages.create(
+            model="claude-haiku-4-5",
+            max_tokens=2048,
+            messages=[{"role": "user", "content": _LLM_PROMPT + text[:24000]}],
+        )
+        raw = next((b.text for b in resp.content if b.type == "text"), "")
+        meta = _coerce_llm_meta(_parse_llm_json(raw))
+    except Exception as e:  # noqa: BLE001 — never let the fallback abort enrichment
+        logger.debug("LLM extraction failed for %s: %s", url[:60], e)
+        return {}
+
+    # If we got a title, try OpenAlex for clean citations/year/journal (validated).
+    if meta.get("title"):
+        oa = _lookup_openalex_title(meta["title"], email)
+        if oa and oa.get("title") and _titles_match(meta["title"], oa["title"]):
+            for k, v in oa.items():
+                if v and not meta.get(k):
+                    meta[k] = v
+    return meta
+
+
 def enrich_url(url: str, email: str = "papertrail@example.com") -> dict[str, Any]:
     """
     Enrich a paper URL using a multi-strategy cascade.
@@ -275,6 +385,17 @@ def enrich_url(url: str, email: str = "papertrail@example.com") -> dict[str, Any
             if oa:
                 result = {**result, **{k: v for k, v in oa.items() if v and not result.get(k)}}
                 logger.debug("Enriched via Google→OpenAlex: %s", url[:60])
+
+    # Strategy 5: Claude reads the page/PDF directly (gated on ANTHROPIC_API_KEY).
+    # The robust last resort for content no deterministic method could resolve —
+    # blog posts, announcements, and PDFs whose layout defeats heuristic parsing.
+    if not result.get("title") or not result.get("abstract"):
+        llm = _llm_extract_metadata(url, email)
+        for k, v in llm.items():
+            if v and not result.get(k):
+                result[k] = v
+        if llm.get("title"):
+            logger.debug("Enriched via Claude fallback: %s", url[:60])
 
     # Final fallback: infer journal from URL domain
     if not result.get("journal"):
