@@ -14,7 +14,7 @@ import logging
 import re
 import time
 from typing import Any, Optional
-from urllib.parse import urlparse, quote
+from urllib.parse import urlparse
 
 import requests
 
@@ -112,18 +112,28 @@ def _parse_pdf_abstract(text: str) -> str:
     return re.sub(r"\s+", " ", rest).strip()[:3000].strip()
 
 
-def _titles_match(a: str, b: str) -> bool:
-    """True if two titles share enough tokens to be the same paper.
+_TITLE_STOPWORDS = {
+    "the", "a", "an", "of", "for", "and", "in", "on", "to", "with", "via",
+    "using", "is", "are", "be", "from", "by", "at",
+}
 
-    Used to validate an unreliable PDF-extracted title against an OpenAlex hit
-    before adopting OpenAlex's (clean) metadata — guards against the title
-    search returning an unrelated paper for a garbage query.
+
+def _titles_match(a: str, b: str) -> bool:
+    """True if two titles are plausibly the same paper.
+
+    Uses Jaccard overlap (intersection / union) of content tokens, NOT
+    overlap/min — otherwise a short body fragment that happens to be a subset
+    of an unrelated title falsely matches (e.g. "the conflicting constraints"
+    matching "Conflicting constraints on the form of intertidal algae").
     """
-    ta = set(re.findall(r"[a-z0-9]+", (a or "").lower()))
-    tb = set(re.findall(r"[a-z0-9]+", (b or "").lower()))
+    def toks(s: str) -> set[str]:
+        return {t for t in re.findall(r"[a-z0-9]+", (s or "").lower())
+                if t not in _TITLE_STOPWORDS}
+
+    ta, tb = toks(a), toks(b)
     if not ta or not tb:
         return False
-    return len(ta & tb) / min(len(ta), len(tb)) >= 0.6
+    return len(ta & tb) / len(ta | tb) >= 0.6
 
 
 def extract_pdf_metadata(url: str) -> dict[str, Any]:
@@ -245,6 +255,15 @@ def enrich_url(url: str, email: str = "papertrail@example.com") -> dict[str, Any
                 result = {**result, **{k: v for k, v in oa.items() if v and not result.get(k)}}
         if result.get("title") and result.get("abstract"):
             logger.debug("Enriched via PDF parse: %s", url[:60])
+            return result
+
+    # Strategy 3c: We have an abstract but no title — find the paper in OpenAlex
+    # by full-text searching the abstract (validated by abstract overlap).
+    if result.get("abstract") and not result.get("title"):
+        oa = _lookup_openalex_by_abstract(result["abstract"], email)
+        if oa and oa.get("title"):
+            result = {**result, **{k: v for k, v in oa.items() if v and not result.get(k)}}
+            logger.debug("Enriched via abstract→OpenAlex: %s", url[:60])
             return result
 
     # Strategy 4: Google search as last resort
@@ -466,9 +485,11 @@ def _lookup_openalex_title(title: str, email: str) -> Optional[dict]:
     """Search OpenAlex by title."""
     try:
         headers = {**HEADERS, "User-Agent": f"PaperTrail/1.0 (mailto:{email})"}
+        # NOTE: pass the title as raw text — requests URL-encodes params itself.
+        # Pre-quoting here double-encodes spaces (%20 → %2520) and matches nothing.
         resp = requests.get(
             "https://api.openalex.org/works",
-            params={"filter": f"title.search:{quote(title[:100], safe='')}", "per_page": 1},
+            params={"filter": f"title.search:{title[:100]}", "per_page": 1},
             headers=headers, timeout=10,
         )
         if resp.ok:
@@ -478,6 +499,46 @@ def _lookup_openalex_title(title: str, email: str) -> Optional[dict]:
     except Exception as e:
         logger.debug("OpenAlex title search failed: %s", e)
     return None
+
+
+def _lookup_openalex_by_abstract(abstract: str, email: str) -> Optional[dict]:
+    """Find a paper via OpenAlex full-text search on a distinctive abstract snippet.
+
+    Full-text search returns topically-similar papers, so the hit is only
+    accepted when its abstract has high token overlap with ours — otherwise a
+    different paper on the same topic would be wrongly adopted.
+    """
+    snippet = " ".join((abstract or "").split()[:30])
+    if len(snippet) < 40:
+        return None
+    try:
+        headers = {**HEADERS, "User-Agent": f"PaperTrail/1.0 (mailto:{email})"}
+        resp = requests.get(
+            "https://api.openalex.org/works",
+            params={"search": snippet, "per_page": 1},
+            headers=headers, timeout=10,
+        )
+        if resp.ok:
+            results = resp.json().get("results", [])
+            if results:
+                parsed = _parse_openalex(results[0])
+                if parsed.get("abstract") and _abstracts_overlap(abstract, parsed["abstract"]):
+                    return parsed
+    except Exception as e:
+        logger.debug("OpenAlex abstract search failed: %s", e)
+    return None
+
+
+def _abstracts_overlap(a: str, b: str) -> bool:
+    """True if two abstracts are the same text (high content-token Jaccard)."""
+    def toks(s: str) -> set[str]:
+        return {t for t in re.findall(r"[a-z0-9]+", (s or "").lower())
+                if t not in _TITLE_STOPWORDS}
+
+    ta, tb = toks(a), toks(b)
+    if not ta or not tb:
+        return False
+    return len(ta & tb) / len(ta | tb) >= 0.55
 
 
 def _lookup_biorxiv_api(doi: str) -> Optional[dict]:
@@ -616,6 +677,14 @@ def _parse_openalex(data: dict) -> dict[str, Any]:
         for a in data.get("authorships", [])
     ]
 
+    # De-duplicated institutional affiliations across all authors (order-preserving)
+    affiliations = list(dict.fromkeys(
+        inst.get("display_name", "")
+        for a in data.get("authorships", [])
+        for inst in a.get("institutions", [])
+        if inst.get("display_name")
+    ))
+
     journal = None
     primary_loc = data.get("primary_location") or {}
     if primary_loc:
@@ -635,6 +704,7 @@ def _parse_openalex(data: dict) -> dict[str, Any]:
     return {
         "title": title,
         "authors": authors,
+        "affiliations": affiliations,
         "year": data.get("publication_year"),
         "journal": journal,
         "abstract": abstract,
