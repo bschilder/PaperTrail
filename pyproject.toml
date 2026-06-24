@@ -30,6 +30,7 @@ dependencies = [
     "tqdm>=4.65",
     "click>=8.1",
     "pyyaml>=6.0",
+    "pymupdf>=1.24",
 ]
 
 [project.optional-dependencies]
