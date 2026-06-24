@@ -816,11 +816,15 @@ def enrich_papers_cascade(
 
     Returns the number of papers enriched.
     """
-    to_enrich = [
-        p for p in papers
-        if not p.get("title") or p["title"] in ("", "Untitled", "Unknown Title")
-    ]
-    logger.info("Enriching %d papers via cascade (%d already have titles)", len(to_enrich), len(papers) - len(to_enrich))
+    # Enrich papers that still lack BOTH a real title and an abstract. Having
+    # either means we already have usable content (e.g. a PDF-parsed abstract),
+    # so we skip them — that keeps the batch small and avoids re-downloading.
+    def _needs_enrichment(p: dict) -> bool:
+        has_title = p.get("title") and p["title"] not in ("", "Untitled", "Unknown Title")
+        return not has_title and not (p.get("abstract") or "").strip()
+
+    to_enrich = [p for p in papers if _needs_enrichment(p)]
+    logger.info("Enriching %d papers via cascade (%d already have content)", len(to_enrich), len(papers) - len(to_enrich))
 
     enriched = 0
     for i, paper in enumerate(to_enrich):
@@ -829,10 +833,16 @@ def enrich_papers_cascade(
             continue
 
         meta = enrich_url(url, email=email)
-        if meta.get("title") and meta["title"] not in ("", "Untitled", "Unknown Title"):
+        has_title = bool(meta.get("title")) and meta["title"] not in ("", "Untitled", "Unknown Title")
+        # Apply when we found a real title OR an abstract — abstract-only results
+        # (e.g. from PDF parsing) are valuable and must not be discarded.
+        if has_title or meta.get("abstract"):
             for k, v in meta.items():
-                if v is not None and v != "" and v != []:
-                    paper[k] = v
+                if v is None or v == "" or v == []:
+                    continue
+                if k == "title" and not has_title:
+                    continue  # never set a junk/empty title
+                paper[k] = v
             enriched += 1
 
         if delay:
