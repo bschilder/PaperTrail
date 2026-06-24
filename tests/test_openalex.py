@@ -97,6 +97,7 @@ def test_fill_missing_metadata_raw_title_and_affiliations(monkeypatch):
 
         def json(self):
             return {"results": [{
+                "title": "Some Real Paper Title",
                 "publication_year": 2020,
                 "cited_by_count": 5,
                 "authorships": [{"author": {"display_name": "Ada Lovelace"},
@@ -115,3 +116,23 @@ def test_fill_missing_metadata_raw_title_and_affiliations(monkeypatch):
     assert captured["params"]["filter"] == "title.search:Some Real Paper Title"
     assert papers[0]["authors"] == ["Ada Lovelace"]
     assert papers[0]["affiliations"] == ["MIT"]
+
+
+def test_fill_missing_metadata_rejects_mismatched_title(monkeypatch):
+    """A blog/repo title that best-matches an unrelated paper must NOT adopt it."""
+    from papertrail import enricher
+
+    class _Resp:
+        ok = True
+
+        def json(self):
+            return {"results": [{
+                "title": "SCALPEL: Selective Capability Ablation",
+                "authorships": [{"author": {"display_name": "Someone Else"}}],
+                "publication_year": 2025,
+            }]}
+
+    monkeypatch.setattr(enricher.requests, "get", lambda *a, **k: _Resp())
+    papers = [{"title": "Interpreting Language Model Parameters", "url": "https://goodfire.ai/x", "authors": []}]
+    enricher.fill_missing_metadata(papers, email="e@x.org")
+    assert not papers[0].get("authors")  # mismatch rejected, no wrong metadata

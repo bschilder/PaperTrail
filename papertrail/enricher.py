@@ -1088,6 +1088,12 @@ def fill_missing_metadata(
             if not doi:
                 results = data.get("results", [])
                 data = results[0] if results else None
+                # Title search returns a best-effort match — confirm it's really
+                # the same paper before adopting its metadata, or a blog/repo
+                # title would pull in an unrelated paper's authors/abstract.
+                from papertrail.enrich_cascade import _titles_match
+                if data and not _titles_match(title, data.get("title", "")):
+                    continue
             if not data:
                 continue
 
