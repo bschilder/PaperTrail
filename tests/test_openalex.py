@@ -84,3 +84,34 @@ def test_abstract_search_rejects_topically_similar_mismatch(monkeypatch):
              "based on conditional diffusion achieving strong results on colorization")
     _mock_openalex(monkeypatch, other)
     assert _lookup_openalex_by_abstract(OURS, "e@x.org") is None
+
+
+def test_fill_missing_metadata_raw_title_and_affiliations(monkeypatch):
+    """The batch backfill must also pass raw titles and now fills affiliations."""
+    from papertrail import enricher
+
+    captured = {}
+
+    class _Resp:
+        ok = True
+
+        def json(self):
+            return {"results": [{
+                "publication_year": 2020,
+                "cited_by_count": 5,
+                "authorships": [{"author": {"display_name": "Ada Lovelace"},
+                                 "institutions": [{"display_name": "MIT"}]}],
+                "abstract_inverted_index": {"Hello": [0], "world": [1]},
+            }]}
+
+    def fake_get(url, params=None, headers=None, timeout=None):
+        captured["params"] = params
+        return _Resp()
+
+    monkeypatch.setattr(enricher.requests, "get", fake_get)
+    papers = [{"title": "Some Real Paper Title", "url": "https://h/x", "authors": []}]
+    enricher.fill_missing_metadata(papers, email="e@x.org")
+
+    assert captured["params"]["filter"] == "title.search:Some Real Paper Title"
+    assert papers[0]["authors"] == ["Ada Lovelace"]
+    assert papers[0]["affiliations"] == ["MIT"]

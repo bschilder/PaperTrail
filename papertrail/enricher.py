@@ -1027,7 +1027,7 @@ def enrich_paper(url: str, timeout: int = DEFAULT_TIMEOUT) -> dict[str, Any]:
 def fill_missing_metadata(
     papers: list[dict[str, Any]],
     email: str = "papertrail@example.com",
-    fields: tuple[str, ...] = ("abstract", "authors", "journal", "year", "cited_by_count"),
+    fields: tuple[str, ...] = ("abstract", "authors", "affiliations", "journal", "year", "cited_by_count"),
 ) -> int:
     """
     Fill missing metadata for a list of papers using OpenAlex title search.
@@ -1072,11 +1072,11 @@ def fill_missing_metadata(
                     timeout=10,
                 )
             else:
-                from urllib.parse import quote
-                safe_title = quote(title[:100], safe='')
+                # Pass the title as raw text — requests URL-encodes params itself.
+                # Pre-quoting double-encodes spaces (%20→%2520) and matches nothing.
                 resp = requests.get(
                     OPENALEX_API,
-                    params={"filter": f"title.search:{safe_title}", "per_page": 1},
+                    params={"filter": f"title.search:{title[:100]}", "per_page": 1},
                     headers=headers,
                     timeout=10,
                 )
@@ -1103,6 +1103,16 @@ def fill_missing_metadata(
             if "authors" in fields and not p.get("authors") and data.get("authorships"):
                 p["authors"] = [a["author"]["display_name"] for a in data["authorships"][:10]]
                 changed = True
+            if "affiliations" in fields and not p.get("affiliations") and data.get("authorships"):
+                affs = list(dict.fromkeys(
+                    inst.get("display_name", "")
+                    for a in data["authorships"]
+                    for inst in a.get("institutions", [])
+                    if inst.get("display_name")
+                ))
+                if affs:
+                    p["affiliations"] = affs
+                    changed = True
             if "abstract" in fields and not p.get("abstract") and data.get("abstract_inverted_index"):
                 inv = data["abstract_inverted_index"]
                 words: dict[int, str] = {}
