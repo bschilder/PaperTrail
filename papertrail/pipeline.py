@@ -25,6 +25,28 @@ def load_config(config_path: str = "config.yml") -> dict:
         return yaml.safe_load(f)
 
 
+def _workspace_slug(config: dict) -> str:
+    """Derive the workspace slug from the Slack workspace URL.
+
+    Mirrors the slug logic in .github/workflows/pipeline.yml so the pipeline,
+    the committed data dir, and the published dashboard path all agree.
+    """
+    url = config.get("slack_workspace_url", "")
+    if "//" in url:
+        return url.split("//")[1].split(".")[0]
+    return "dashboard"
+
+
+def _existing_data_path(config: dict) -> Path:
+    """Path to this workspace's committed enriched data (the merge cache).
+
+    Historically this was a single hardcoded ``data/papers_final.json`` which
+    stopped existing once data moved under ``data/<workspace>/`` — silently
+    disabling incremental enrichment and forcing a full re-enrich every run.
+    """
+    return Path("data") / _workspace_slug(config) / "papers_final.json"
+
+
 def run_pipeline(
     config_path: str = "config.yml",
     output_dir: str = "build",
@@ -149,7 +171,7 @@ def run_pipeline(
 
     # ── Step 2: Enrich ──────────────────────────────────────────
     # Merge with existing enriched data to avoid re-enriching known papers
-    existing_path = Path("data/papers_final.json")
+    existing_path = _existing_data_path(config)
     existing_by_url = {}
     if existing_path.exists():
         with open(existing_path) as f:
@@ -208,16 +230,10 @@ def run_pipeline(
     logger.info("Enriched %d additional papers via title search", fill_count)
 
     # Remove dead links (untitled papers with 404/error pages)
-    from papertrail.enrich_cascade import apply_url_fallback_titles, remove_dead_links
+    from papertrail.enrich_cascade import remove_dead_links
     dead_count = remove_dead_links(all_papers)
     if dead_count:
         logger.info("Removed %d dead links → %d papers", dead_count, len(all_papers))
-
-    # Give any still-untitled papers a readable title derived from their URL,
-    # so bot-blocked/paywalled papers we keep don't render as "(no title)".
-    titled = apply_url_fallback_titles(all_papers)
-    if titled:
-        logger.info("Applied URL-based fallback titles to %d papers", titled)
 
     with open(enriched_path, "w") as f:
         json.dump(all_papers, f, indent=2)
@@ -284,6 +300,15 @@ def run_pipeline(
     with open(final_path, "w") as f:
         json.dump(all_papers, f, indent=2)
     logger.info("Embedded %d papers → %s (%d dims)", len(all_papers), final_path, embeddings.shape[1])
+
+    # Give still-untitled papers a readable title derived from their URL, for
+    # display ONLY. This runs AFTER writing the merge cache (final_path) so the
+    # cache keeps real titles only — otherwise fallback titles would block
+    # re-enrichment next run and collide in title-dedup.
+    from papertrail.enrich_cascade import apply_url_fallback_titles
+    titled = apply_url_fallback_titles(all_papers)
+    if titled:
+        logger.info("Applied URL-based fallback titles to %d papers (display only)", titled)
 
     # ── Step 4: Build Dashboard ─────────────────────────────────
     logger.info("Building dashboard...")

@@ -170,6 +170,10 @@ jobs:
           path: site
 
   deploy:
+    # GitHub Pages environment is restricted to the default branch, so this
+    # only runs on main. Gating it keeps PR-branch test runs from showing a
+    # false failure on the Pages step (Vercel deploy happens in the pipeline job).
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
