@@ -1797,7 +1797,30 @@
       -0.0634,
       0.0746,
       0.0002
-    ]
+    ],
+    "abstract": "The Harvard-Emory ECG Database (HEEDB) is currently the largest open-access collection of 12-lead electrocardiogram (ECG) recordings, developed through a collaboration between Harvard and Emory University. The database consists of 10,608,417 ECG recordings from 1,818,247 patients from Massachusetts General Hospital (MGH) and 998,844 recordings from 349,548 patients from Emory University Hospital (EUH) collected between 1980 and 2022 in clinical settings as part of routine patient care. The ECGs are 10-second, 12-lead recordings sampled at either 250 or 500 Hz, and stored in WFDB format. Each ECG is linked to demographic metadata (age, sex, race, ethnicity, education), along with deidentified acquisition dates, last visit dates, and death dates, when available. The dataset includes three forms of MarquetteTM 12SL Analysis Software annotations: (1) batch-reprocessed diagnostic labels generated using the latest available 12SL software (version 24); (2) the original 12SL outputs from the time of ECG acquisition; and (3) the corresponding physician overreads. Additionally, the dataset includes associated ICD-9 and ICD-10 codes with the corresponding diagnosis dates. This database represents a large, diverse multi-center collection on which machine learning algorithms can be trained and tested for performance and bias.",
+    "authors": [
+      "Zuzana Koscova",
+      "Qiao Li",
+      "Chad Robichaux",
+      "Valdery Moura",
+      "Manohar Ghanta",
+      "Aditya Gupta",
+      "Jonathan Rosand",
+      "Aaron D. Aguirre",
+      "Erik Reinertsen",
+      "Steven Song",
+      "Shenda Hong",
+      "David E. Albert",
+      "Joel Xue",
+      "Aarya Parekh",
+      "Reza Sameni",
+      "Matthew A. Reyna",
+      "M. Brandon Westover",
+      "Gari D. Clifford"
+    ],
+    "year": 2026,
+    "doi": "10.1038/s41597-026-06861-9"
   },
   {
     "channel": "standardmodelbio",
@@ -7201,7 +7224,19 @@
       -0.0148,
       0.0504,
       -0.0363
-    ]
+    ],
+    "abstract": "With the rise and ever-increasing potential of deep learning techniques in recent years, publicly available medical datasets became a key factor to enable reproducible development of diagnostic algorithms in the medical domain. Medical data contains sensitive patient-related information and is therefore usually anonymized by removing patient identifiers, e.g., patient names before publication. To the best of our knowledge, we are the first to show that a well-trained deep learning system is able to recover the patient identity from chest X-ray data. We demonstrate this using the publicly available large-scale ChestX-ray14 dataset, a collection of 112,120 frontal-view chest X-ray images from 30,805 unique patients. Our verification system is able to identify whether two frontal chest X-ray images are from the same person with an AUC of 0.9940 and a classification accuracy of 95.55%. We further highlight that the proposed system is able to reveal the same person even ten and more years after the initial scan. When pursuing a retrieval approach, we observe an mAP@R of 0.9748 and a precision@1 of 0.9963. Furthermore, we achieve an AUC of up to 0.9870 and a precision@1 of up to 0.9444 when evaluating our trained networks on external datasets such as CheXpert and the COVID-19 Image Data Collection. Based on this high identification rate, a potential attacker may leak patient-related information and additionally cross-reference images to obtain more information. Thus, there is a great risk of sensitive content falling into unauthorized hands or being disseminated against the will of the concerned patients. Especially during the COVID-19 pandemic, numerous chest X-ray datasets have been published to advance research. Therefore, such data may be vulnerable to potential attacks by deep learning-based re-identification algorithms.",
+    "authors": [
+      "Kai Packh\u00e4user",
+      "Sebastian G\u00fcndel",
+      "Nicolas M\u00fcnster",
+      "Christopher Syben",
+      "Vincent Christlein",
+      "Andreas Maier"
+    ],
+    "year": 2022,
+    "doi": "10.1038/s41598-022-19045-3",
+    "cited_by_count": 80
   },
   {
     "channel": "standardmodelbio",
@@ -11233,7 +11268,26 @@
       -0.0745,
       0.0568,
       -0.0239
-    ]
+    ],
+    "abstract": "Head and neck cancer is a common disease and is associated with a poor prognosis. A promising approach to improving patient outcomes is personalized treatment, which uses information from a variety of modalities. However, only little progress has been made due to the lack of large public datasets. We present a multimodal dataset, HANCOCK, that comprises monocentric, real-world data of 763 head and neck cancer patients. Our dataset contains demographical, pathological, and blood data as well as surgery reports and histologic images, that can be explored in a low-dimensional representation. We can show that combining these modalities using machine learning is superior to a single modality and the integration of imaging data using foundation models helps in endpoint prediction. We believe that HANCOCK will not only open new insights into head and neck cancer pathology but also serve as a major source for researching multimodal machine-learning methodologies in precision oncology.",
+    "authors": [
+      "Marion D\u00f6rrich",
+      "Matthias Balk",
+      "Tatjana Heusinger",
+      "Sandra Beyer",
+      "Hamed Mirbagheri",
+      "David J. Fischer",
+      "Hassan Kanso",
+      "Christian Matek",
+      "Arndt Hartmann",
+      "Heinrich Iro",
+      "Markus Eckstein",
+      "Antoniu\u2010Oreste Gostian",
+      "Andreas M. Kist"
+    ],
+    "year": 2025,
+    "doi": "10.1038/s41467-025-62386-6",
+    "cited_by_count": 8
   },
   {
     "channel": "standardmodelbio",
