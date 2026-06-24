@@ -66,6 +66,29 @@ def test_ok_page_is_not_dead(monkeypatch):
     assert is_dead_link("https://example.com/paper") is False
 
 
+# --- cascade applies abstract-only enrichment (e.g. from PDF parsing) ----------
+
+def test_cascade_applies_abstract_even_without_title(monkeypatch):
+    monkeypatch.setattr(enrich_cascade, "enrich_url",
+                        lambda url, email="x": {"abstract": "Recovered from the PDF."})
+    papers = [{"url": "https://host/paper.pdf", "title": ""}]
+    n = enrich_cascade.enrich_papers_cascade(papers, delay=0)
+    assert n == 1
+    assert papers[0]["abstract"] == "Recovered from the PDF."
+    assert not papers[0].get("title")  # no junk title invented
+
+
+def test_cascade_skips_papers_that_already_have_an_abstract(monkeypatch):
+    calls = []
+    def fake(url, email="x"):
+        calls.append(url)
+        return {}
+    monkeypatch.setattr(enrich_cascade, "enrich_url", fake)
+    papers = [{"url": "https://host/x", "title": "", "abstract": "Already enriched."}]
+    enrich_cascade.enrich_papers_cascade(papers, delay=0)
+    assert calls == []  # not re-fetched — it already has content
+
+
 # --- URL-based fallback titles -------------------------------------------------
 
 def test_derive_title_arxiv():

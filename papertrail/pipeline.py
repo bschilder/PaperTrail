@@ -176,7 +176,10 @@ def run_pipeline(
     if existing_path.exists():
         with open(existing_path) as f:
             for p in json.load(f):
-                if p.get("url") and p.get("title"):
+                # Reuse any paper we previously got content for — a title OR an
+                # abstract (e.g. a PDF-parsed abstract on an otherwise untitled
+                # paper), so we don't re-download/re-enrich it every run.
+                if p.get("url") and (p.get("title") or (p.get("abstract") or "").strip()):
                     existing_by_url[p["url"]] = p
         logger.info("Loaded %d existing enriched papers for merge", len(existing_by_url))
 
