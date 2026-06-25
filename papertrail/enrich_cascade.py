@@ -598,6 +598,14 @@ def _extract_ids(url: str) -> dict[str, str]:
         if m:
             ids["doi"] = m.group(1)
 
+        # bioRxiv/medRxiv "content/early/YYYY/MM/DD/YYYY.MM.DD.NNNNNN" (no 10.xxxx
+        # in the path) — reconstruct the DOI from the trailing date-id.
+        if re.search(r'bio[rx]xiv\.org|biorxiv\.org|medrxiv\.org', url, re.I):
+            m = re.search(r'/(\d{4}\.\d{2}\.\d{2}\.\d+)', url)
+            if m:
+                ids["doi"] = "10.1101/" + m.group(1)
+                ids["biorxiv_doi"] = ids["doi"]
+
     # arXiv ID
     arxiv_match = re.search(r'arxiv\.org/(?:abs|pdf)/(\d{4}\.\d{4,})', url, re.I)
     if arxiv_match:
@@ -626,18 +634,24 @@ def _clean_doi(doi: str) -> str:
 
 
 def _doi_candidates(doi: str):
-    """Yield the DOI then progressively shorter forms (drop trailing /segments).
+    """Yield the DOI and lookup-friendly variants.
 
-    Recovers DOIs the URL regex over-captured with a trailing page/path crumb
-    (OUP '10.1093/gigascience/giaf132/829' → '…/giaf132'), without guessing
-    which slash is the boundary — we just retry the lookup against each form.
+    - version-stripped: bioRxiv/arXiv URLs carry a version suffix
+      ('10.1101/2024.10.29.620913v2') that OpenAlex 404s — the indexed DOI is
+      versionless.
+    - progressively shorter: the URL regex over-captures a trailing page/path
+      crumb (OUP '10.1093/gigascience/giaf132/829' → '…/giaf132'); we retry
+      the lookup against each form rather than guess the boundary.
     """
-    yield doi
-    parts = doi.split('/')
-    # DOI = prefix '10.xxxx' + suffix; never trim below prefix + first suffix seg
-    while len(parts) > 2:
-        parts = parts[:-1]
-        yield '/'.join(parts)
+    seen: set[str] = set()
+    for base in (doi, re.sub(r'v\d+$', '', doi)):
+        parts = base.split('/')
+        while len(parts) >= 2:  # never trim below prefix '10.xxxx' + first suffix seg
+            cand = '/'.join(parts)
+            if cand and cand not in seen:
+                seen.add(cand)
+                yield cand
+            parts = parts[:-1]
 
 
 def _lookup_openalex_doi(doi: str, email: str) -> Optional[dict]:
