@@ -136,3 +136,24 @@ def test_fill_missing_metadata_rejects_mismatched_title(monkeypatch):
     papers = [{"title": "Interpreting Language Model Parameters", "url": "https://goodfire.ai/x", "authors": []}]
     enricher.fill_missing_metadata(papers, email="e@x.org")
     assert not papers[0].get("authors")  # mismatch rejected, no wrong metadata
+
+
+def test_clean_doi_truncates_embedded_url():
+    from papertrail.enrich_cascade import _clean_doi
+    assert _clean_doi("10.1126/science.abl4290https://www.science.org/doi/x") == "10.1126/science.abl4290"
+    assert _clean_doi("10.1101/2023.07.26.550653.full") == "10.1101/2023.07.26.550653"
+
+
+def test_doi_candidates_trims_trailing_segments():
+    from papertrail.enrich_cascade import _doi_candidates
+    cands = list(_doi_candidates("10.1093/gigascience/giaf132/829"))
+    assert cands[0] == "10.1093/gigascience/giaf132/829"
+    assert "10.1093/gigascience/giaf132" in cands   # the real DOI is reached
+    assert all(c.startswith("10.1093/") for c in cands)
+    assert "10.1093" not in cands                    # never trims below prefix+1
+
+
+def test_extract_ids_cleans_doubled_science_url():
+    from papertrail.enrich_cascade import _extract_ids
+    ids = _extract_ids("https://www.science.org/doi/10.1126/science.abl4290https://www.science.org/doi/1")
+    assert ids.get("doi") == "10.1126/science.abl4290"

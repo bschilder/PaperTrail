@@ -21,12 +21,35 @@ def test_titles_match_rejects_unrelated():
     assert not _titles_match("", "anything")
 
 
+def test_titles_match_rejects_partial_fragment_false_positive():
+    # Real bug: a PDF body fragment matched an unrelated paper because its few
+    # tokens were a subset of the candidate. Jaccard (overlap/union) rejects it.
+    assert not _titles_match(
+        "The conflicting constraints",
+        "Conflicting constraints on the form of intertidal algae",
+    )
+
+
+def test_titles_match_tolerates_minor_truncation():
+    assert _titles_match(
+        "Denoising Diffusion Probabilistic",
+        "Denoising Diffusion Probabilistic Models",
+    )
+
+
 def test_is_pdf_url():
     assert _is_pdf_url("https://tahoebio-assets.com/rhaister-manuscript.pdf")
     assert _is_pdf_url("https://www.ttic.edu/dl/dark14.pdf")
     assert _is_pdf_url("https://cdn.openai.com/pdf/abc.pdf?token=xyz")  # query string
     assert not _is_pdf_url("https://arxiv.org/abs/2401.12345")
     assert not _is_pdf_url("https://www.nature.com/articles/s41586-024-1.html")
+
+
+def test_is_pdf_url_openreview():
+    # OpenReview serves PDFs at /pdf?id=... — no .pdf extension, id in query.
+    assert _is_pdf_url("https://openreview.net/pdf?id=HJFVrpCaGE")
+    assert _is_pdf_url("https://openreview.net/pdf/abc123")
+    assert not _is_pdf_url("https://openreview.net/forum?id=HJFVrpCaGE")  # forum page, not PDF
 
 
 SAMPLE = """A Foundation Model for the Cancer Genome
