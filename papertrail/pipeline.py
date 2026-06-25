@@ -251,12 +251,11 @@ def run_pipeline(
         compute_projections_3d,
     )
 
-    from papertrail.enrich_cascade import clean_text_for_clustering
+    from papertrail.enrich_cascade import clustering_text
 
-    texts = [
-        clean_text_for_clustering(p.get("title", ""), p.get("abstract", ""), p.get("text", ""))
-        for p in all_papers
-    ]
+    # clustering_text falls back to channel + URL slug for content-less papers,
+    # so husks don't collapse to a degenerate embedding (the outlier-island artifact).
+    texts = [clustering_text(p) for p in all_papers]
 
     backend = config.get("embedding_backend", None)
     embeddings = embed_texts(texts, backend=backend)
