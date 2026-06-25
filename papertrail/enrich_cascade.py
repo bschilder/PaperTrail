@@ -369,7 +369,7 @@ def enrich_url(url: str, email: str = "papertrail@example.com") -> dict[str, Any
 
     # Elsevier/Cell PII → Crossref search
     if ids.get("pii") and not result.get("title"):
-        r = _lookup_crossref_pii(ids["pii"])
+        r = _lookup_pubmed_pii(ids["pii"], email) or _lookup_crossref_pii(ids["pii"])
         if r and r.get("title"):
             result = {**result, **{k: v for k, v in r.items() if v}}
 
@@ -583,10 +583,15 @@ def _extract_ids(url: str) -> dict[str, str]:
         if m:
             ids["doi"] = m.group(1)
 
-        # Cell/Elsevier PII → search Crossref
+        # Cell/Elsevier PII → search Crossref/PubMed
         m = re.search(r'(S\d{4}-\d{4}\(\d{2}\)\d{5}-\w)', url, re.I)
         if m:
             ids["pii"] = m.group(1)
+        # Bare ScienceDirect PII (no punctuation): /pii/S2405471224003120
+        if not ids.get("pii"):
+            m = re.search(r'/pii/(S\d{15,17})', url, re.I)
+            if m:
+                ids["pii"] = m.group(1)
 
         # PNAS: pnas.org/doi/10.1073/...
         m = re.search(r'pnas\.org/doi/(10\.\d+/[^\s?#]+)', url, re.I)
@@ -799,6 +804,73 @@ def _lookup_crossref(doi: str) -> Optional[dict]:
     return None
 
 
+def _format_pii_variants(pii: str) -> list[str]:
+    """PII forms to try. A bare 16-digit ScienceDirect PII (S2405471224003120)
+    is reformatted to the standard punctuated form (S2405-4712(24)00312-0) that
+    PubMed indexes; the punctuated form is returned as-is."""
+    out = [pii]
+    digits = re.sub(r'\D', '', pii)
+    if len(digits) == 16:
+        f = f"S{digits[0:4]}-{digits[4:8]}({digits[8:10]}){digits[10:15]}-{digits[15]}"
+        if f not in out:
+            out.append(f)
+    return out
+
+
+def _lookup_pubmed_pii(pii: str, email: str) -> Optional[dict]:
+    """Resolve an Elsevier/Cell PII via PubMed E-utilities (the documented
+    most-reliable path for PIIs, whose publisher pages hard-403). esearch by PII
+    → PMID → esummary for title/journal/year/authors/DOI, then OpenAlex (by DOI,
+    else validated title) for abstract/affiliations/citations."""
+    headers = {**HEADERS, "User-Agent": f"PaperTrail/1.0 (mailto:{email})"}
+    base = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
+    try:
+        pmid = None
+        for variant in _format_pii_variants(pii):
+            for term in (variant, f"{variant}[pii]"):
+                r = requests.get(f"{base}/esearch.fcgi",
+                                 params={"db": "pubmed", "term": term, "retmode": "json", "email": email},
+                                 headers=headers, timeout=10)
+                idlist = r.json().get("esearchresult", {}).get("idlist", []) if r.ok else []
+                if idlist:
+                    pmid = idlist[0]
+                    break
+                time.sleep(0.34)  # NCBI rate limit (3 req/s w/o key)
+            if pmid:
+                break
+        if not pmid:
+            return None
+
+        r = requests.get(f"{base}/esummary.fcgi",
+                         params={"db": "pubmed", "id": pmid, "retmode": "json", "email": email},
+                         headers=headers, timeout=10)
+        rec = r.json().get("result", {}).get(pmid, {}) if r.ok else {}
+        title = (rec.get("title") or "").strip().rstrip('.')
+        if not title:
+            return None
+        doi = next((a.get("value") for a in rec.get("articleids", []) if a.get("idtype") == "doi"), None)
+        yr = rec.get("pubdate", "")[:4]
+        result: dict[str, Any] = {
+            "title": title,
+            "year": int(yr) if yr.isdigit() else None,
+            "journal": rec.get("fulljournalname") or None,
+            "authors": [a.get("name", "") for a in rec.get("authors", []) if a.get("name")],
+            "doi": doi,
+        }
+        oa = _lookup_openalex_doi(doi, email) if doi else None
+        if not oa:
+            cand = _lookup_openalex_title(title, email)
+            oa = cand if cand and _titles_match(title, cand.get("title", "")) else None
+        if oa:
+            for k, v in oa.items():
+                if v and not result.get(k):
+                    result[k] = v
+        return {k: v for k, v in result.items() if v}
+    except Exception as e:
+        logger.debug("PubMed PII lookup failed for %s: %s", pii, e)
+        return None
+
+
 def _lookup_crossref_pii(pii: str) -> Optional[dict]:
     """Look up a paper by Elsevier PII in Crossref."""
     try:
@@ -944,6 +1016,40 @@ def clean_text_for_clustering(title: str, abstract: str, message: str) -> str:
             if len(cleaned) > 5:
                 parts.append(cleaned)
     return ' '.join(parts)
+
+
+def has_semantic_content(paper: dict) -> bool:
+    """True if the paper has a real title or an abstract (something to theme on)."""
+    t = (paper.get("title") or "").strip().lower()
+    has_title = bool(t) and t not in ("untitled", "unknown title", "(no title)", "none", "null")
+    return has_title or bool((paper.get("abstract") or "").strip())
+
+
+def _is_nonpaper_host(url: str) -> bool:
+    """True for hosts that are not scholarly papers (code repos, app backends,
+    HF spaces/docs) — used to drop content-less husks that carry no theme."""
+    parsed = urlparse(url or "")
+    host = parsed.netloc.lower().replace("www.", "")
+    path = parsed.path.lower()
+    if host == "github.com" or host.endswith(".github.io") or host == "github.io":
+        return True
+    if host.endswith("supabase.co"):
+        return True
+    if host.endswith("huggingface.co") and (path.startswith("/spaces") or path.startswith("/docs")):
+        return True
+    return False
+
+
+def drop_nonpaper_husks(papers: list[dict]) -> int:
+    """Remove content-less papers (no title and no abstract) whose URL is a
+    non-paper host. These carry no theme and only add noise to the map. Real
+    papers we merely failed to enrich (biorxiv, cell, …) are kept. In-place."""
+    before = len(papers)
+    papers[:] = [
+        p for p in papers
+        if has_semantic_content(p) or not _is_nonpaper_host(p.get("url") or p.get("paper_url") or "")
+    ]
+    return before - len(papers)
 
 
 def clustering_text(paper: dict) -> str:
