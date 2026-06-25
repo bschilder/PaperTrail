@@ -6,9 +6,9 @@ PaperTrail automatically discovers papers shared across your Slack workspace, en
 
 ### Live Demos
 
-- **Landing page** (lab picker): [papertrail-xi.vercel.app](https://papertrail-xi.vercel.app)
-- Koo Lab Dashboard — [Vercel](https://papertrail-xi.vercel.app/koolab/) · [GitHub Pages](https://bschilder.github.io/PaperTrail/koolab/)
-- Standard Model Bio Dashboard — [Vercel](https://papertrail-xi.vercel.app/standardmodelbio/) · [GitHub Pages](https://bschilder.github.io/PaperTrail/standardmodelbio/)
+- **Landing page** (lab picker): [papertrail-portal.vercel.app](https://papertrail-portal.vercel.app)
+- Koo Lab Dashboard — [Vercel](https://papertrail-portal.vercel.app/koolab/) · [GitHub Pages](https://bschilder.github.io/PaperTrail/koolab/)
+- Standard Model Bio Dashboard — [Vercel](https://papertrail-portal.vercel.app/standardmodelbio/) · [GitHub Pages](https://bschilder.github.io/PaperTrail/standardmodelbio/)
 
 [Documentation](https://bschilder.github.io/PaperTrail) · [Report Bug](https://github.com/bschilder/PaperTrail/issues) · [Request Feature](https://github.com/bschilder/PaperTrail/issues)
 
