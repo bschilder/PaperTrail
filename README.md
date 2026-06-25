@@ -1,6 +1,12 @@
 # PaperTrail
 
+[![Pipeline](https://github.com/bschilder/PaperTrail/actions/workflows/pipeline.yml/badge.svg)](https://github.com/bschilder/PaperTrail/actions/workflows/pipeline.yml)
+[![Freshness](https://github.com/bschilder/PaperTrail/actions/workflows/freshness.yml/badge.svg)](https://github.com/bschilder/PaperTrail/actions/workflows/freshness.yml)
+[![CI](https://github.com/bschilder/PaperTrail/actions/workflows/ci.yml/badge.svg)](https://github.com/bschilder/PaperTrail/actions/workflows/ci.yml)
+
 **Every paper your team shares — found and mapped.**
+
+> Dashboards rebuild & redeploy automatically every Sunday (GitHub Actions cron); the [landing page](https://papertrail-portal.vercel.app) footer shows the last data update.
 
 PaperTrail automatically discovers papers shared across your Slack workspace, enriches them with metadata, computes LLM semantic embeddings, and builds an interactive visual dashboard with hierarchical topic clustering, AI-powered search, and full engagement metrics.
 
