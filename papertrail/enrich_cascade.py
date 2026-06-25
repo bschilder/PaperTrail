@@ -38,7 +38,15 @@ NATURE_JOURNALS = {
     's41568': 'Nature Reviews Cancer', 's42003': 'Communications Biology',
 }
 
-HEADERS = {"User-Agent": "PaperTrail/1.0 (https://github.com/bschilder/PaperTrail)"}
+# Use a real browser User-Agent: many publisher/preprint endpoints (notably the
+# Cloudflare-fronted bioRxiv API) return 503/403 to non-browser agents. OpenAlex
+# lookups override this with a polite mailto UA, so the polite pool is unaffected.
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    )
+}
 
 
 def _normalize_pdf_url(url: str) -> str:
@@ -53,8 +61,16 @@ def _normalize_pdf_url(url: str) -> str:
 
 
 def _is_pdf_url(url: str) -> bool:
-    """True if the URL path points at a PDF (ignoring query string)."""
-    return urlparse(url).path.lower().endswith(".pdf")
+    """True if the URL points at a PDF.
+
+    Covers the normal `.pdf` extension plus OpenReview, which serves PDFs at
+    `/pdf?id=...` (the id is in the query string, so the path has no extension).
+    """
+    parsed = urlparse(url)
+    if parsed.path.lower().endswith(".pdf"):
+        return True
+    host = parsed.netloc.lower().replace("www.", "")
+    return host.endswith("openreview.net") and "/pdf" in parsed.path.lower()
 
 
 def _looks_like_title(s: str) -> bool:
@@ -316,12 +332,14 @@ def enrich_url(url: str, email: str = "papertrail@example.com") -> dict[str, Any
     ids = _extract_ids(url)
 
     if ids.get("doi"):
-        r = _lookup_openalex_doi(ids["doi"], email)
-        if r and r.get("title"):
-            result = {**result, **{k: v for k, v in r.items() if v}}
-            if result.get("title") and result.get("abstract"):
-                logger.debug("Enriched via OpenAlex DOI: %s", url[:60])
-                return result
+        for cand in _doi_candidates(ids["doi"]):
+            r = _lookup_openalex_doi(cand, email)
+            if r and r.get("title"):
+                result = {**result, **{k: v for k, v in r.items() if v}}
+                if result.get("title") and result.get("abstract"):
+                    logger.debug("Enriched via OpenAlex DOI: %s", url[:60])
+                    return result
+                break
 
     if ids.get("arxiv_id"):
         r = _lookup_openalex_arxiv(ids["arxiv_id"], email)
@@ -591,7 +609,35 @@ def _extract_ids(url: str) -> dict[str, str]:
         if id_match:
             ids["openreview_id"] = id_match.group(1)
 
+    for k in ("doi", "biorxiv_doi"):
+        if ids.get(k):
+            ids[k] = _clean_doi(ids[k])
     return ids
+
+
+def _clean_doi(doi: str) -> str:
+    """Trim crumbs the URL regex over-captures: an embedded second URL
+    (science.org doubled links → '…abl4290https://…') and trailing file
+    extensions / punctuation. Trailing path-segment junk (e.g. OUP '/829') is
+    handled separately by _doi_candidates' trim-retry."""
+    doi = re.split(r'https?://', doi, maxsplit=1)[0]
+    doi = re.sub(r'\.(pdf|html?|xml|full|abstract)$', '', doi, flags=re.I)
+    return doi.rstrip('/.')
+
+
+def _doi_candidates(doi: str):
+    """Yield the DOI then progressively shorter forms (drop trailing /segments).
+
+    Recovers DOIs the URL regex over-captured with a trailing page/path crumb
+    (OUP '10.1093/gigascience/giaf132/829' → '…/giaf132'), without guessing
+    which slash is the boundary — we just retry the lookup against each form.
+    """
+    yield doi
+    parts = doi.split('/')
+    # DOI = prefix '10.xxxx' + suffix; never trim below prefix + first suffix seg
+    while len(parts) > 2:
+        parts = parts[:-1]
+        yield '/'.join(parts)
 
 
 def _lookup_openalex_doi(doi: str, email: str) -> Optional[dict]:
