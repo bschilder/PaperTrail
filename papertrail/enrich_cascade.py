@@ -886,6 +886,31 @@ def clean_text_for_clustering(title: str, abstract: str, message: str) -> str:
     return ' '.join(parts)
 
 
+def clustering_text(paper: dict) -> str:
+    """Text used to embed/cluster a paper.
+
+    Content-less husks (no title/abstract, URL-only message) otherwise produce
+    an EMPTY clustering string — and every empty string embeds to the same point,
+    which UMAP/t-SNE fling to a far-off outlier island (the "Paper Reference" /
+    "Paper Sources" artifact). For those, fall back to the channel name (a strong
+    topical prior) plus a URL-derived slug (per-paper distinctness) so they land
+    near their real topic instead of collapsing.
+    """
+    text = clean_text_for_clustering(
+        paper.get("title", ""), paper.get("abstract", ""), paper.get("text", "")
+    )
+    if len(text.strip()) >= 6:
+        return text
+    channels = paper.get("channels") or ([paper["channel"]] if paper.get("channel") else [])
+    ch = " ".join(c.replace("-", " ").replace("_", " ") for c in channels if c)
+    # Tokenize the whole URL (domain + path + query) so papers whose only
+    # distinguishing id sits in the query string (e.g. openreview /pdf?id=XYZ)
+    # still get distinct text instead of collapsing to a shared slug.
+    parsed = urlparse(paper.get("url") or paper.get("paper_url") or "")
+    url_tokens = re.sub(r"[^a-z0-9]+", " ", f"{parsed.netloc} {parsed.path} {parsed.query}".lower()).strip()
+    return f"{ch} {url_tokens}".strip()
+
+
 def _clean_title(title: str) -> str:
     """Clean up a title string."""
     title = re.sub(r'\s+', ' ', title).strip()
