@@ -157,3 +157,16 @@ def test_extract_ids_cleans_doubled_science_url():
     from papertrail.enrich_cascade import _extract_ids
     ids = _extract_ids("https://www.science.org/doi/10.1126/science.abl4290https://www.science.org/doi/1")
     assert ids.get("doi") == "10.1126/science.abl4290"
+
+
+def test_doi_candidates_strips_version():
+    from papertrail.enrich_cascade import _doi_candidates
+    cands = list(_doi_candidates("10.1101/2024.10.29.620913v2"))
+    assert "10.1101/2024.10.29.620913" in cands  # versionless form tried
+
+
+def test_extract_ids_biorxiv_early_format():
+    from papertrail.enrich_cascade import _extract_ids
+    ids = _extract_ids("http://biorxiv.org/content/early/2023/10/26/2023.07.26.550653")
+    assert ids.get("doi") == "10.1101/2023.07.26.550653"
+    assert ids.get("biorxiv_doi") == "10.1101/2023.07.26.550653"
