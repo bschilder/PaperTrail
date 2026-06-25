@@ -63,7 +63,7 @@ def discover_workspaces(config_glob: str = "config/*.yml") -> list[dict]:
     return workspaces
 
 
-def render(workspaces: list[dict]) -> str:
+def render(workspaces: list[dict], updated: str) -> str:
     cards = []
     for ws in workspaces:
         title = html.escape(ws["title"])
@@ -149,7 +149,7 @@ def render(workspaces: list[dict]) -> str:
 {cards_html}
   </div>
   <footer>
-    Updated weekly &middot; <a href="https://github.com/bschilder/PaperTrail">github.com/bschilder/PaperTrail</a>
+    Updated {updated} &middot; <a href="https://github.com/bschilder/PaperTrail">github.com/bschilder/PaperTrail</a>
   </footer>
 </body>
 </html>
@@ -160,12 +160,15 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Build the PaperTrail landing page.")
     parser.add_argument("--out", default="vercel_site/index.html", help="Output HTML path.")
     parser.add_argument("--config-glob", default="config/*.yml", help="Glob for workspace configs.")
+    parser.add_argument("--updated", default=None, help="Last-updated date (default: today, UTC).")
     args = parser.parse_args()
 
+    from datetime import datetime, timezone
+    updated = args.updated or datetime.now(timezone.utc).strftime("%Y-%m-%d")
     workspaces = discover_workspaces(args.config_glob)
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(render(workspaces))
+    out.write_text(render(workspaces, updated))
     print(f"Wrote landing page with {len(workspaces)} workspace(s) -> {out}")
     for ws in workspaces:
         print(f"  - {ws['slug']}: {ws['title']} ({ws['count']} papers)")

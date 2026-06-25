@@ -18,29 +18,52 @@ permissions:
   contents: write
   pages: write
   id-token: write
+  issues: write
 
 concurrency:
   group: "pipeline"
   cancel-in-progress: false
 
 jobs:
-  pipeline:
+  # ── Discover workspaces → matrix ──────────────────────────────
+  discover:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.gen.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
+      - id: gen
+        env:
+          WS_INPUT: ${{ inputs.workspace }}
+        run: |
+          if [ -n "$WS_INPUT" ]; then
+            arr=$(WS="$WS_INPUT" python3 -c "import json,os; print(json.dumps([os.environ['WS']]))")
+          else
+            arr=$(ls config/*.yml 2>/dev/null | xargs -n1 basename | sed 's/\.yml$//' \
+              | python3 -c "import sys,json; print(json.dumps([l.strip() for l in sys.stdin if l.strip()]))")
+          fi
+          echo "matrix=$arr" >> "$GITHUB_OUTPUT"
+          echo "Workspaces: $arr"
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+  # ── Build each workspace in parallel (isolated) ───────────────
+  build:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false          # one workspace failing must not block the others
+      matrix:
+        workspace: ${{ fromJSON(needs.discover.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - run: pip install -e ".[all,dev]"
 
-      - name: Install dependencies
-        run: pip install -e ".[all,dev]"
-
-      - name: Run pipelines for all workspaces
-        timeout-minutes: 120
+      - name: Build ${{ matrix.workspace }}
+        timeout-minutes: 90
         env:
-          # Slack tokens — each config references its own via slack_token_secret
+          WS: ${{ matrix.workspace }}
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACKBOT_STANDARDMODELBIO_TOKEN: ${{ secrets.SLACKBOT_STANDARDMODELBIO_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -49,63 +72,70 @@ jobs:
           OPENALEX_EMAIL: ${{ secrets.OPENALEX_EMAIL || format('{0}@users.noreply.github.com', github.actor) }}
         run: |
           set -e
+          cfg="config/${WS}.yml"
+          SLUG=$(python -c "import yaml; c=yaml.safe_load(open('$cfg')); url=c.get('slack_workspace_url',''); print(url.split('//')[1].split('.')[0] if '//' in url else 'dashboard')")
+          TOKEN_SECRET=$(python -c "import yaml; c=yaml.safe_load(open('$cfg')); print(c.get('slack_token_secret', 'SLACK_BOT_TOKEN'))")
+          export SLACK_BOT_TOKEN="${!TOKEN_SECRET}"
+          mkdir -p "build/$SLUG" "data/$SLUG"
 
-          # Find config files — single workspace or all
-          if [ -n "${{ inputs.workspace }}" ]; then
-            CONFIGS="config/${{ inputs.workspace }}.yml"
-          elif [ -d config ]; then
-            CONFIGS=$(ls config/*.yml 2>/dev/null)
+          if [ "${{ inputs.skip_scrape }}" = "true" ] && [ -f "data/$SLUG/papers_final.json" ]; then
+            papertrail -v run-pipeline -c "$cfg" -o "build/$SLUG" --skip-scrape --data-file "data/$SLUG/papers_final.json"
           else
-            CONFIGS="config.yml"
+            papertrail -v run-pipeline -c "$cfg" -o "build/$SLUG"
           fi
 
-          for cfg in $CONFIGS; do
-            echo "========================================="
-            echo "Processing: $cfg"
-            echo "========================================="
+          if [ ! -f "build/$SLUG/papers_final.json" ]; then
+            echo "::error::Pipeline produced no output for $SLUG"; exit 1
+          fi
+          cp "build/$SLUG/papers_final.json" "data/$SLUG/papers_final.json"
+          echo "SLUG=$SLUG" >> "$GITHUB_ENV"
 
-            # Extract workspace name from config
-            WORKSPACE=$(python -c "import yaml; c=yaml.safe_load(open('$cfg')); url=c.get('slack_workspace_url',''); name=url.split('//')[1].split('.')[0] if '//' in url else 'dashboard'; print(name)")
-            echo "Workspace: $WORKSPACE"
+      - name: Upload ${{ matrix.workspace }} artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ws-${{ matrix.workspace }}
+          path: |
+            build/${{ env.SLUG }}/dashboard.html
+            data/${{ env.SLUG }}/papers_final.json
+          if-no-files-found: error
+          retention-days: 7
 
-            # Set the correct Slack token for this workspace
-            TOKEN_SECRET=$(python -c "import yaml; c=yaml.safe_load(open('$cfg')); print(c.get('slack_token_secret', 'SLACK_BOT_TOKEN'))")
-            export SLACK_BOT_TOKEN="${!TOKEN_SECRET}"
+  # ── Collect built workspaces → commit + deploy (single atomic step) ──
+  deploy:
+    needs: build
+    if: ${{ always() && needs.build.result != 'cancelled' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[all,dev]"
 
-            OUTDIR="build/$WORKSPACE"
-            DATADIR="data/$WORKSPACE"
-            mkdir -p "$OUTDIR" "$DATADIR"
-
-            # Run pipeline
-            if [ "${{ inputs.skip_scrape }}" = "true" ] && [ -f "$DATADIR/papers_final.json" ]; then
-              echo "Skipping scrape, using existing data"
-              papertrail -v run-pipeline -c "$cfg" -o "$OUTDIR" --skip-scrape --data-file "$DATADIR/papers_final.json"
-            else
-              papertrail -v run-pipeline -c "$cfg" -o "$OUTDIR" || echo "WARNING: Pipeline failed for $WORKSPACE (may be missing token)"
-            fi
-
-            # Copy data for commit
-            if [ -f "$OUTDIR/papers_final.json" ]; then
-              cp "$OUTDIR/papers_final.json" "$DATADIR/papers_final.json"
-            fi
-          done
+      - name: Download built workspaces
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ws-*
+          merge-multiple: true   # restores build/<slug>/ and data/<slug>/ in place
 
       - name: Build docs + dashboards
         run: |
           mkdocs build --strict
-
-          # Deploy each workspace dashboard
           for cfg in config/*.yml; do
-            WORKSPACE=$(python -c "import yaml; c=yaml.safe_load(open('$cfg')); url=c.get('slack_workspace_url',''); name=url.split('//')[1].split('.')[0] if '//' in url else 'dashboard'; print(name)")
-            DASHBOARD="build/$WORKSPACE/dashboard.html"
-            if [ -f "$DASHBOARD" ]; then
-              mkdir -p "site/$WORKSPACE"
-              cp "$DASHBOARD" "site/$WORKSPACE/index.html"
-              echo "Deployed: site/$WORKSPACE/"
+            SLUG=$(python -c "import yaml; c=yaml.safe_load(open('$cfg')); url=c.get('slack_workspace_url',''); print(url.split('//')[1].split('.')[0] if '//' in url else 'dashboard')")
+            # If a workspace build failed (no fresh dashboard), rebuild from the
+            # committed data so it stays on the site rather than disappearing.
+            if [ ! -f "build/$SLUG/dashboard.html" ] && [ -f "data/$SLUG/papers_final.json" ]; then
+              echo "No fresh build for $SLUG — rebuilding dashboard from committed data"
+              TITLE=$(python -c "import yaml; print(yaml.safe_load(open('$cfg')).get('title','PaperTrail'))")
+              mkdir -p "build/$SLUG"
+              papertrail build "data/$SLUG/papers_final.json" -o "build/$SLUG/dashboard.html" --title "$TITLE" || true
+            fi
+            if [ -f "build/$SLUG/dashboard.html" ]; then
+              mkdir -p "site/$SLUG"
+              cp "build/$SLUG/dashboard.html" "site/$SLUG/index.html"
             fi
           done
-
-          # Backward compat redirect
           mkdir -p site/dashboard
           echo "<meta http-equiv='refresh' content='0;url=../koolab/'>" > site/dashboard/index.html
 
@@ -116,49 +146,35 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           set -e
-
           if [ -z "$VERCEL_TOKEN" ]; then
-            echo "VERCEL_TOKEN not set — skipping Vercel deploy (GitHub Pages deploy still runs)."
-            exit 0
+            echo "VERCEL_TOKEN not set — skipping Vercel deploy (GitHub Pages still runs)."; exit 0
           fi
-
           npm install --global vercel@latest
-
-          # Assemble a prebuilt static site via Vercel's Build Output API (v3).
-          # Using --prebuilt + VERCEL_PROJECT_ID pins the deploy to the
-          # "papertrail" project and skips any Vercel-side build step.
           OUT=.vercel/output/static
           rm -rf .vercel/output
           mkdir -p "$OUT"
           echo '{ "version": 3 }' > .vercel/output/config.json
-
-          # Lab-picker landing page at the root (reads config/*.yml + data counts)
           python scripts/build_landing.py --out "$OUT/index.html"
-
-          # One dashboard per workspace at /<slug>/
           for cfg in config/*.yml; do
-            WORKSPACE=$(python -c "import yaml; c=yaml.safe_load(open('$cfg')); url=c.get('slack_workspace_url',''); name=url.split('//')[1].split('.')[0] if '//' in url else 'dashboard'; print(name)")
-            DASHBOARD="build/$WORKSPACE/dashboard.html"
-            if [ -f "$DASHBOARD" ]; then
-              mkdir -p "$OUT/$WORKSPACE"
-              cp "$DASHBOARD" "$OUT/$WORKSPACE/index.html"
-              echo "Staged for Vercel: /$WORKSPACE/"
+            SLUG=$(python -c "import yaml; c=yaml.safe_load(open('$cfg')); url=c.get('slack_workspace_url',''); print(url.split('//')[1].split('.')[0] if '//' in url else 'dashboard')")
+            if [ -f "build/$SLUG/dashboard.html" ]; then
+              mkdir -p "$OUT/$SLUG"
+              cp "build/$SLUG/dashboard.html" "$OUT/$SLUG/index.html"
             fi
           done
-
           vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN" --yes
 
-      - name: Commit updated data
+      - name: Commit updated data (+ keep-alive heartbeat)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f data/
+          # Heartbeat: always stamp the run time so there is at least one commit
+          # per week. Keeps GitHub from auto-disabling the schedule after 60 days
+          # of inactivity, and doubles as the "data last updated" timestamp.
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > .github/last_run.txt
+          git add -f data/ .github/last_run.txt
           if ! git diff --staged --quiet; then
             git commit -m "Update paper data [pipeline]"
-            # Reconcile against the branch we're running on (main for the cron,
-            # the PR branch for test runs). -X theirs keeps THIS run's freshly
-            # built data on the rare conflict where another run pushed data
-            # while we were building. Only data/ is regenerated, so this is safe.
             BRANCH="${GITHUB_REF_NAME}"
             git pull --rebase -X theirs origin "$BRANCH" || git rebase --abort
             git push origin "HEAD:${BRANCH}"
@@ -169,17 +185,44 @@ jobs:
         with:
           path: site
 
-  deploy:
-    # GitHub Pages environment is restricted to the default branch, so this
-    # only runs on main. Gating it keeps PR-branch test runs from showing a
-    # false failure on the Pages step (Vercel deploy happens in the pipeline job).
-    if: github.ref == 'refs/heads/main'
+  # ── GitHub Pages (main only — the environment is default-branch-restricted) ──
+  pages:
+    needs: deploy
+    if: ${{ github.ref == 'refs/heads/main' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: pipeline
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # ── Alert on any failure → open/append a GitHub issue ─────────
+  alert:
+    needs: [discover, build, deploy, pages]
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const title = "⚠️ PaperTrail pipeline failed";
+            const url = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = `Scheduled/triggered pipeline run failed.\n\nRun: ${url}\nTriggered by: ${context.eventName}`;
+            const open = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: "open", labels: "pipeline-failure",
+            });
+            const existing = open.data.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.number, body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: ["pipeline-failure"],
+              });
+            }
