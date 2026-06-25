@@ -233,10 +233,16 @@ def run_pipeline(
     logger.info("Enriched %d additional papers via title search", fill_count)
 
     # Remove dead links (untitled papers with 404/error pages)
-    from papertrail.enrich_cascade import remove_dead_links
+    from papertrail.enrich_cascade import drop_nonpaper_husks, remove_dead_links
     dead_count = remove_dead_links(all_papers)
     if dead_count:
         logger.info("Removed %d dead links → %d papers", dead_count, len(all_papers))
+
+    # Drop content-less papers on non-paper hosts (code repos, HF spaces/docs) —
+    # they carry no theme and only add noise to the projection.
+    nonpaper = drop_nonpaper_husks(all_papers)
+    if nonpaper:
+        logger.info("Dropped %d content-less non-paper husks → %d papers", nonpaper, len(all_papers))
 
     with open(enriched_path, "w") as f:
         json.dump(all_papers, f, indent=2)
